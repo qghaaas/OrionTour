@@ -4,6 +4,6 @@ import MainRouter from "./MainRouter"
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-  <MainRouter></MainRouter>
+    <MainRouter/>
   </StrictMode>,
 )
