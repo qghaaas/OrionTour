@@ -1,0 +1,70 @@
+.travdes {
+    width: 100%;
+    height: 100vh;
+}
+
+.travdes-inner {
+    padding-left: 8%;
+}
+
+.travdes-inner h2 {
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: 1%;
+    color: #202020;
+    margin-bottom: 138px;
+}
+
+.travdes-form {
+    background-color: rgba(78, 110, 145, 1);
+    background-image: url('./img/travelGlow.png');
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+    width: 72.3%;
+    height: 50.6vh;
+    position: relative;
+    border-radius: 50px;
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}
+
+.travdes-form img {
+    position: absolute;
+    bottom: 0;
+    left: -100px;
+}
+
+.travdes-content {
+    width: 59%;
+    padding-right: 38px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    align-items: flex-start;
+    font-family: "Raleway", sans-serif;
+    color: #FFF;
+    letter-spacing: 1%;
+}
+
+.travdes-content h3 {
+    font-weight: 700;
+    font-size: 35px;
+}
+
+.travdes-content p {
+    font-weight: 500;
+    font-size: 20px;
+}
+
+.travdes-content input {
+    width: 90%;
+    height: 89px;
+    border-radius: 35px;
+    font-family: "Raleway", sans-serif;
+    padding: 0 25px;
+    font-size: 20px;
+    color: #7D7D7D;
+}

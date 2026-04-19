@@ -6,8 +6,17 @@ const bcrypt = require('bcrypt');
 const crypto = require('crypto');
 require('dotenv').config();
 
-const PORT = process.env.PORT || 3010;
+
+const dns = require('node:dns');
+dns.setDefaultResultOrder('ipv4first');
+
 const app = express();
+const PORT = Number(process.env.PORT) || 3010;
+
+const CODE_EXPIRES_MINUTES = 10;
+const RESEND_DELAY_SECONDS = 30;
+const MAX_VERIFY_ATTEMPTS = 5;
+const REGISTRATION_ERROR_MESSAGE = 'Проблема с регистрацией. Попробуйте снова.';
 
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
@@ -21,18 +30,20 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
-const CODE_EXPIRES_MINUTES = 10;
-const RESEND_DELAY_SECONDS = 30;
-const MAX_VERIFY_ATTEMPTS = 5;
-
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: Number(process.env.SMTP_PORT) || 587,
+  host: process.env.SMTP_HOST, 
+  port: 587,
   secure: false,
   auth: {
     user: process.env.SMTP_USER,
     pass: process.env.SMTP_PASS
-  }
+  },
+  tls: {
+    servername: 'smtp.gmail.com'
+  },
+  connectionTimeout: 15000,
+  greetingTimeout: 15000,
+  socketTimeout: 15000
 });
 
 function normalizeEmail(email = '') {
@@ -47,49 +58,59 @@ function hashCode(code) {
   return crypto.createHash('sha256').update(code).digest('hex');
 }
 
-function isValidEmail(email) {
+function isValidEmail(email = '') {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
 
 async function deleteExpiredCodes() {
-  await pool.query(`
-    DELETE FROM registration_codes
-    WHERE expires_at < NOW()
-  `);
+  await pool.query(
+    `DELETE FROM registration_codes WHERE expires_at < NOW()`
+  );
 }
+
+async function sendVerificationEmail(to, code) {
+  return transporter.sendMail({
+    from: `"${process.env.SMTP_FROM_NAME || 'Orion Tour'}" <${process.env.SMTP_USER}>`,
+    to,
+    subject: 'Код подтверждения регистрации',
+    text: `Ваш код подтверждения: ${code}. Код действует ${CODE_EXPIRES_MINUTES} минут.`
+  });
+}
+
+(async () => {
+  try {
+    await transporter.verify();
+    console.log('SMTP ready');
+  } catch (error) {
+    console.error('SMTP verify error:', error.message);
+  }
+})();
 
 app.get('/api/health', async (req, res) => {
   try {
     await pool.query('SELECT 1');
-    res.json({ ok: true, message: 'Server is running' });
+    return res.json({ ok: true, message: 'Server is running' });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ ok: false, message: 'Database error' });
+    return res.status(500).json({ ok: false, message: 'Database error' });
   }
 });
 
 app.post('/api/auth/register/send-code', async (req, res) => {
   try {
     const { full_name, email, password } = req.body;
-
     const normalizedEmail = normalizeEmail(email);
 
     if (!full_name || !normalizedEmail || !password) {
-      return res.status(400).json({
-        message: 'Заполните имя, email и пароль'
-      });
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
     if (!isValidEmail(normalizedEmail)) {
-      return res.status(400).json({
-        message: 'Некорректный email'
-      });
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
     if (password.length < 6) {
-      return res.status(400).json({
-        message: 'Пароль должен содержать минимум 6 символов'
-      });
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
     await deleteExpiredCodes();
@@ -100,15 +121,11 @@ app.post('/api/auth/register/send-code', async (req, res) => {
     );
 
     if (existingUser.rows.length > 0) {
-      return res.status(400).json({
-        message: 'Пользователь с таким email уже зарегистрирован'
-      });
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
     const pendingCode = await pool.query(
-      `SELECT resend_available_at
-       FROM registration_codes
-       WHERE email = $1`,
+      `SELECT resend_available_at FROM registration_codes WHERE email = $1`,
       [normalizedEmail]
     );
 
@@ -120,7 +137,7 @@ app.post('/api/auth/register/send-code', async (req, res) => {
         const secondsLeft = Math.ceil((resendAvailableAt - now) / 1000);
 
         return res.status(429).json({
-          message: `Новый код можно запросить через ${secondsLeft} сек.`,
+          message: `Отправить новый код через ${secondsLeft} сек`,
           secondsLeft
         });
       }
@@ -164,14 +181,9 @@ app.post('/api/auth/register/send-code', async (req, res) => {
     );
 
     try {
-      await transporter.sendMail({
-        from: `"${process.env.SMTP_FROM_NAME || 'Orion Tour'}" <${process.env.SMTP_USER}>`,
-        to: normalizedEmail,
-        subject: 'Код подтверждения регистрации',
-        text: `Ваш код подтверждения: ${code}. Код действует ${CODE_EXPIRES_MINUTES} минут.`
-      });
+      await sendVerificationEmail(normalizedEmail, code);
     } catch (mailError) {
-      console.error('Ошибка отправки письма:', mailError);
+      console.error('Ошибка отправки письма:', mailError.message);
 
       await pool.query(
         `DELETE FROM registration_codes WHERE email = $1`,
@@ -179,7 +191,7 @@ app.post('/api/auth/register/send-code', async (req, res) => {
       );
 
       return res.status(500).json({
-        message: 'Не удалось отправить письмо с кодом'
+        message: REGISTRATION_ERROR_MESSAGE
       });
     }
 
@@ -190,7 +202,7 @@ app.post('/api/auth/register/send-code', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({
-      message: 'Ошибка сервера при отправке кода'
+      message: REGISTRATION_ERROR_MESSAGE
     });
   }
 });
@@ -203,16 +215,14 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
     const normalizedEmail = normalizeEmail(email);
 
     if (!normalizedEmail || !code) {
-      return res.status(400).json({
-        message: 'Введите email и код'
-      });
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
     await deleteExpiredCodes();
 
     const codeResult = await client.query(
       `
-      SELECT id, email, full_name, password_hash, code_hash, expires_at, attempts
+      SELECT email, full_name, password_hash, code_hash, expires_at, attempts
       FROM registration_codes
       WHERE email = $1
       `,
@@ -221,7 +231,7 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
 
     if (codeResult.rows.length === 0) {
       return res.status(400).json({
-        message: 'Код не найден или истёк. Запросите новый код'
+        message: REGISTRATION_ERROR_MESSAGE
       });
     }
 
@@ -234,31 +244,23 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
       );
 
       return res.status(400).json({
-        message: 'Срок действия кода истёк. Запросите новый код'
+        message: REGISTRATION_ERROR_MESSAGE
       });
     }
 
     if (row.attempts >= MAX_VERIFY_ATTEMPTS) {
-      return res.status(429).json({
-        message: 'Слишком много попыток. Запросите новый код'
+      return res.status(400).json({
+        message: REGISTRATION_ERROR_MESSAGE
       });
     }
 
-    const incomingCodeHash = hashCode(code.trim());
-
-    if (incomingCodeHash !== row.code_hash) {
+    if (hashCode(code.trim()) !== row.code_hash) {
       await client.query(
-        `
-        UPDATE registration_codes
-        SET attempts = attempts + 1
-        WHERE email = $1
-        `,
+        `UPDATE registration_codes SET attempts = attempts + 1 WHERE email = $1`,
         [normalizedEmail]
       );
 
-      return res.status(400).json({
-        message: 'Неверный код'
-      });
+      return res.status(400).json({ message: 'Неверный код' });
     }
 
     await client.query('BEGIN');
@@ -276,11 +278,11 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
       );
 
       return res.status(400).json({
-        message: 'Пользователь уже зарегистрирован'
+        message: REGISTRATION_ERROR_MESSAGE
       });
     }
 
-    const userInsert = await client.query(
+    const newUser = await client.query(
       `
       INSERT INTO users (email, password_hash, full_name)
       VALUES ($1, $2, $3)
@@ -298,13 +300,13 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
 
     return res.status(201).json({
       message: 'Регистрация успешно завершена',
-      user: userInsert.rows[0]
+      user: newUser.rows[0]
     });
   } catch (error) {
     await client.query('ROLLBACK').catch(() => { });
     console.error(error);
     return res.status(500).json({
-      message: 'Ошибка сервера при подтверждении кода'
+      message: REGISTRATION_ERROR_MESSAGE
     });
   } finally {
     client.release();
@@ -317,9 +319,7 @@ app.post('/api/auth/login', async (req, res) => {
     const normalizedEmail = normalizeEmail(email);
 
     if (!normalizedEmail || !password) {
-      return res.status(400).json({
-        message: 'Введите email и пароль'
-      });
+      return res.status(400).json({ message: 'Введите email и пароль' });
     }
 
     const userResult = await pool.query(
@@ -338,13 +338,10 @@ app.post('/api/auth/login', async (req, res) => {
     }
 
     const user = userResult.rows[0];
-
     const isPasswordCorrect = await bcrypt.compare(password, user.password_hash);
 
     if (!isPasswordCorrect) {
-      return res.status(400).json({
-        message: 'Неверный пароль'
-      });
+      return res.status(400).json({ message: 'Неверный пароль' });
     }
 
     return res.status(200).json({

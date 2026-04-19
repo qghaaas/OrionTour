@@ -1,13 +1,18 @@
-import Header from "../MainPage/Header/Header"
-import Regtest from "../MainPage/Regtest/Regtest"
-import Logtest from "../MainPage/Logtest/Logtest"
+import DomTour from "../MainPage/DomTour/DomTour"
+import Hero from "../MainPage/Hero/Hero"
+import PopularDes from "../MainPage/PopularDes/PopularDes"
+import Reviews from "../MainPage/Reviews/Reviews"
+import TravelDes from "../MainPage/TravelDes/TravelDes"
+
 
 export default function MainPageLink() {
     return (
         <>
-            <Header />
-            <Regtest />
-            <Logtest />
+            <Hero />
+            <PopularDes />
+            <DomTour />
+            <TravelDes />
+            <Reviews/>
         </>
     )
 }

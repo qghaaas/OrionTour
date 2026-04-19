@@ -1,9 +1,10 @@
 header {
-  margin-top: 56px;
+  padding-top: 56px;
   font-family: "Raleway", sans-serif;
   font-size: 25px;
   line-height: 1;
   color: #fff;
+  margin-bottom: 160px;
 }
 
 .header-inner {
@@ -43,10 +44,5 @@ header {
 .login-link {
   min-width: 140px;
   min-height: 65px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: #F99244;
-  border-radius: 77px;
 }
 
