@@ -2,10 +2,7 @@ export default function SuccessMessage({ onClose }) {
   return (
         <div>
           <h2>Добро пожаловать!</h2>
-          <p>Вы успешно вошли в личный кабинет.</p>
-          <button type="button" onClick={onClose}>
-            Продолжить
-          </button>
+          <h2 className="h2-verifOK">Вы успешно вошли в личный кабинет</h2>
         </div>
   );
 }

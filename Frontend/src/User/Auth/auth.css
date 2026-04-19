@@ -1,18 +1,20 @@
 .auth-section {
-    background-color: rgb(82, 74, 74);
-    height: 100vh;
-    width: 60%;
-    margin: 0 auto;
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
     display: flex;
     justify-content: center;
     align-items: center;
+    background: rgba(17, 24, 39, 0.8);
 }
 
 .auth-inner {
-    min-width: 580px;
+    width: 580px;
     min-height: 558px;
-    background: #FEFEFE;
+    background: rgba(255, 255, 255, 0.92);
+    border: 1px solid rgba(255,255,255,0.4);
     border-radius: 42px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
 }
 
 .closeBtn {
@@ -29,13 +31,14 @@
     letter-spacing: 1%;
     border-bottom: 1px #C9C9C9 solid;
     line-height: 61px;
+    margin-bottom: 40px;
 }
 
 .auth-inner form {
     display: flex;
     justify-content: center;
     flex-direction: column;
-    padding: 48px 58px 0 38px;
+    padding: 0 58px 0 38px;
     gap: 24px;
 }
 
@@ -61,11 +64,11 @@
 }
 
 .auth-activeBTN,
-.auth-notreg{
- font-weight: 700;
+.auth-notreg {
+    font-weight: 700;
     font-size: 20px;
     letter-spacing: 1%;
-     line-height: 67px;
+
 }
 
 .auth-activeBTN {
@@ -74,16 +77,81 @@
     border-radius: 50px;
     min-width: 256px;
     align-self: center;
-   
+    height: 54px;
+    margin: 10px 0 20px;
 }
 
 .auth-notreg {
-    display: block;
-    margin: 0 auto;
     color: #1F2A36;
-
+    margin: 0 auto;
+    display: block;
 }
 
 .auth-inner button {
     font-family: "Raleway", sans-serif;
 }
+
+.verify-sub_text {
+    font-family: "Arimo", sans-serif;
+    font-size: 20px;
+    line-height: 44px;
+    letter-spacing: 1%;
+    color: #A8A1A1;
+    text-align: center;
+    margin-bottom: 51px;
+}
+
+.form-verify div {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 62px;
+}
+
+.form-verify input {
+    width: 78px;
+    height: 81px;
+    border-radius: 16px;
+    border: none;
+    background-color: #DFDFDF;
+    text-align: center;
+}
+
+.verify-cod {
+    display: block;
+    margin: 0 auto;
+    font-family: Arimo, sans-serif !important;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #1F2A36;
+}
+
+.h2-verifOK {
+    border-bottom: none !important;
+    padding: 88px 117px 0 !important;
+    line-height: 38px !important;
+    text-align: center;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    width: 100%;
+    padding-right: 56px;
+}
+
+.password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    padding: 0;
+}
+
+.password-toggle img {
+    width: 22px;
+    height: 22px;
+}
+

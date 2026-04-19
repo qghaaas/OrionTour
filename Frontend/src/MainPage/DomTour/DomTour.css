@@ -1,0 +1,79 @@
+.domtour {
+    width: 100%;
+    height: fit-content;
+    margin-bottom: 103px;
+}
+
+.domtour-inner {
+    padding-left: 8%;
+    width: 82%;
+}
+
+.domtour-title {
+    margin-bottom: 35px;
+    font-family: "Arimo", sans-serif;
+    color: #202020;
+    letter-spacing: 1%;
+}
+
+.domtour-title h2 {
+    font-weight: 700;
+    font-size: 40px;
+    margin-bottom: 36px;
+}
+
+.domtour-title p {
+    font-size: 20px;
+}
+
+.domtour-grid {
+    display: grid;
+    grid-template-columns: 2.11fr 1fr 1fr 1fr 1fr;
+    grid-template-rows: 111px 180px 130px 114px;
+    gap: 26px;
+}
+
+.domtour-item {
+    position: relative;
+    overflow: hidden;
+    border-radius: 25px;
+}
+
+.domtour-item img {
+    width: 100%;
+    height: 100%;
+}
+
+.domtour-item p {
+    position: absolute;
+    left: 36px;
+    bottom: 30px;
+    z-index: 2;
+    color: #fff;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+}
+
+.domtour-item::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.45) 21.12%, rgba(0, 0, 0, 0) 39.88%);
+}
+
+.domcards1 {
+    grid-area: 1 / 1 / 5 / 2;
+}
+
+.domcards2 {
+    grid-area: 1 / 2 / 3 / 4;
+}
+
+.domcards3 {
+    grid-area: 1 / 4 / 3 / 6;
+}
+
+.domcards4 {
+    grid-area: 3 / 2 / 5 / 6;
+}

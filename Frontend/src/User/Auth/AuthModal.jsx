@@ -10,6 +10,7 @@ import './auth.css'
 
 export default function AuthModal({ isOpen, onClose }) {
     const [step, setStep] = useState("login");
+    const [userEmail, setUserEmail] = useState("");
 
     if (!isOpen) return null;
 
@@ -35,11 +36,17 @@ export default function AuthModal({ isOpen, onClose }) {
                     {step === "registration" && (
                         <RegistrationForm
                             onOpenLogin={() => setStep("login")}
-                            onCodeSent={() => setStep("verify")}
+                            onCodeSent={(email) => {
+                                setUserEmail(email);
+                                setStep("verify");
+                            }}
                         />
                     )}
                     {step === "verify" && (
-                        <VerifyCodeForm onSuccess={() => setStep("success")} />
+                        <VerifyCodeForm
+                            email={userEmail}
+                            onSuccess={() => setStep("success")}
+                        />
                     )}
                     {step === "success" && (
                         <SuccessMessage onClose={handleClose} />

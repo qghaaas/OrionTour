@@ -32,7 +32,7 @@ export default function Header() {
                         </nav>
 
                         <button
-                            className="login-link"
+                            className="login-link main-btn_site"
                             onClick={() => setIsAuthOpen(true)}
                         >
                             Войти
