@@ -1,30 +1,24 @@
 import '../../main.css'
 import './DomTour.css'
-import frontdom from './img/frontdom.png'
+import { useEffect, useState } from 'react'
 
 export default function DomTour() {
-    const domtour = [
-        {
-            id: 1,
-            description: 'Туры в Калининград',
-            image: frontdom,
-        },
-        {
-            id: 2,
-            description: 'Туры в Калининград',
-            image: frontdom,
-        },
-        {
-            id: 3,
-            description: 'Экскурсии по Светлогорску, Зеленоградску, Пионерску',
-            image: frontdom,
-        },
-        {
-            id: 4,
-            description: 'Индивидуальные экскурсии',
-            image: frontdom,
-        },
-    ]
+    const [domtour, setDomtour] = useState([])
+
+    useEffect(() => {
+        fetch('http://localhost:3010/api/domestic-categories')
+            .then((res) => res.json())
+            .then((data) => {
+                const normalizedData = data.map((item) => ({
+                    ...item,
+                    image_url: item.image_url?.startsWith('http')
+                        ? item.image_url
+                        : `http://localhost:3010${item.image_url}`,
+                }))
+                setDomtour(normalizedData)
+            })
+            .catch((err) => console.error('Ошибка загрузки внутреннего туризма:', err))
+    }, [])
 
     return (
         <section className="domtour">
@@ -45,7 +39,7 @@ export default function DomTour() {
                                 key={tour.id}
                                 className={`domtour-item domcards${index + 1}`}
                             >
-                                <img src={tour.image} alt={tour.description} />
+                                <img src={tour.image_url} alt={tour.description} />
                                 <p>{tour.description}</p>
                             </div>
                         ))}

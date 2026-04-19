@@ -4,8 +4,8 @@ const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const path = require('path');
 require('dotenv').config();
-
 
 const dns = require('node:dns');
 dns.setDefaultResultOrder('ipv4first');
@@ -30,8 +30,11 @@ const pool = new Pool({
 app.use(cors());
 app.use(express.json());
 
+
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+
 const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST, 
+  host: process.env.SMTP_HOST,
   port: 587,
   secure: false,
   auth: {
@@ -63,9 +66,7 @@ function isValidEmail(email = '') {
 }
 
 async function deleteExpiredCodes() {
-  await pool.query(
-    `DELETE FROM registration_codes WHERE expires_at < NOW()`
-  );
+  await pool.query(`DELETE FROM registration_codes WHERE expires_at < NOW()`);
 }
 
 async function sendVerificationEmail(to, code) {
@@ -303,7 +304,7 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
       user: newUser.rows[0]
     });
   } catch (error) {
-    await client.query('ROLLBACK').catch(() => { });
+    await client.query('ROLLBACK').catch(() => {});
     console.error(error);
     return res.status(500).json({
       message: REGISTRATION_ERROR_MESSAGE
@@ -358,6 +359,197 @@ app.post('/api/auth/login', async (req, res) => {
     return res.status(500).json({
       message: 'Ошибка сервера при входе'
     });
+  }
+});
+
+app.get('/api/domestic-categories', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        title AS description,
+        image_url
+      FROM domestic_categories
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, id ASC
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения категорий внутреннего туризма' });
+  }
+});
+
+app.get('/api/popular-tours', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        t.id,
+        t.title,
+        t.location_name AS location,
+        t.short_description AS description,
+        t.price,
+        t.nights,
+        CASE
+          WHEN ti.image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', ti.image_url)
+          ELSE ''
+        END AS image
+      FROM tours t
+      LEFT JOIN tour_images ti
+        ON ti.tour_id = t.id
+       AND ti.is_main = TRUE
+      WHERE t.is_active = TRUE
+        AND t.is_popular = TRUE
+      ORDER BY t.id ASC
+      LIMIT 12
+    `);
+
+    const formattedRows = result.rows.map((tour) => ({
+      ...tour,
+      price: `от ${Number(tour.price).toLocaleString('ru-RU')} ₽`,
+      nights: `${tour.nights} ночей`
+    }));
+
+    return res.status(200).json(formattedRows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения популярных туров' });
+  }
+});
+
+app.get('/api/reviews', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        author_name AS name,
+        COALESCE(
+          avatar_url,
+          UPPER(
+            LEFT(SPLIT_PART(author_name, ' ', 1), 1) ||
+            LEFT(SPLIT_PART(author_name, ' ', 2), 1)
+          )
+        ) AS initials,
+        review_text AS description,
+        rating
+      FROM reviews
+      WHERE is_active = TRUE
+      ORDER BY sort_order ASC, created_at DESC
+      LIMIT 20
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения отзывов' });
+  }
+});
+
+app.post('/api/travel-requests', async (req, res) => {
+  try {
+    const { request_text, user_id = null } = req.body;
+
+    if (!request_text || !request_text.trim()) {
+      return res.status(400).json({
+        message: 'Введите пожелания к путешествию'
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO travel_requests (user_id, request_text)
+      VALUES ($1, $2)
+      RETURNING id, user_id, request_text, status, created_at
+      `,
+      [user_id, request_text.trim()]
+    );
+
+    return res.status(201).json({
+      message: 'Заявка успешно отправлена',
+      request: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка при отправке заявки'
+    });
+  }
+});
+
+app.get('/api/home', async (req, res) => {
+  try {
+    const [domesticCategories, popularTours, reviews] = await Promise.all([
+      pool.query(`
+        SELECT
+          id,
+          title AS description,
+          CASE
+            WHEN image_url IS NOT NULL
+              THEN CONCAT('http://localhost:${PORT}', image_url)
+            ELSE ''
+          END AS image_url
+        FROM domestic_categories
+        WHERE is_active = TRUE
+        ORDER BY sort_order ASC, id ASC
+      `),
+      pool.query(`
+        SELECT
+          t.id,
+          t.title,
+          t.location_name AS location,
+          t.short_description AS description,
+          t.price,
+          t.nights,
+          CASE
+            WHEN ti.image_url IS NOT NULL
+              THEN CONCAT('http://localhost:${PORT}', ti.image_url)
+            ELSE ''
+          END AS image
+        FROM tours t
+        LEFT JOIN tour_images ti
+          ON ti.tour_id = t.id
+         AND ti.is_main = TRUE
+        WHERE t.is_active = TRUE
+          AND t.is_popular = TRUE
+        ORDER BY t.id ASC
+        LIMIT 12
+      `),
+      pool.query(`
+        SELECT
+          id,
+          author_name AS name,
+          COALESCE(
+            avatar_url,
+            UPPER(
+              LEFT(SPLIT_PART(author_name, ' ', 1), 1) ||
+              LEFT(SPLIT_PART(author_name, ' ', 2), 1)
+            )
+          ) AS initials,
+          review_text AS description,
+          rating
+        FROM reviews
+        WHERE is_active = TRUE
+        ORDER BY sort_order ASC, created_at DESC
+        LIMIT 20
+      `)
+    ]);
+
+    const formattedPopularTours = popularTours.rows.map((tour) => ({
+      ...tour,
+      price: `от ${Number(tour.price).toLocaleString('ru-RU')} ₽`,
+      nights: `${tour.nights} ночей`
+    }));
+
+    return res.status(200).json({
+      domesticCategories: domesticCategories.rows,
+      popularTours: formattedPopularTours,
+      reviews: reviews.rows
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения данных главной страницы' });
   }
 });
 

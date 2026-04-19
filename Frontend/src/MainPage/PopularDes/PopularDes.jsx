@@ -1,7 +1,7 @@
 import '../../main.css'
 import './PopularDes.css'
-import frontpop from './img/frontpop.png'
 import arrowSwiper from '../../mainIMG/arrowSwiper.svg'
+import { useEffect, useState } from 'react'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { Navigation } from 'swiper/modules'
@@ -10,50 +10,19 @@ import 'swiper/css'
 import 'swiper/css/navigation'
 
 export default function PopularDes() {
-    const cards = [
-        {
-            id: 1,
-            title: 'Fort Arabesque The Villas',
-            location: 'Макади Бей, Хургада',
-            description: 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых Виллы с одной или двумя спальнями',
-            price: 'от 105 900 ₽',
-            nights: '9 ночей',
-            image: frontpop,
-        },
-        {
-            id: 2,
-            title: 'Fort Arabesque The Villas',
-            location: 'Макади Бей, Хургада',
-            description: 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых Виллы с одной или двумя спальнями',
-            price: 'от 105 900 ₽',
-            nights: '9 ночей',
-            image: frontpop,
-        },
-        {
-            id: 3,
-            title: 'Fort Arabesque The Villas',
-            location: 'Макади Бей, Хургада',
-            description: 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых Виллы с одной или двумя спальнями',
-            price: 'от 105 900 ₽',
-            nights: '9 ночей',
-            image: frontpop,
-        },
-        {
-            id: 4,
-            title: 'Fort Arabesque The Villas',
-            location: 'Макади Бей, Хургада',
-            description: 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых Виллы с одной или двумя спальнями',
-            price: 'от 105 900 ₽',
-            nights: '9 ночей',
-            image: frontpop,
-        },
-    ]
+    const [cards, setCards] = useState([])
+
+    useEffect(() => {
+        fetch('http://localhost:3010/api/popular-tours')
+            .then((res) => res.json())
+            .then((data) => setCards(data))
+            .catch((err) => console.error('Ошибка загрузки популярных туров:', err))
+    }, [])
 
     return (
         <section className="popdes">
             <div className="container">
                 <div className="popdes-inner">
-
                     <h2>Популярные направления</h2>
 
                     <button className="popdes-btn popdes-prev" type="button">
