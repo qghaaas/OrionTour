@@ -12,9 +12,9 @@
     width: 580px;
     min-height: 558px;
     background: rgba(255, 255, 255, 0.92);
-    border: 1px solid rgba(255,255,255,0.4);
+    border: 1px solid rgba(255, 255, 255, 0.4);
     border-radius: 42px;
-    box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.18);
 }
 
 .closeBtn {
@@ -24,14 +24,25 @@
 }
 
 .auth-inner h2 {
-    padding: 0 0 13px 38px;
+    position: relative;
+    padding: 0 38px 13px 38px;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
     font-size: 35px;
     letter-spacing: 1%;
-    border-bottom: 1px #C9C9C9 solid;
     line-height: 61px;
     margin-bottom: 40px;
+}
+
+.auth-inner h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: #C9C9C9;
+    width: 579px;
 }
 
 .auth-inner form {
@@ -127,10 +138,12 @@
 }
 
 .h2-verifOK {
+    position: static !important;
     border-bottom: none !important;
     padding: 88px 117px 0 !important;
     line-height: 38px !important;
     text-align: center;
+    margin: 0 auto;
 }
 
 .password-field {
@@ -154,4 +167,3 @@
     width: 22px;
     height: 22px;
 }
-
