@@ -44,5 +44,7 @@ header {
 .login-link {
   min-width: 140px;
   min-height: 65px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
-
