@@ -1,51 +1,124 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
-export default function VerifyCodeForm({ email, onSuccess }) {
-  const [code, setCode] = useState(["", "", "", ""]);
+const API_URL = "http://localhost:3010/api/auth";
+const EMPTY_CODE = ["", "", "", ""];
+const CODE_LENGTH = 4;
+
+export default function VerifyCodeForm({ email, password, onSuccess }) {
+  const [code, setCode] = useState(EMPTY_CODE);
+  const [timer, setTimer] = useState(30);
+  const [loadingVerify, setLoadingVerify] = useState(false);
+  const [loadingResend, setLoadingResend] = useState(false);
+  const [error, setError] = useState("");
+
+  const isSubmittingRef = useRef(false);
+  const inputsRef = useRef([]);
+
+  useEffect(() => {
+    if (timer <= 0) return;
+
+    const interval = setInterval(() => {
+      setTimer((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(interval);
+  }, [timer]);
+
+  const verifyCode = async (value) => {
+    if (isSubmittingRef.current) return;
+
+    if (!/^\d{4}$/.test(value)) {
+      setError("Введите корректный код");
+      return;
+    }
+
+    try {
+      isSubmittingRef.current = true;
+      setLoadingVerify(true);
+      setError("");
+
+      const response = await fetch(`${API_URL}/register/verify-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, code: value }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Ошибка подтверждения кода");
+        return;
+      }
+
+      onSuccess?.();
+    } catch {
+      setError("Ошибка соединения с сервером");
+    } finally {
+      setLoadingVerify(false);
+      isSubmittingRef.current = false;
+    }
+  };
 
   const handleChange = (index, value) => {
-    if (!/^[0-9]?$/.test(value)) return;
+    if (!/^\d?$/.test(value)) return;
 
-    const newCode = [...code];
-    newCode[index] = value;
-    setCode(newCode);
+    setError("");
 
-    // переход к следующему input
-    if (value && index < code.length - 1) {
-      const nextInput = document.querySelector(
-        `input[data-index="${index + 1}"]`
-      );
+    const nextCode = [...code];
+    nextCode[index] = value;
+    setCode(nextCode);
 
-      nextInput?.focus();
+    if (value && index < CODE_LENGTH - 1) {
+      inputsRef.current[index + 1]?.focus();
+    }
+
+    const fullCode = nextCode.join("");
+
+    if (!nextCode.includes("") && fullCode.length === CODE_LENGTH) {
+      verifyCode(fullCode);
     }
   };
 
-  const handleKeyDown = (index, e) => {
-    if (
-      e.key === "Backspace" &&
-      code[index] === "" &&
-      index > 0
-    ) {
-      const prevInput = document.querySelector(
-        `input[data-index="${index - 1}"]`
-      );
-
-      prevInput?.focus();
+  const handleKeyDown = (index, event) => {
+    if (event.key === "Backspace" && !code[index] && index > 0) {
+      inputsRef.current[index - 1]?.focus();
     }
   };
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  const handleResendCode = async () => {
+    if (timer > 0) return;
 
-    const fullCode = code.join("");
+    try {
+      setLoadingResend(true);
+      setError("");
 
-    if (fullCode.length !== 4) return;
+      const response = await fetch(`${API_URL}/register/send-code`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      });
 
-    onSuccess();
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Ошибка повторной отправки кода");
+        return;
+      }
+
+      setCode(EMPTY_CODE);
+      setTimer(data.resendAfter || 30);
+      inputsRef.current[0]?.focus();
+    } catch {
+      setError("Ошибка соединения с сервером");
+    } finally {
+      setLoadingResend(false);
+    }
   };
+
+  const hasError = Boolean(error);
 
   return (
-    <div>
+    <>
       <h2>Введите код из письма</h2>
 
       <div className="verify-sub_text">
@@ -53,29 +126,49 @@ export default function VerifyCodeForm({ email, onSuccess }) {
         <p>{email}</p>
       </div>
 
-      <form className="form-verify" onSubmit={handleSubmit}>
+      <div className="form-verify">
         <div className="verify-inputs">
           {code.map((digit, index) => (
             <input
               key={index}
-              data-index={index}
+              ref={(element) => {
+                inputsRef.current[index] = element;
+              }}
               type="text"
               maxLength={1}
               value={digit}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
+              disabled={loadingVerify}
+              className={hasError ? "verify-input verify-input-error" : "verify-input"}
             />
           ))}
         </div>
 
-        <button type="submit">
-          Подтвердить
-        </button>
-      </form>
+        <div className="verify-message">
+          {loadingVerify && <p className="auth-success">Проверка кода...</p>}
+          {!loadingVerify && error && (
+            <p className="auth-error auth-error-verif">{error}</p>
+          )}
+        </div>
+      </div>
 
-      <button className="verify-cod" type="button">
-        Отправить новый код
+      <button
+        className="verify-cod"
+        type="button"
+        onClick={handleResendCode}
+        disabled={timer > 0 || loadingResend || loadingVerify}
+      >
+        {timer > 0 ? (
+          <span className="verify-cod-disabled">
+            Отправить новый код через {timer} сек
+          </span>
+        ) : loadingResend ? (
+          "Отправка..."
+        ) : (
+          <span className="verify-cod-active">Отправить новый код</span>
+        )}
       </button>
-    </div>
+    </>
   );
 }
