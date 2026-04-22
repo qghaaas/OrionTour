@@ -21,7 +21,7 @@ export default function Header() {
 
                         <nav className="header-nav">
                             <ul className='header-menu'>
-                                <li><Link to="#">Направления</Link></li>
+                                <li><Link to="/Directions">Направления</Link></li>
                                 <li><Link to="#">Поиск тура</Link></li>
                                 <li><Link to="/DomesticTourism">Внутренний туризм</Link></li>
                                 <li><Link to="#">Блог</Link></li>

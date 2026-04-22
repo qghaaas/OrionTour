@@ -18,7 +18,7 @@
 
 .pop-card {
     width: 100%;
-    height: 65.6vh;
+    height: 67.6vh;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -40,6 +40,7 @@
     display: block;
     border-radius: 15px;
     object-fit: cover;
+    height: 29.8vh;
 }
 
 .pop-card_top span {
@@ -63,7 +64,7 @@
 }
 
 .pop-card_title {
-    margin-bottom: 40px;
+    margin-bottom: 18px;
 }
 
 .pop-card_title h3 {
@@ -84,6 +85,8 @@
 .pop-card_title p {
     font-weight: 500;
     letter-spacing: 1%;
+    line-height: 24px;
+    height: 105px;
 }
 
 .pop-card span {
@@ -91,7 +94,7 @@
 }
 
 .pop-card_time {
-    width: 32.5%;
+    width: 33%;
     background-color: #DDDDDD;
     text-align: center;
     border-radius: 25px;
@@ -99,7 +102,7 @@
     font-family: "Arimo", sans-serif;
     font-size: 20px;
     letter-spacing: 1%;
-    padding: 8px 16px;
+    padding: 8px 12px;
     margin-bottom: 15px;
 }
 
@@ -141,3 +144,4 @@
 .popdes-next {
     right: 8.5%;
 }
+

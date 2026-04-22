@@ -583,6 +583,61 @@ app.get('/api/domestic-tours/kaliningrad', async (req, res) => {
   }
 });
 
+app.get('/api/tours/:id/details', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const tourResult = await pool.query(
+      `
+      SELECT
+        t.id,
+        t.title,
+        t.price,
+        t.nights,
+        t.hotel_rating,
+        t.location_name,
+        t.short_description,
+        t.full_description,
+        t.hotel_lat,
+        t.hotel_lng
+      FROM tours t
+      WHERE t.id = $1
+        AND t.is_active = TRUE
+      `,
+      [id]
+    );
+
+    if (tourResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Тур не найден' });
+    }
+
+    const imagesResult = await pool.query(
+      `
+      SELECT
+        id,
+        CASE
+          WHEN image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', image_url)
+          ELSE ''
+        END AS image_url,
+        is_main
+      FROM tour_images
+      WHERE tour_id = $1
+      ORDER BY is_main DESC, id ASC
+      `,
+      [id]
+    );
+
+    return res.status(200).json({
+      ...tourResult.rows[0],
+      images: imagesResult.rows
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения данных тура' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

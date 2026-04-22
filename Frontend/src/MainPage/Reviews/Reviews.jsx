@@ -1,7 +1,7 @@
 import '../../main.css'
 import './Reviews.css'
 import arrowSwiper from '../../mainIMG/arrowSwiper.svg'
-import star from './img/star.svg'
+import star from '../../mainIMG/star.svg'
 import { useEffect, useRef, useState } from 'react'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
