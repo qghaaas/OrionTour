@@ -18,53 +18,47 @@ export default function Footer({ variant = 'default', className = '' }) {
                         <img src={logo} alt="Логотип" />
                     </Link>
 
-                    <ul className="footer-item">
-                        <li><Link to="#">Главная страница</Link></li>
-                        <li><Link to="#">Направления</Link></li>
-                        <li><Link to="#">Поиск тура</Link></li>
-                    </ul>
-
-                    <ul className="footer-item">
-                        <li><Link to="#">Внутренний туризм</Link></li>
-                        <li><Link to="#">Направления</Link></li>
-                        <li><Link to="#">Блог</Link></li>
-                    </ul>
-
-                    <ul className="footer-item">
-                        <li><Link to="#">Контакты</Link></li>
-                        <li><Link to="#">О нас</Link></li>
-                    </ul>
-
-                    <ul className="footer-item footer-item_sep">
-                        <li>
-                            <img src={location} alt="" />
-                            <Link to="#">orion_tour_39</Link>
-                        </li>
-
-                        <li>
-                            <img src={phone} alt="" />
-                            <Link to="#">+7 (4012) 75-95-99</Link>
-                        </li>
-
-                        <li>
-                            <img src={atsign} alt="" />
-                            <Link to="#">Калининград, площадь Победы, 4</Link>
-                        </li>
-                    </ul>
-
-                    <div className="social-link">
-                        <p>Соц.сети</p>
-
-                        <div>
-                            <Link to="#">
-                                <img src={telegram} alt="Telegram" />
-                            </Link>
-
-                            <Link to="#">
-                                <img src={vk} alt="VK" />
-                            </Link>
+                    <nav className='footer-menu'>
+                        <ul className="footer-item">
+                            <li><Link to="#">Главная страница</Link></li>
+                            <li><Link to="#">Направления</Link></li>
+                            <li><Link to="#">Поиск тура</Link></li>
+                        </ul>
+                        <ul className="footer-item">
+                            <li><Link to="#">Внутренний туризм</Link></li>
+                            <li><Link to="#">Направления</Link></li>
+                            <li><Link to="#">Блог</Link></li>
+                        </ul>
+                        <ul className="footer-item">
+                            <li><Link to="#">Контакты</Link></li>
+                            <li><Link to="#">О нас</Link></li>
+                        </ul>
+                        <ul className="footer-item footer-item_sep">
+                            <li>
+                                <img src={location} alt="" />
+                                <Link to="#">orion_tour_39</Link>
+                            </li>
+                            <li>
+                                <img src={phone} alt="" />
+                                <Link to="#">+7 (4012) 75-95-99</Link>
+                            </li>
+                            <li>
+                                <img src={atsign} alt="" />
+                                <Link to="#">Калининград, площадь Победы, 4</Link>
+                            </li>
+                        </ul>
+                        <div className="social-link">
+                            <p>Соц.сети</p>
+                            <div>
+                                <Link to="#">
+                                    <img src={telegram} alt="Telegram" />
+                                </Link>
+                                <Link to="#">
+                                    <img src={vk} alt="VK" />
+                                </Link>
+                            </div>
                         </div>
-                    </div>
+                    </nav>
                 </div>
             </div>
         </footer>

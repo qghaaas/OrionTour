@@ -8,6 +8,7 @@ footer {
     display: flex;
     align-items: flex-start;
     justify-content: space-between;
+    gap: 88px;
 }
 
 .footer-item {
@@ -16,6 +17,16 @@ footer {
     display: flex;
     flex-direction: column;
     gap: 25px;
+    padding: 0 20px;
+}
+
+.footer-menu {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    flex: 1;
+    flex-wrap: wrap;
+    gap: 30px;
 }
 
 .footer-item li {
@@ -26,7 +37,7 @@ footer {
 
 .footer-item_sep {
     font-family: "Raleway", sans-serif;
-    padding-left: 100px;
+
 }
 
 .social-link {
@@ -36,21 +47,59 @@ footer {
     align-items: flex-start;
     font-family: "Raleway", sans-serif;
     font-size: 20px;
+    padding: 0 20px;
 }
 
-.social-link p{
+.social-link p {
     padding-left: 10px;
 }
 
-.social-link img{
+.social-link img {
     width: 70px;
     height: 70px;
 }
 
-@media (max-width: 1024px){
+@media (max-width: 1024px) {
+    .footer-menu {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px 20px;
+        justify-items: start;
+        /* чтобы элементы не растягивались */
+    }
 
+    .footer-item {
+        padding: 0;
+        /* убираем лишние отступы */
+        gap: 15px;
+    }
+
+    .social-link {
+        padding: 0;
+        grid-column: 2 / -1;
+    }
+
+    .footer-inner {
+        gap: 0 50px;
+    }
+
+    .footer-item li {
+        gap: 5px;
+    }
 }
 
-@media (max-width: 767px){
+@media (max-width: 767px) {
+    .footer-inner {
+        flex-direction: column;
+       align-items: center;
+    }
 
+    .footer-menu a,
+    .social-link p {
+        font-size: 16px;
+    }
+
+    .footer-item{
+       
+    }
 }
