@@ -24,14 +24,25 @@
 }
 
 .auth-inner h2 {
-    padding: 0 0 13px 38px;
+    position: relative;
+    padding: 0 38px 13px 38px;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
     font-size: 35px;
     letter-spacing: 1%;
-    border-bottom: 1px #C9C9C9 solid;
     line-height: 61px;
     margin-bottom: 40px;
+}
+
+.auth-inner h2::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    height: 1px;
+    background: #C9C9C9;
+    width: 579px;
 }
 
 .auth-inner form {
@@ -100,20 +111,29 @@
     margin-bottom: 51px;
 }
 
-.form-verify div {
+.verify-inputs {
     display: flex;
     justify-content: center;
     gap: 12px;
-    margin-bottom: 62px;
+    margin-bottom: 32px;
 }
 
-.form-verify input {
+.verify-input {
     width: 78px;
-    height: 81px;
-    border-radius: 16px;
-    border: none;
+    height: 81px !important;
+    border-radius: 16px !important;
     background-color: #DFDFDF;
     text-align: center;
+    font-weight: 700;
+    transition: border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.verify-input-error {
+    border: 1px solid #E64E4E !important;
+}
+
+.auth-error-verif {
+    margin-top: 0;
 }
 
 .verify-cod {
@@ -123,13 +143,20 @@
     font-size: 20px;
     letter-spacing: 1%;
     color: #1F2A36;
+    padding-top: 30px;
+}
+
+.verify-cod-disabled {
+    color: #A8A1A1;
 }
 
 .h2-verifOK {
+    position: static !important;
     border-bottom: none !important;
-    padding: 88px 117px 0 !important;
+    padding: 88px 0 0 !important;
     line-height: 38px !important;
     text-align: center;
+    margin: 0 auto;
 }
 
 .password-field {
@@ -155,13 +182,12 @@
 }
 
 .auth-error {
-    margin-top: -35px;
-    padding: 12px 16px;
-    color: #b33636;
-    font-size: 13px;
+    color: #E64E4E;
+    font-size: 18px;
     font-weight: 500;
     text-align: center;
     font-family: Arimo, sans-serif !important;
+    margin-top: -10px;
 }
 
 .auth-success {
@@ -173,3 +199,8 @@
     text-align: center;
     font-family: Arimo, sans-serif !important;
 }
+
+span:not(:last-child){
+    margin-bottom: 20px;
+}
+

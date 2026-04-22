@@ -1,0 +1,122 @@
+.domtour-page {
+    width: 100%;
+    height: fit-content;
+}
+
+.domtour-page_inner {
+    padding-top: 130px;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 120px 0;
+}
+
+.domtour-page_card {
+    display: flex;
+    gap: 0 60px;
+}
+
+.domtour-page_card-content {
+    width: 100%;
+    max-width: 810px;
+}
+
+.domtour-page_card h2,
+span {
+    font-weight: 700;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.domtour-page_card-content h2 {
+    font-family: "Arimo", sans-serif;
+    font-size: clamp(25px, 2.08vw, 40px);
+    line-height: 47px;
+}
+
+.domtour-page_card-content span {
+    font-family: Arial, sans-serif;
+    font-size: clamp(18px, 1.82vw, 35px);
+    line-height: 61px;
+    margin-bottom: 18px;
+    display: block;
+}
+
+.domtour-page_card-content p {
+    max-width: 628px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: 1%;
+    margin-bottom: 18px;
+}
+
+.domtour-page_card-content button {
+    letter-spacing: 0%;
+    line-height: 1;
+    padding: 0 30px;
+    width: 144px;
+    height: 65px;
+}
+
+.footer-domestic-tour {
+    margin-bottom: 0;
+    background-color: #F9F9F9;
+    padding: 240px 0 40px;
+    margin-top: -50px;
+}
+
+
+@media (max-width: 1024px) {
+
+    .domtour-page_card-content h2,
+    .domtour-page_card-content span {
+        line-height: 1.1;
+    }
+
+    .domtour-page_card-content span {
+        padding: 10px 0;
+        margin-bottom: 10px;
+    }
+
+    .domtour-page_card {
+        gap: 0 40px;
+    }
+
+    .domtour-page_inner {
+        gap: 80px 0;
+        padding-top: 80px;
+    }
+
+    .footer-domestic-tour{
+        padding: 160px 0 30px;
+         
+    }
+}
+
+
+@media (max-width: 767px) {
+
+    .domtour-page_inner {
+        grid-template-columns: repeat(2, 1fr);
+        justify-content: space-between;
+        gap: 20px;
+        padding-top: 60px;
+    }
+
+    .domtour-page_card img {
+        width: 100%;
+        height: auto;
+        margin-bottom: 10px;
+    }
+
+    .domtour-page_card {
+        flex-direction: column;
+        width: 90%;
+    }
+
+    .domtour-page_card-content p{
+        font-size: 15px;
+    }
+
+}

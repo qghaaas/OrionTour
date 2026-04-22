@@ -301,7 +301,7 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
       user: newUser.rows[0]
     });
   } catch (error) {
-    await client.query('ROLLBACK').catch(() => {});
+    await client.query('ROLLBACK').catch(() => { });
     console.error(error);
     return res.status(500).json({
       message: REGISTRATION_ERROR_MESSAGE
@@ -546,6 +546,40 @@ app.get('/api/home', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Ошибка получения данных главной страницы' });
+  }
+});
+
+app.get('/api/domestic-tours/kaliningrad', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        t.id,
+        t.title,
+        t.short_description AS description,
+        t.price,
+        CASE
+          WHEN ti.image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', ti.image_url)
+          ELSE ''
+        END AS image
+      FROM tours t
+      JOIN directions d
+        ON d.id = t.direction_id
+      LEFT JOIN tour_images ti
+        ON ti.tour_id = t.id
+       AND ti.is_main = TRUE
+      WHERE t.is_active = TRUE
+        AND d.country_slug = 'kaliningrad'
+        AND d.is_domestic = TRUE
+      ORDER BY t.id ASC
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения туров Калининграда'
+    });
   }
 });
 

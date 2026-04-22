@@ -1,4 +1,5 @@
 import DomTour from "../MainPage/DomTour/DomTour"
+import Footer from "../MainPage/Footer/Footer"
 import Hero from "../MainPage/Hero/Hero"
 import PopularDes from "../MainPage/PopularDes/PopularDes"
 import Reviews from "../MainPage/Reviews/Reviews"
@@ -12,7 +13,8 @@ export default function MainPageLink() {
             <PopularDes />
             <DomTour />
             <TravelDes />
-            <Reviews/>
+            <Reviews />
+            <Footer />
         </>
     )
 }
