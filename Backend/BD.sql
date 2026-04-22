@@ -43,7 +43,9 @@ CREATE TABLE tours (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     domestic_category_id BIGINT REFERENCES domestic_categories(id),
     tour_type VARCHAR(100),
-    location_name VARCHAR(255)
+    location_name VARCHAR(255),
+    hotel_lat NUMERIC(9,6),
+	hotel_lng NUMERIC(9,6)
 );
 
 -- Таблица изображений тура
@@ -407,3 +409,26 @@ VALUES
     '/uploads/kldtours/active-tour.png',
     TRUE
 );
+
+UPDATE tours
+SET
+    title = 'Fort Arabesque The Villas',
+    hotel_rating = 4.0,
+    nights = 9,
+    location_name = 'Макади Бей, Хургада',
+    full_description = 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых. 65 вилл с одной или двумя спальнями, все с просторной стойкой регистрации и гостиной, современной ванной комнатой и частной террасой с доступом к бассейну с подогревом.
+
+Роскошные удобства включают широкий выбор кофе / чая и натуральных трав, полностью укомплектованный мини-бар, собственный DVD-плеер, ЖК-телевизор с плоским экраном и библиотеку последних международных фильмов.',
+    hotel_lat = 26.991200,
+    hotel_lng = 33.899800
+WHERE id = 1;
+
+
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque.png', TRUE),
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque2.png', FALSE),
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque3.png', FALSE),
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque4.png', FALSE),
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque5.png', FALSE),
+(1, '/uploads/hotels/fort-arabesque/fort-arabesque-more.png', FALSE);
