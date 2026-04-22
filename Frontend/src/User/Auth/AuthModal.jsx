@@ -13,8 +13,16 @@ const initialRegistrationData = {
 };
 
 export default function AuthModal({ isOpen, onClose }) {
+<<<<<<< HEAD
   const [step, setStep] = useState("login");
   const [registrationData, setRegistrationData] = useState(initialRegistrationData);
+=======
+    const [step, setStep] = useState("login");
+    const [registrationData, setRegistrationData] = useState({
+        email: "",
+        password: "",
+    });
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
   const handleClose = () => {
     setStep("login");
@@ -22,13 +30,25 @@ export default function AuthModal({ isOpen, onClose }) {
     onClose();
   };
 
+<<<<<<< HEAD
   const handleCodeSent = (data) => {
     setRegistrationData(data);
     setStep("verify");
   };
+=======
+    const handleClose = () => {
+        setStep("login");
+        setRegistrationData({
+            email: "",
+            password: "",
+        });
+        onClose();
+    };
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
   if (!isOpen) return null;
 
+<<<<<<< HEAD
   return (
     <section className="auth-section">
       <div className="container" onClick={handleClose}>
@@ -36,6 +56,12 @@ export default function AuthModal({ isOpen, onClose }) {
           <button className="closeBtn" type="button" onClick={handleClose}>
             <img src={closeBtn} alt="Закрыть" />
           </button>
+=======
+    const handleCodeSent = ({ email, password }) => {
+        setRegistrationData({ email, password });
+        setStep("verify");
+    };
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
           {step === "login" && (
             <LoginForm
@@ -56,9 +82,35 @@ export default function AuthModal({ isOpen, onClose }) {
             />
           )}
 
+<<<<<<< HEAD
           {step === "success" && <SuccessMessage />}
         </div>
       </div>
     </section>
   );
+=======
+                    {step === "register" && (
+                        <RegistrationForm
+                            onOpenLogin={() => setStep("login")}
+                            onCodeSent={handleCodeSent}
+                        />
+                    )}
+
+                    {step === "verify" && (
+                        <VerifyCodeForm
+                            email={registrationData.email}
+                            password={registrationData.password}
+                            onBack={() => setStep("register")}
+                            onSuccess={() => setStep("success")}
+                        />
+                    )}
+
+                    {step === "success" && (
+                        <SuccessMessage onClose={handleClose} />
+                    )}
+                </div>
+            </div>
+        </section>
+    );
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 }

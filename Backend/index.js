@@ -122,7 +122,19 @@ app.post("/api/auth/register/send-code", async (req, res) => {
     const normalizedEmail = normalizeEmail(email);
 
     if (!normalizedEmail || !password) {
+<<<<<<< HEAD
       return res.status(400).json({ message: "Заполните все поля" });
+=======
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
+    }
+
+    if (!isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
+    }
+
+    if (password.length < 6) {
+      return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
     }
 
     await deleteExpiredCodes();
@@ -160,6 +172,7 @@ app.post("/api/auth/register/send-code", async (req, res) => {
 
     await pool.query(
       `
+<<<<<<< HEAD
         INSERT INTO registration_codes (
           email,
           password_hash,
@@ -185,6 +198,34 @@ app.post("/api/auth/register/send-code", async (req, res) => {
           attempts = 0
       `,
       [normalizedEmail, passwordHash, hashCode(code)]
+=======
+      INSERT INTO registration_codes (
+        email,
+        password_hash,
+        code_hash,
+        expires_at,
+        resend_available_at,
+        attempts
+      )
+      VALUES (
+        $1,
+        $2,
+        $3,
+        NOW() + INTERVAL '10 minutes',
+        NOW() + INTERVAL '30 seconds',
+        0
+      )
+      ON CONFLICT (email)
+      DO UPDATE SET
+        password_hash = EXCLUDED.password_hash,
+        code_hash = EXCLUDED.code_hash,
+        expires_at = NOW() + INTERVAL '10 minutes',
+        resend_available_at = NOW() + INTERVAL '30 seconds',
+        attempts = 0,
+        created_at = CURRENT_TIMESTAMP
+      `,
+      [normalizedEmail, passwordHash, codeHash]
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
     );
 
     try {
@@ -223,9 +264,15 @@ app.post("/api/auth/register/verify-code", async (req, res) => {
 
     const codeResult = await client.query(
       `
+<<<<<<< HEAD
         SELECT email, password_hash, code_hash, expires_at, attempts
         FROM registration_codes
         WHERE email = $1
+=======
+      SELECT email, password_hash, code_hash, expires_at, attempts
+      FROM registration_codes
+      WHERE email = $1
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
       `,
       [normalizedEmail]
     );
@@ -274,11 +321,19 @@ app.post("/api/auth/register/verify-code", async (req, res) => {
 
     const newUser = await client.query(
       `
+<<<<<<< HEAD
         INSERT INTO users (email, password_hash, full_name)
         VALUES ($1, $2, $3)
         RETURNING id, email, full_name, created_at
       `,
       [registration.email, registration.password_hash, null]
+=======
+      INSERT INTO users (email, password_hash)
+      VALUES ($1, $2)
+      RETURNING id, email, created_at
+      `,
+      [row.email, row.password_hash]
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
     );
 
     await client.query("DELETE FROM registration_codes WHERE email = $1", [
@@ -322,9 +377,15 @@ app.post("/api/auth/login", async (req, res) => {
 
     const userResult = await pool.query(
       `
+<<<<<<< HEAD
         SELECT id, email, full_name, password_hash, created_at
         FROM users
         WHERE email = $1
+=======
+      SELECT id, email, password_hash, created_at
+      FROM users
+      WHERE email = $1
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
       `,
       [normalizedEmail]
     );
@@ -345,9 +406,19 @@ app.post("/api/auth/login", async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
+<<<<<<< HEAD
         full_name: user.full_name,
         created_at: user.created_at,
       },
+=======
+        created_at: user.created_at
+      }
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка сервера при входе'
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
     });
   } catch {
     res.status(500).json({ message: "Ошибка входа" });

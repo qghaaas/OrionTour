@@ -4,8 +4,18 @@ const API_URL = "http://localhost:3010/api/auth";
 const EMPTY_CODE = ["", "", "", ""];
 const CODE_LENGTH = 4;
 
+<<<<<<< HEAD
 export default function VerifyCodeForm({ email, password, onSuccess }) {
   const [code, setCode] = useState(EMPTY_CODE);
+=======
+export default function VerifyCodeForm({
+  email,
+  password,
+  onBack,
+  onSuccess,
+}) {
+  const [code, setCode] = useState(["", "", "", ""]);
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
   const [timer, setTimer] = useState(30);
   const [loadingVerify, setLoadingVerify] = useState(false);
   const [loadingResend, setLoadingResend] = useState(false);
@@ -95,7 +105,14 @@ export default function VerifyCodeForm({ email, password, onSuccess }) {
       const response = await fetch(`${API_URL}/register/send-code`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+<<<<<<< HEAD
         body: JSON.stringify({ email, password }),
+=======
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
       });
 
       const data = await response.json();

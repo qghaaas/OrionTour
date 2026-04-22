@@ -4,9 +4,13 @@ import eyeClose from "./img/eyeCLose.svg";
 
 const API_URL = "http://localhost:3010/api/auth";
 
+<<<<<<< HEAD
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
 export default function RegistrationForm({ onCodeSent }) {
+=======
+export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -18,6 +22,7 @@ export default function RegistrationForm({ onCodeSent }) {
     e.preventDefault();
     setError("");
 
+<<<<<<< HEAD
     const normalizedEmail = email.trim().toLowerCase();
     const normalizedPassword = password.trim();
     const normalizedConfirmPassword = confirmPassword.trim();
@@ -27,6 +32,9 @@ export default function RegistrationForm({ onCodeSent }) {
       !normalizedPassword ||
       !normalizedConfirmPassword
     ) {
+=======
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
       setError("Заполните все поля");
       return;
     }
@@ -53,8 +61,13 @@ export default function RegistrationForm({ onCodeSent }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+<<<<<<< HEAD
           email: normalizedEmail,
           password: normalizedPassword,
+=======
+          email,
+          password,
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
         }),
       });
 
@@ -65,11 +78,23 @@ export default function RegistrationForm({ onCodeSent }) {
         return;
       }
 
+<<<<<<< HEAD
       onCodeSent?.({
         email: normalizedEmail,
         password: normalizedPassword,
       });
     } catch {
+=======
+      setSuccess(data.message || "Код отправлен");
+
+      if (onCodeSent) {
+        onCodeSent({
+          email,
+          password,
+        });
+      }
+    } catch (err) {
+>>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
       setError("Ошибка соединения с сервером");
     } finally {
       setLoading(false);
