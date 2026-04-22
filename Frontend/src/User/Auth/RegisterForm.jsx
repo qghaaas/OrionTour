@@ -5,7 +5,6 @@ import eyeClose from "./img/eyeCLose.svg";
 const API_URL = "http://localhost:3010/api/auth";
 
 export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
-  const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -24,7 +23,7 @@ export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
     e.preventDefault();
     resetMessages();
 
-    if (!fullName.trim() || !email.trim() || !password.trim() || !confirmPassword.trim()) {
+    if (!email.trim() || !password.trim() || !confirmPassword.trim()) {
       setError("Заполните все поля");
       return;
     }
@@ -46,7 +45,6 @@ export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          full_name: fullName,
           email,
           password,
         }),
@@ -63,7 +61,6 @@ export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
 
       if (onCodeSent) {
         onCodeSent({
-          fullName,
           email,
           password,
         });
@@ -80,14 +77,6 @@ export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
       <h2>Регистрация</h2>
 
       <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="ФИО"
-          value={fullName}
-          onChange={(e) => setFullName(e.target.value)}
-          required
-        />
-
         <input
           type="email"
           placeholder="E-mail"

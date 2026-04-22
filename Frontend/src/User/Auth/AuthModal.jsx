@@ -10,7 +10,6 @@ import "./auth.css";
 export default function AuthModal({ isOpen, onClose }) {
     const [step, setStep] = useState("login");
     const [registrationData, setRegistrationData] = useState({
-        fullName: "",
         email: "",
         password: "",
     });
@@ -22,7 +21,6 @@ export default function AuthModal({ isOpen, onClose }) {
     const handleClose = () => {
         setStep("login");
         setRegistrationData({
-            fullName: "",
             email: "",
             password: "",
         });
@@ -34,8 +32,8 @@ export default function AuthModal({ isOpen, onClose }) {
         setStep("success");
     };
 
-    const handleCodeSent = ({ fullName, email, password }) => {
-        setRegistrationData({ fullName, email, password });
+    const handleCodeSent = ({ email, password }) => {
+        setRegistrationData({ email, password });
         setStep("verify");
     };
 
@@ -66,7 +64,6 @@ export default function AuthModal({ isOpen, onClose }) {
 
                     {step === "verify" && (
                         <VerifyCodeForm
-                            fullName={registrationData.fullName}
                             email={registrationData.email}
                             password={registrationData.password}
                             onBack={() => setStep("register")}

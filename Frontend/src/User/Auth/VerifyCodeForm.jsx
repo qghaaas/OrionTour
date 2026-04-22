@@ -3,7 +3,6 @@ import { useEffect, useRef, useState } from "react";
 const API_URL = "http://localhost:3010/api/auth";
 
 export default function VerifyCodeForm({
-  fullName,
   email,
   password,
   onBack,
@@ -109,7 +108,6 @@ export default function VerifyCodeForm({
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          full_name: fullName,
           email,
           password,
         }),

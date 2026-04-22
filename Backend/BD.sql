@@ -1,10 +1,6 @@
 SET search_path TO oriontour;
 
--- =========================
--- ОСНОВНЫЕ ТАБЛИЦЫ
--- =========================
 
--- Таблица направлений
 CREATE TABLE directions (
     id BIGSERIAL PRIMARY KEY,
     name VARCHAR(100) NOT NULL,
@@ -15,7 +11,7 @@ CREATE TABLE directions (
     is_domestic BOOLEAN DEFAULT FALSE
 );
 
--- Таблица категорий внутреннего туризма
+
 CREATE TABLE domestic_categories (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -26,7 +22,7 @@ CREATE TABLE domestic_categories (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица туров
+
 CREATE TABLE tours (
     id BIGSERIAL PRIMARY KEY,
     direction_id BIGINT NOT NULL REFERENCES directions(id) ON DELETE CASCADE,
@@ -46,7 +42,7 @@ CREATE TABLE tours (
     location_name VARCHAR(255)
 );
 
--- Таблица изображений тура
+
 CREATE TABLE tour_images (
     id BIGSERIAL PRIMARY KEY,
     tour_id BIGINT NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
@@ -55,7 +51,7 @@ CREATE TABLE tour_images (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица пользователей
+
 CREATE TABLE users (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
@@ -65,7 +61,7 @@ CREATE TABLE users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица отзывов
+
 CREATE TABLE reviews (
     id BIGSERIAL PRIMARY KEY,
     author_name VARCHAR(255) NOT NULL,
@@ -78,7 +74,7 @@ CREATE TABLE reviews (
     user_id BIGINT REFERENCES users(id) ON DELETE CASCADE
 );
 
--- Таблица заявок с формы обратной связи
+
 CREATE TABLE contact_requests (
     id BIGSERIAL PRIMARY KEY,
     full_name VARCHAR(255) NOT NULL,
@@ -88,7 +84,7 @@ CREATE TABLE contact_requests (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица заявок из конструктора путешествий
+
 CREATE TABLE travel_requests (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT REFERENCES users(id) ON DELETE SET NULL,
@@ -97,7 +93,7 @@ CREATE TABLE travel_requests (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица статей блога
+
 CREATE TABLE blog_posts (
     id BIGSERIAL PRIMARY KEY,
     title VARCHAR(255) NOT NULL,
@@ -108,14 +104,14 @@ CREATE TABLE blog_posts (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица изображений статьи
+
 CREATE TABLE blog_post_images (
     id BIGSERIAL PRIMARY KEY,
     blog_post_id BIGINT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
     image_url TEXT NOT NULL
 );
 
--- Таблица избранных туров пользователя
+
 CREATE TABLE favorite_tours (
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     tour_id BIGINT NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
@@ -123,7 +119,7 @@ CREATE TABLE favorite_tours (
     PRIMARY KEY (user_id, tour_id)
 );
 
--- Таблица заказов пользователя
+
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -137,11 +133,10 @@ CREATE TABLE orders (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- Таблица временных кодов регистрации
+
 CREATE TABLE registration_codes (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-    full_name VARCHAR(255) NOT NULL,
     password_hash TEXT NOT NULL,
     code_hash TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,
@@ -153,11 +148,7 @@ CREATE TABLE registration_codes (
 CREATE INDEX idx_registration_codes_email ON registration_codes(email);
 CREATE INDEX idx_registration_codes_expires_at ON registration_codes(expires_at);
 
--- =========================
--- НАЧАЛЬНЫЕ ДАННЫЕ
--- =========================
 
--- Направления
 INSERT INTO directions (name, country_slug, globe_lat, globe_lng, is_domestic)
 VALUES
     ('Калининградская область', 'kaliningrad', 54.710426, 20.452214, TRUE),
@@ -165,7 +156,7 @@ VALUES
     ('Мальдивы', 'maldives', 3.202778, 73.220680, FALSE)
 ON CONFLICT (country_slug) DO NOTHING;
 
--- Категории внутреннего туризма из DomTour.jsx
+
 INSERT INTO domestic_categories (title, image_url, slug, sort_order, is_active)
 VALUES
     ('Туры в Калининград', '/uploads/domtour/frontdom.png', 'kaliningrad-tours-1', 1, TRUE),
@@ -173,7 +164,7 @@ VALUES
     ('Экскурсии по Светлогорску, Зеленоградску, Пионерску', '/uploads/domtour/frontdom3.png', 'svetlogorsk-zelenogradsk-pionersk', 3, TRUE),
     ('Индивидуальные экскурсии', '/uploads/domtour/frontdom4.png', 'individual-excursions', 4, TRUE);
 
--- Популярные туры
+
 INSERT INTO tours (
     direction_id,
     title,
@@ -250,7 +241,7 @@ VALUES
     'hotel'
 );
 
--- Изображения популярных туров: каждому туру своё изображение
+
 INSERT INTO tour_images (tour_id, image_url, is_main)
 VALUES
 (
@@ -274,7 +265,7 @@ VALUES
     TRUE
 );
 
--- Отзывы из Reviews.jsx
+
 INSERT INTO reviews (author_name, rating, review_text, sort_order, is_active)
 VALUES
 (

@@ -99,10 +99,10 @@ app.get('/api/health', async (req, res) => {
 
 app.post('/api/auth/register/send-code', async (req, res) => {
   try {
-    const { full_name, email, password } = req.body;
+    const { email, password } = req.body;
     const normalizedEmail = normalizeEmail(email);
 
-    if (!full_name || !normalizedEmail || !password) {
+    if (!normalizedEmail || !password) {
       return res.status(400).json({ message: REGISTRATION_ERROR_MESSAGE });
     }
 
@@ -152,7 +152,6 @@ app.post('/api/auth/register/send-code', async (req, res) => {
       `
       INSERT INTO registration_codes (
         email,
-        full_name,
         password_hash,
         code_hash,
         expires_at,
@@ -163,14 +162,12 @@ app.post('/api/auth/register/send-code', async (req, res) => {
         $1,
         $2,
         $3,
-        $4,
         NOW() + INTERVAL '10 minutes',
         NOW() + INTERVAL '30 seconds',
         0
       )
       ON CONFLICT (email)
       DO UPDATE SET
-        full_name = EXCLUDED.full_name,
         password_hash = EXCLUDED.password_hash,
         code_hash = EXCLUDED.code_hash,
         expires_at = NOW() + INTERVAL '10 minutes',
@@ -178,7 +175,7 @@ app.post('/api/auth/register/send-code', async (req, res) => {
         attempts = 0,
         created_at = CURRENT_TIMESTAMP
       `,
-      [normalizedEmail, full_name.trim(), passwordHash, codeHash]
+      [normalizedEmail, passwordHash, codeHash]
     );
 
     try {
@@ -223,7 +220,7 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
 
     const codeResult = await client.query(
       `
-      SELECT email, full_name, password_hash, code_hash, expires_at, attempts
+      SELECT email, password_hash, code_hash, expires_at, attempts
       FROM registration_codes
       WHERE email = $1
       `,
@@ -285,11 +282,11 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
 
     const newUser = await client.query(
       `
-      INSERT INTO users (email, password_hash, full_name)
-      VALUES ($1, $2, $3)
-      RETURNING id, email, full_name, created_at
+      INSERT INTO users (email, password_hash)
+      VALUES ($1, $2)
+      RETURNING id, email, created_at
       `,
-      [row.email, row.password_hash, row.full_name]
+      [row.email, row.password_hash]
     );
 
     await client.query(
@@ -325,7 +322,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const userResult = await pool.query(
       `
-      SELECT id, email, full_name, password_hash, created_at
+      SELECT id, email, password_hash, created_at
       FROM users
       WHERE email = $1
       `,
@@ -350,7 +347,6 @@ app.post('/api/auth/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
-        full_name: user.full_name,
         created_at: user.created_at
       }
     });
