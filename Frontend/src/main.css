@@ -4,19 +4,20 @@
     font-family: "Arimo", sans-serif;
     font-family: Arial, sans-serif;
    */
-*,
-*::after,
-*::before {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-
-}
-
 html {
   overflow-x: hidden;
   scroll-behavior: smooth;
   background: #FEFEFE;
+  box-sizing: border-box;
+}
+
+*,
+*::after,
+*::before {
+  box-sizing: inherit;
+  margin: 0;
+  padding: 0;
+
 }
 
 a {
@@ -59,11 +60,15 @@ button {
 
 .container {
   max-width: 100%;
-  max-width: 1570px;
+  max-width: 1610px;
   height: fit-content;
   margin: 0 auto;
-  padding: 0 auto;
+  padding: 0 1%;
 }
+
+
+
+
 
 .main-btn_site {
   font-family: "Raleway", sans-serif;
@@ -73,4 +78,25 @@ button {
   background: #F99244;
   border-radius: 50px;
   color: #fff;
+}
+
+.name-title_page {
+  font-family: "Arimo", sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  letter-spacing: 1%;
+  color: #202020;
+  text-align: center;
+  position: relative;
+  padding-bottom: 32px;
+}
+
+.name-title_page::after {
+  content: "";
+  position: absolute;
+  height: 1px;
+  width: 100%;
+  background-color: #A4A4A4;
+  bottom: 0;
+  left: 0;
 }

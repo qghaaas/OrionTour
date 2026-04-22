@@ -1,7 +1,7 @@
 footer {
     width: 100%;
     height: fit-content;
-    margin-bottom: 68px
+    margin-bottom: 40px
 }
 
 .footer-inner {
@@ -45,4 +45,12 @@ footer {
 .social-link img{
     width: 70px;
     height: 70px;
+}
+
+@media (max-width: 1024px){
+
+}
+
+@media (max-width: 767px){
+
 }

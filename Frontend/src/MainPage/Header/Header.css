@@ -17,7 +17,7 @@ header {
   flex: 1;
   display: flex;
   min-height: 65px;
-  padding: 0 32px;
+  padding-inline: min(1.66vw, 32px);
   background: rgba(37, 53, 71, 0.74);
   border-radius: 36px;
 }
@@ -25,7 +25,10 @@ header {
 .header-menu {
   width: 100%;
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20% 32px;
+  padding: 20px 0;
 }
 
 .header-menu li {
