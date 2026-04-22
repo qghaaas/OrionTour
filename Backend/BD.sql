@@ -137,10 +137,6 @@ CREATE TABLE orders (
 CREATE TABLE registration_codes (
     id BIGSERIAL PRIMARY KEY,
     email VARCHAR(255) NOT NULL UNIQUE,
-<<<<<<< HEAD
-    full_name VARCHAR(255),
-=======
->>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
     password_hash TEXT NOT NULL,
     code_hash TEXT NOT NULL,
     expires_at TIMESTAMP NOT NULL,

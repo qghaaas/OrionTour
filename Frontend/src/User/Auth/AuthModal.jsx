@@ -7,35 +7,17 @@ import closeBtn from "../../mainIMG/closeBtn.svg";
 import "../../main.css";
 import "./auth.css";
 
-const initialRegistrationData = {
-  email: "",
-  password: "",
-};
-
 export default function AuthModal({ isOpen, onClose }) {
-<<<<<<< HEAD
-  const [step, setStep] = useState("login");
-  const [registrationData, setRegistrationData] = useState(initialRegistrationData);
-=======
     const [step, setStep] = useState("login");
     const [registrationData, setRegistrationData] = useState({
         email: "",
         password: "",
     });
->>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
-  const handleClose = () => {
-    setStep("login");
-    setRegistrationData(initialRegistrationData);
-    onClose();
-  };
+    const handleForgotPassword = () => {
+        alert("Функция восстановления пароля пока не реализована");
+    };
 
-<<<<<<< HEAD
-  const handleCodeSent = (data) => {
-    setRegistrationData(data);
-    setStep("verify");
-  };
-=======
     const handleClose = () => {
         setStep("login");
         setRegistrationData({
@@ -44,51 +26,35 @@ export default function AuthModal({ isOpen, onClose }) {
         });
         onClose();
     };
->>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
-  if (!isOpen) return null;
+    const handleLoginSuccess = (user) => {
+        console.log("Пользователь вошёл:", user);
+        setStep("success");
+    };
 
-<<<<<<< HEAD
-  return (
-    <section className="auth-section">
-      <div className="container" onClick={handleClose}>
-        <div className="auth-inner" onClick={(e) => e.stopPropagation()}>
-          <button className="closeBtn" type="button" onClick={handleClose}>
-            <img src={closeBtn} alt="Закрыть" />
-          </button>
-=======
     const handleCodeSent = ({ email, password }) => {
         setRegistrationData({ email, password });
         setStep("verify");
     };
->>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 
-          {step === "login" && (
-            <LoginForm
-              onOpenRegistration={() => setStep("register")}
-              onSuccess={() => setStep("success")}
-            />
-          )}
+    if (!isOpen) return null;
 
-          {step === "register" && (
-            <RegistrationForm onCodeSent={handleCodeSent} />
-          )}
+    return (
+        <section className="auth-section">
+            <div className="container" onClick={handleClose}>
+                <div className="auth-inner" onClick={(e) => e.stopPropagation()}>
+                    <button className="closeBtn" type="button" onClick={handleClose}>
+                        <img src={closeBtn} alt="" />
+                    </button>
 
-          {step === "verify" && (
-            <VerifyCodeForm
-              email={registrationData.email}
-              password={registrationData.password}
-              onSuccess={() => setStep("success")}
-            />
-          )}
+                    {step === "login" && (
+                        <LoginForm
+                            onOpenRegistration={() => setStep("register")}
+                            onForgotPassword={handleForgotPassword}
+                            onSuccess={handleLoginSuccess}
+                        />
+                    )}
 
-<<<<<<< HEAD
-          {step === "success" && <SuccessMessage />}
-        </div>
-      </div>
-    </section>
-  );
-=======
                     {step === "register" && (
                         <RegistrationForm
                             onOpenLogin={() => setStep("login")}
@@ -112,5 +78,4 @@ export default function AuthModal({ isOpen, onClose }) {
             </div>
         </section>
     );
->>>>>>> ccb94e64a2a5b67ff729f0f370f3df0ebd72e690
 }
