@@ -24,7 +24,7 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'postgres',
   password: process.env.DB_PASSWORD || '1234',
   port: Number(process.env.DB_PORT) || 5432,
-  options: `-c search_path=${process.env.DB_SCHEMA || 'oriontour'}`
+  options: `-c search_path=${process.env.DB_SCHEMA || 'oriontourvar2'}`
 });
 
 app.use(cors());

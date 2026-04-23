@@ -1,0 +1,127 @@
+.offersdes {
+    width: 100%;
+    height: 100vh;
+    margin-bottom: 235px;
+}
+
+.offersdes-inner {
+    display: flex;
+    flex-direction: column;
+    gap: 150px 0;
+}
+
+.offersdes-card {
+    display: flex;
+    gap: 0 30px;
+}
+
+.offersdes-gallery_preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.offersdes-gallery_main {
+    position: relative;
+    margin-bottom: 19px;
+}
+
+.offersdes-gallery_thumb {
+    position: relative;
+    overflow: hidden;
+    max-height: 95px;
+    border-radius: 15px;
+
+}
+
+.offersdes-gallery_thumb::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+
+    background: linear-gradient(0deg,
+            rgba(0, 0, 0, 0.56) 29.81%,
+            rgba(102, 102, 102, 0.1064) 62.02%);
+
+    pointer-events: none;
+}
+
+.offersdes-gallery_thumb:last-child::after {
+    background: rgba(0, 0, 0, 0.46);
+}
+
+.offersdes-price {
+    position: absolute;
+    background-color: #fff;
+    font-family: "Arimo", sans-serif;
+    font-size: 20px;
+    letter-spacing: 1%;
+    line-height: 1.5;
+    color: #000;
+    left: 20px;
+    top: 20px;
+    border-radius: 15px;
+    padding: 0 10px;
+    font-weight: 400;
+}
+
+.offersdes-card_text {
+    display: flex;
+    flex-direction: column;
+}
+
+.offersdes-card_text {
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    letter-spacing: 1%;
+    max-width: 364px;
+}
+
+.offersdes-card_title {
+    margin-bottom: 10px;
+    line-height: 1.5;
+}
+
+.offersdes-card_title h2 {
+    font-weight: 700;
+    font-size: 29px;
+}
+
+.offersdes-card_title h3 {
+    color: #A4A4A4;
+}
+
+.offersdes-card_text p {
+    font-size: 1rem;
+    line-height: 24px;
+    margin-bottom: 32px;
+}
+
+.offersdes-card_subtitle {
+    margin-bottom: min(35px);
+    margin-bottom: auto;
+}
+
+.offersdes-card_subtitle li {
+    display: flex;
+    align-items: center;
+    gap: 0 9px;
+}
+
+.offersdes-card_subtitle span {
+    color: #000;
+    font-weight: 500;
+}
+
+.offersdes-card_subtitle li:not(:last-child) {
+    margin-bottom: 8px;
+}
+
+.offersdes-card_text a {
+    padding: 0 26px;
+    width: 284px;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
