@@ -50,6 +50,8 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
       }
 
       localStorage.setItem("user", JSON.stringify(data.user));
+      window.dispatchEvent(new Event("authChanged"));
+
       setEmail("");
       setPassword("");
       onSuccess?.(data.user);
@@ -92,7 +94,7 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
         </div>
 
         {error && <p className="auth-error">{error}</p>}
-        
+
         <button className="auth-activeBTN" type="submit" disabled={loading}>
           {loading ? "Вход..." : "Войти в кабинет"}
         </button>

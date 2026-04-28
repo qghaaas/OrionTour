@@ -2,13 +2,27 @@ import '../../main.css'
 import './Header.css'
 import logo from '../../mainIMG/logo.svg'
 import { Link } from 'react-router-dom'
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import AuthModal from '../../User/Auth/AuthModal'
-
-
 
 export default function Header() {
     const [isAuthOpen, setIsAuthOpen] = useState(false);
+    const [isAuth, setIsAuth] = useState(false);
+
+    useEffect(() => {
+        const checkAuth = () => {
+            const savedUser = localStorage.getItem("user");
+            setIsAuth(!!savedUser);
+        };
+
+        checkAuth();
+
+        window.addEventListener("authChanged", checkAuth);
+
+        return () => {
+            window.removeEventListener("authChanged", checkAuth);
+        };
+    }, []);
 
     return (
         <>
@@ -16,7 +30,7 @@ export default function Header() {
                 <div className="container">
                     <div className="header-inner">
                         <Link className='logo-link' to="/">
-                            <img src={logo} alt="logo"/>
+                            <img src={logo} alt="logo" />
                         </Link>
 
                         <nav className="header-nav">
@@ -31,20 +45,28 @@ export default function Header() {
                             </ul>
                         </nav>
 
-                        <button
-                            className="login-link main-btn_site"
-                            onClick={() => setIsAuthOpen(true)}
-                        >
-                            Войти
-                        </button>
+                        {isAuth ? (
+                            <Link className="login-link main-btn_site" to="/account">
+                                Личный кабинет
+                            </Link>
+                        ) : (
+                            <button
+                                className="login-link main-btn_site"
+                                onClick={() => setIsAuthOpen(true)}
+                            >
+                                Войти
+                            </button>
+                        )}
                     </div>
                 </div>
             </header>
 
-            <AuthModal
-                isOpen={isAuthOpen}
-                onClose={() => setIsAuthOpen(false)}
-            />
+            {!isAuth && (
+                <AuthModal
+                    isOpen={isAuthOpen}
+                    onClose={() => setIsAuthOpen(false)}
+                />
+            )}
         </>
     );
 }

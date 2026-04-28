@@ -18,10 +18,10 @@
 
 .pop-card {
     width: 100%;
-    height: 67.6vh;
+    min-height: 620px;
+    height: 100%;
     display: flex;
     flex-direction: column;
-    align-items: center;
     background-color: #F4F4F4;
     padding: 14px 14px 19px;
     border-radius: 25px;
@@ -40,7 +40,7 @@
     display: block;
     border-radius: 15px;
     object-fit: cover;
-    height: 29.8vh;
+    height: clamp(220px, 29.8vh, 320px);
 }
 
 .pop-card_top span {
@@ -61,6 +61,10 @@
     font-family: "Raleway", sans-serif;
     width: 100%;
     box-sizing: border-box;
+
+    display: flex;
+    flex-direction: column;
+    flex: 1;
 }
 
 .pop-card_title {
@@ -86,7 +90,11 @@
     font-weight: 500;
     letter-spacing: 1%;
     line-height: 24px;
-    height: 105px;
+
+    display: -webkit-box;
+    -webkit-line-clamp: 4;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
 }
 
 .pop-card span {
@@ -94,7 +102,8 @@
 }
 
 .pop-card_time {
-    width: 33%;
+    width: fit-content;
+    min-width: 33%;
     background-color: #DDDDDD;
     text-align: center;
     border-radius: 25px;
@@ -104,11 +113,14 @@
     letter-spacing: 1%;
     padding: 8px 12px;
     margin-bottom: 15px;
+
+    margin-top: auto;
 }
 
 .pop-card button {
     width: 100%;
     height: 58px;
+     flex-shrink: 0;
 }
 
 .popdes-next img {

@@ -29,6 +29,11 @@ export default function AuthModal({ isOpen, onClose }) {
 
     const handleLoginSuccess = (user) => {
         console.log("Пользователь вошёл:", user);
+
+        localStorage.setItem("user", JSON.stringify(user));
+
+        window.dispatchEvent(new Event("authChanged"));
+
         setStep("success");
     };
 

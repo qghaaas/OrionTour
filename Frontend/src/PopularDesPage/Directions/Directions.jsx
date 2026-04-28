@@ -63,7 +63,10 @@ export default function Directions() {
         tour.images?.[0]?.image_url ||
         ''
 
-    const sideImages = tour.images?.filter((img) => !img.is_main).slice(0, 4) || []
+    const sideImages =
+        tour.images
+            ?.filter((img) => img.image_url !== mainImage)
+            .slice(0, 5) || []
 
     const morePhotoImage =
         tour.images?.[5]?.image_url ||
@@ -72,89 +75,88 @@ export default function Directions() {
 
     return (
         <section className="directions">
-            <div className="container">
-                <div className="directions-inner">
-                    <div className="directions-top">
-                        <div className="directions-top_title">
-                            <div className="directions-top_title-inner">
-                                <h2>{tour.title}</h2>
+            <div className="directions-top">
+                <div className="directions-top_title">
+                    <div className="directions-top_title-inner">
+                        <h2>{tour.title}</h2>
 
-                                <div className="directions-top_title-rev">
-                                    <span>{Number(tour.hotel_rating)}</span>
-                                    <img src={star} alt="star" />
-                                </div>
-                            </div>
-
-                            <div className="directions-top_title-bot">
-                                <span>{tour.nights} ночей</span>
-                                <h3>{tour.location_name}</h3>
-                            </div>
-                        </div>
-
-                        <div className="directions-top_img">
-                            <div className="directions-gallery">
-                                <div className="directions-gallery-main">
-                                    {mainImage && (
-                                        <img src={mainImage} alt={tour.title} />
-                                    )}
-                                </div>
-
-                                <div className="directions-gallery-grid">
-                                    {sideImages.map((img) => (
-                                        <div className="directions-gallery-small" key={img.id}>
-                                            <img src={img.image_url} alt={tour.title} />
-                                        </div>
-                                    ))}
-
-                                    <div className="directions-gallery-small directions-gallery-more">
-                                        <img src={morePhotoImage} alt="more photos" />
-                                        <div className="directions-gallery-overlay">
-                                            +40 фото
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
+                        <div className="directions-top_title-rev">
+                            <span>{Number(tour.hotel_rating)}</span>
+                            <img src={star} alt="star" />
                         </div>
                     </div>
 
-                    <div className="directions-main">
-                        <div className="directions-des_loc">
-                            <div className="directions-description">
-                                <p style={{ whiteSpace: 'pre-line' }}>
-                                    {tour.full_description}
-                                </p>
-                            </div>
+                    <div className="directions-top_title-bot">
+                        <span>{tour.nights} ночей</span>
+                        <h3>{tour.location_name}</h3>
+                    </div>
+                </div>
 
-                            <div className="directions-loc">
-                                <p>Где находится</p>
+                <div className="directions-top_img">
+                    <div className="directions-gallery">
+                        <div className="directions-gallery-main">
+                            <img src={mainImage} alt={tour.title} />
+                        </div>
 
-                                {tour.hotel_lat && tour.hotel_lng ? (
-                                    <div className="directions-map">
-                                        <YMaps>
-                                            <Map
-                                                defaultState={{
-                                                    center: [
-                                                        Number(tour.hotel_lat),
-                                                        Number(tour.hotel_lng),
-                                                    ],
-                                                    zoom: 15,
-                                                }}
-                                                width="100%"
-                                                height="250px"
-                                            >
-                                                <Placemark
-                                                    geometry={[
-                                                        Number(tour.hotel_lat),
-                                                        Number(tour.hotel_lng),
-                                                    ]}
-                                                />
-                                            </Map>
-                                        </YMaps>
-                                    </div>
-                                ) : (
-                                    <p>Координаты не указаны</p>
-                                )}
-                            </div>
+                        <div className="directions-gallery-grid">
+                            {sideImages.map((img, index) => (
+                                <div
+                                    className={`directions-gallery-small ${index === 4 ? 'directions-gallery-more' : ''
+                                        }`}
+                                    key={img.id}
+                                >
+                                    <img src={img.image_url} alt={tour.title} />
+
+                                    {index === 4 && (
+                                        <div className="directions-gallery-overlay">
+                                            +40 <br /> фото
+                                        </div>
+                                    )}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div className="container">
+                <div className="directions-inner">
+                    <div className="directions-des_loc">
+                        <div className="directions-description">
+                            <p style={{ whiteSpace: 'pre-line' }}>
+                                {tour.full_description}
+                            </p>
+                        </div>
+
+                        <div className="directions-loc">
+                            <p>Где находится</p>
+
+                            {tour.hotel_lat && tour.hotel_lng ? (
+                                <div className="directions-map">
+                                    <YMaps>
+                                        <Map
+                                            defaultState={{
+                                                center: [
+                                                    Number(tour.hotel_lat),
+                                                    Number(tour.hotel_lng),
+                                                ],
+                                                zoom: 15,
+                                                controls: [],
+                                            }}
+                                            width="100%"
+                                            height="100%"
+                                        >
+                                            <Placemark
+                                                geometry={[
+                                                    Number(tour.hotel_lat),
+                                                    Number(tour.hotel_lng),
+                                                ]}
+                                            />
+                                        </Map>
+                                    </YMaps>
+                                </div>
+                            ) : (
+                                <p>Координаты не указаны</p>
+                            )}
                         </div>
                     </div>
                 </div>

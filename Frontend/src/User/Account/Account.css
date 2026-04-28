@@ -1,0 +1,118 @@
+.account {
+    width: 100%;
+    height: fit-content;
+}
+
+.account-inner {
+    display: flex;
+    background-color: #F9F9F9;
+    padding: 100px 0 280px;
+}
+
+.account-aside {
+    background-color: #fff;
+    padding: 45px 0 30px;
+    width: 23.5%;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    border-radius: 25px;
+}
+
+.account-aside_user {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 20px;
+    margin-bottom: 14px;
+}
+
+.user-avatar {
+    width: 122px;
+    aspect-ratio: 1;
+    background-color: #D9D9D9;
+    border-radius: 50%;
+    margin-bottom: 20px;
+}
+
+.account-aside_user p {
+    font-weight: 700;
+    margin-bottom: 7px;
+    color: #1F2A36;
+}
+
+.account-aside_user span {
+    font-weight: 500;
+    color: #A8A1A1;
+}
+
+.aside_select-list {
+    padding: 30px 0 30px 60px;
+    display: flex;
+    flex-direction: column;
+    border-top: 1px solid #A4A4A4;
+    border-bottom: 1px solid #A4A4A4;
+}
+
+.aside_select-list>li:not(:last-child) {
+    margin-bottom: 30px;
+}
+
+.aside_select-list li {
+    display: flex;
+    align-items: center;
+    gap: 0 5px;
+}
+
+.orders-item {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start !important;
+}
+
+.aside-item-main {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.aside_select-list-nested {
+    margin-left: 34px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    transition: max-height 0.35s ease, opacity 0.35s ease, margin-top 0.35s ease;
+}
+
+.aside_select-list-nested.show {
+    margin-top: 16px;
+    max-height: 120px;
+    opacity: 1;
+}
+
+.aside_select-list-nested button {
+    color: #A8A1A1 !important;
+}
+
+.account-inner button {
+    color: #1F2A36;
+    font-family: "Raleway", sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+}
+
+.exit-account {
+    padding-top: 21px;
+    margin: 0 auto;
+    display: block;
+}
+
+.aside_select-list li.active button {
+    color: #F99244;
+}
+
+.aside_select-list li.active img {
+    filter: brightness(0) saturate(100%) invert(63%) sepia(70%) saturate(500%) hue-rotate(350deg);
+}

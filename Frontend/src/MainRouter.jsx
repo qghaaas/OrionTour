@@ -3,6 +3,7 @@ import { HashRouter } from "react-router-dom";
 import MainPageLink from "./Route/MainPageLink";
 import DomesticTourPageLink from './Route/DomesticTourPageLink'
 import PopularDesPageLink from "./Route/PopularDesPageLink";
+import AccountLink from "./Route/AccountLink";
 
 
 export default function MainRouter() {
@@ -15,6 +16,7 @@ export default function MainRouter() {
                     <Route path="/Home" element={<MainPageLink />} />
                     <Route path="/DomesticTourism" element={<DomesticTourPageLink />} />
                     <Route path="/Directions" element={<PopularDesPageLink />} />
+                    <Route path="/account" element={<AccountLink />} />
 
                 </Routes>
             </HashRouter>

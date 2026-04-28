@@ -21,11 +21,12 @@
 }
 
 .reviews-slide {
-    width: 803px !important;
-    height: 623px !important;
+    width: 808px !important;
+    height: 523px !important;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin: 0 !important;
 }
 
 .reviews-card {
