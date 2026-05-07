@@ -24,7 +24,7 @@ const pool = new Pool({
   database: process.env.DB_NAME || 'postgres',
   password: process.env.DB_PASSWORD || '1234',
   port: Number(process.env.DB_PORT) || 5432,
-  options: `-c search_path=${process.env.DB_SCHEMA || 'oriontourvar2'}`
+  options: `-c search_path=${process.env.DB_SCHEMA || 'oriontour'}`
 });
 
 app.use(cors());
@@ -635,6 +635,74 @@ app.get('/api/tours/:id/details', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Ошибка получения данных тура' });
+  }
+});
+
+app.get('/api/offers-des', async (req, res) => {
+  try {
+    const toursResult = await pool.query(`
+      SELECT
+        t.id,
+        t.title,
+        t.location_name AS location,
+        t.short_description AS description,
+        t.price,
+        t.nights,
+        CASE
+          WHEN t.title = 'Hard Rock Hotel Maldives'
+            THEN 'с прямым вылетом из Москвы на BlackJet'
+          WHEN t.title = 'Pickalbatros Luxury Suites'
+            THEN 'центр города'
+          ELSE 'с прямым вылетом из Москвы'
+        END AS flight,
+        CASE
+          WHEN t.title = 'Hard Rock Hotel Maldives'
+            THEN 'завтраки'
+          WHEN t.title = 'Pickalbatros Luxury Suites'
+            THEN 'поле для гольфа'
+          ELSE 'всё включено'
+        END AS food
+      FROM tours t
+      WHERE t.is_active = TRUE
+        AND t.tour_type = 'offer'
+      ORDER BY t.price DESC
+    `);
+
+    const tourIds = toursResult.rows.map((tour) => tour.id);
+
+    if (tourIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const imagesResult = await pool.query(
+      `
+      SELECT
+        id,
+        tour_id,
+        CASE
+          WHEN image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', image_url)
+          ELSE ''
+        END AS image_url,
+        is_main
+      FROM tour_images
+      WHERE tour_id = ANY($1)
+      ORDER BY is_main DESC, id ASC
+      `,
+      [tourIds]
+    );
+
+    const formattedTours = toursResult.rows.map((tour) => ({
+      ...tour,
+      images: imagesResult.rows.filter((image) => image.tour_id === tour.id)
+    }));
+
+    return res.status(200).json(formattedTours);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения предложений'
+    });
   }
 });
 
