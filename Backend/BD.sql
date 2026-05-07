@@ -432,3 +432,97 @@ VALUES
 (1, '/uploads/hotels/fort-arabesque/fort-arabesque4.png', FALSE),
 (1, '/uploads/hotels/fort-arabesque/fort-arabesque5.png', FALSE),
 (1, '/uploads/hotels/fort-arabesque/fort-arabesque-more.png', FALSE);
+
+
+INSERT INTO directions (name, country_slug, is_domestic)
+VALUES
+('Мальдивы', 'maldives', FALSE),
+('Египет', 'egypt', FALSE)
+ON CONFLICT (country_slug) DO NOTHING;
+
+INSERT INTO tours (
+    direction_id,
+    title,
+    short_description,
+    full_description,
+    price,
+    nights,
+    hotel_rating,
+    is_hot,
+    is_active,
+    is_popular,
+    tour_type,
+    location_name
+)
+VALUES
+(
+    (SELECT id FROM directions WHERE country_slug = 'maldives'),
+    'Hard Rock Hotel Maldives',
+    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock',
+    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock.',
+    477900,
+    9,
+    5.0,
+    TRUE,
+    TRUE,
+    FALSE,
+    'offer',
+    'Мальдивы, Южный Мале Атолл'
+),
+(
+    (SELECT id FROM directions WHERE country_slug = 'egypt'),
+    'Pickalbatros Luxury Suites',
+    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа',
+    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа.',
+    110200,
+    14,
+    5.0,
+    TRUE,
+    TRUE,
+    FALSE,
+    'offer',
+    'Шармс Бей'
+);
+
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/popular/hard-rock-hotel-maldives.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/hard-rock/hard-rock-1.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/hard-rock/hard-rock-2.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/hard-rock/hard-rock-3.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/popular/pickalbatros-luxury-suites.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/pickalbatros/pickalbatros-1.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/pickalbatros/pickalbatros-2.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
+    '/uploads/offers/pickalbatros/pickalbatros-3.png',
+    FALSE
+);
