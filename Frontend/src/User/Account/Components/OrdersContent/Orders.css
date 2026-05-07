@@ -1,0 +1,70 @@
+.orders-content {
+    width: 88%;
+}
+
+
+.orders-content h1 {
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    color: #1F2A36;
+    margin-bottom: 35px;
+}
+
+.order-card {
+    width: 100%;
+    background-color: #FFFFFF;
+    border-radius: 25px;
+    display: flex;
+    padding: 25px;
+    gap: 28px;
+    font-family: "Raleway", sans-serif;
+    letter-spacing: 1%;
+}
+
+.delete-order {
+    align-self: flex-start;
+    margin-left: auto;
+}
+
+.order-info-title h3 {
+    font-weight: 700;
+    font-size: 29px;
+    margin-bottom: 3px;
+}
+
+.order-info-title p {
+    font-weight: 500;
+    font-size: 20px;
+    color: #A4A4A4;
+}
+
+.order-info-title {
+    margin-bottom: 20px;
+}
+
+.order-info_list p {
+    font-weight: 500;
+    font-size: 16px;
+    line-height: 24px;
+}
+
+.order-info_list li:not(:last-child) {
+    margin-bottom: 18px;
+}
+
+.order-info strong {
+    font-weight: 600;
+    font-size: 20px;
+    margin-top: auto;
+}
+
+.order-info {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.order-image {
+    border-radius: 15px;
+}

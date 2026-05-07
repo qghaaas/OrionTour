@@ -5,8 +5,9 @@
 
 .account-inner {
     display: flex;
+    padding: 100px 0 280px 9%;
     background-color: #F9F9F9;
-    padding: 100px 0 280px;
+    gap: 80px;
 }
 
 .account-aside {
@@ -115,4 +116,14 @@
 
 .aside_select-list li.active img {
     filter: brightness(0) saturate(100%) invert(63%) sepia(70%) saturate(500%) hue-rotate(350deg);
+}
+
+.active-content {
+    flex: 1;
+}
+
+.footer-account-footer {
+    background-color: #F9F9F9;
+    margin: 0;
+    padding-bottom: 30px;
 }

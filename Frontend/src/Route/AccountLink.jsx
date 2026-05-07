@@ -9,7 +9,7 @@ export default function AccountLink() {
         <>
             <Header />
             <Account />
-            <Footer />
+            <Footer variant="account-footer" />
         </>
     )
 }
