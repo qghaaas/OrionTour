@@ -111,12 +111,13 @@ export default function RegistrationForm({ onOpenLogin, onCodeSent }) {
           required
         />
 
-        <button className="auth-activeBTN" type="submit" disabled={loadingSend}>
-          {loadingSend ? "Отправка..." : "Зарегистрироваться"}
-        </button>
 
         {error && <p className="auth-error">{error}</p>}
         {success && <p className="auth-success">{success}</p>}
+
+        <button className="auth-activeBTN" type="submit" disabled={loadingSend}>
+          {loadingSend ? "Отправка..." : "Зарегистрироваться"}
+        </button>
       </form>
     </div>
   );

@@ -100,3 +100,9 @@ button {
   bottom: 0;
   left: 0;
 }
+
+.name-title_page-sub {
+  font-family: "Raleway", sans-serif;
+  font-weight: 500;
+  font-size: 20px;
+}

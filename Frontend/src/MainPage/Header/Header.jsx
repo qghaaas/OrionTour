@@ -38,10 +38,10 @@ export default function Header() {
                                 <li><Link to="/Directions">Направления</Link></li>
                                 <li><Link to="#">Поиск тура</Link></li>
                                 <li><Link to="/DomesticTourism">Внутренний туризм</Link></li>
-                                <li><Link to="#">Блог</Link></li>
+                                <li><Link to="/Blog">Блог</Link></li>
                                 <li><Link to="#">Конструктор</Link></li>
-                                <li><Link to="#">О нас</Link></li>
-                                <li><Link to="#">Контакты</Link></li>
+                                <li><Link to="/AboutUs">О нас</Link></li>
+                                <li><Link to="/ContactInfo">Контакты</Link></li>
                             </ul>
                         </nav>
 

@@ -1,0 +1,84 @@
+.blog {
+    width: 100%;
+    height: fit-content;
+}
+
+.blog-inner {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 432px));
+    gap: 18px;
+    justify-content: center;
+
+    width: 90%;
+    margin: 0 auto;
+    padding: 130px 0 210px;
+}
+
+.blog-link {
+    display: block;
+    width: 100%;
+    max-width: 432px;
+    min-width: 0;
+}
+
+.blog-card {
+    position: relative;
+    width: 100%;
+    min-height: 422px;
+    padding: 30px;
+    box-sizing: border-box;
+    border-radius: 25px;
+    overflow: hidden;
+
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-position: center;
+
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+
+    color: #fff;
+}
+
+.blog-card::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.56) 29.81%, rgba(102, 102, 102, 0.1064) 62.02%);
+    z-index: 1;
+}
+
+.blog-card_item {
+    position: relative;
+    z-index: 2;
+
+    display: flex;
+    gap: 0 30px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.blog-card_item div {
+    display: flex;
+    align-items: center;
+    gap: 0 10px;
+}
+
+.blog-card_item span {
+    color: #fff;
+}
+
+.blog-card h2 {
+    position: relative;
+    z-index: 2;
+    margin: 0;
+    max-width: 100%;
+    min-width: 0;
+    font-family: "Raleway", sans-serif;
+    color: #fff;
+    font-weight: 700;
+    font-size: 30px;
+    line-height: 100%;
+    white-space: normal;
+}

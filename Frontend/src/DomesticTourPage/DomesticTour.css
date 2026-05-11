@@ -64,6 +64,7 @@ span {
     background-color: #F9F9F9;
     padding: 240px 0 40px;
     margin-top: -50px;
+    z-index: -1;
 }
 
 

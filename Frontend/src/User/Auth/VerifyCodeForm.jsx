@@ -74,6 +74,9 @@ export default function VerifyCodeForm({
   const handleChange = (index, value) => {
     if (!/^[0-9]?$/.test(value)) return;
 
+    setError("");
+    setSuccess("");
+
     const newCode = [...code];
     newCode[index] = value;
     setCode(newCode);
@@ -148,6 +151,7 @@ export default function VerifyCodeForm({
               type="text"
               maxLength={1}
               value={digit}
+              className={error ? "verify-input-error" : ""}
               onChange={(e) => handleChange(index, e.target.value)}
               onKeyDown={(e) => handleKeyDown(index, e)}
               disabled={loadingVerify}
@@ -158,6 +162,9 @@ export default function VerifyCodeForm({
         {loadingVerify && <p className="auth-success">Проверка кода...</p>}
       </div>
 
+      {error && <p className="auth-error">{error}</p>}
+      {success && <p className="auth-success">{success}</p>}
+
       <button
         className="verify-cod"
         type="button"
@@ -167,12 +174,10 @@ export default function VerifyCodeForm({
         {timer > 0
           ? `Отправить новый код через ${timer} сек`
           : loadingResend
-          ? "Отправка..."
-          : "Отправить новый код"}
+            ? "Отправка..."
+            : "Отправить новый код"}
       </button>
 
-      {error && <p className="auth-error">{error}</p>}
-      {success && <p className="auth-success">{success}</p>}
     </div>
   );
 }

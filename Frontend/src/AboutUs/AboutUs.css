@@ -1,0 +1,45 @@
+.about-us {
+    width: 100%;
+    height: fit-content;
+}
+
+.about-us {
+    font-family: "Arimo", sans-serif;
+    font-size: 20px;
+}
+
+.about-us_inner {
+    padding: 64px 0;
+    width: 50%;
+}
+
+.about-us_inner p:not(:last-child) {
+    margin-bottom: 20px;
+}
+
+.details {
+    margin: 0 auto;
+    padding: 42px 9% 11%;
+    background-color: #F9F9F9;
+}
+
+.details h2 {
+    font-size: 35px;
+    font-weight: 700;
+    margin-bottom: 40px;
+}
+
+.details-inner {
+    display: flex;
+    gap: 0 138px;
+}
+
+.details-list li:not(:last-child) {
+    margin-bottom: 28px;
+}
+
+.footer-aboutus-footer {
+    margin: 0;
+    background-color: #F9F9F9;
+    padding-bottom: 2%;
+}
