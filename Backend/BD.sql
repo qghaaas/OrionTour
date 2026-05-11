@@ -45,7 +45,7 @@ CREATE TABLE tours (
     tour_type VARCHAR(100),
     location_name VARCHAR(255),
     hotel_lat NUMERIC(9,6),
-	hotel_lng NUMERIC(9,6)
+    hotel_lng NUMERIC(9,6)
 );
 
 -- Таблица изображений тура
@@ -127,7 +127,7 @@ CREATE TABLE blog_post_images (
     id BIGSERIAL PRIMARY KEY,
     sort_order INTEGER DEFAULT 0,
     blog_post_id BIGINT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
-    image_url TEXT NOT null,
+    image_url TEXT NOT NULL,
     section_id BIGINT REFERENCES blog_post_sections(id) ON DELETE CASCADE
 );
 
@@ -165,7 +165,6 @@ CREATE TABLE registration_codes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
 CREATE INDEX idx_registration_codes_email ON registration_codes(email);
 CREATE INDEX idx_registration_codes_expires_at ON registration_codes(expires_at);
 
@@ -181,7 +180,7 @@ VALUES
     ('Мальдивы', 'maldives', 3.202778, 73.220680, FALSE)
 ON CONFLICT (country_slug) DO NOTHING;
 
--- Категории внутреннего туризма из DomTour.jsx
+-- Категории внутреннего туризма
 INSERT INTO domestic_categories (title, image_url, slug, sort_order, is_active)
 VALUES
     ('Туры в Калининград', '/uploads/domtour/frontdom.png', 'kaliningrad-tours-1', 1, TRUE),
@@ -189,7 +188,11 @@ VALUES
     ('Экскурсии по Светлогорску, Зеленоградску, Пионерску', '/uploads/domtour/frontdom3.png', 'svetlogorsk-zelenogradsk-pionersk', 3, TRUE),
     ('Индивидуальные экскурсии', '/uploads/domtour/frontdom4.png', 'individual-excursions', 4, TRUE);
 
--- Популярные туры
+-- =========================
+-- ПОПУЛЯРНЫЕ ТУРЫ ДЛЯ ГЛАВНОГО СВАЙПЕРА
+-- Только эти 3 тура имеют is_popular = TRUE
+-- =========================
+
 INSERT INTO tours (
     direction_id,
     title,
@@ -202,7 +205,9 @@ INSERT INTO tours (
     is_active,
     is_popular,
     location_name,
-    tour_type
+    tour_type,
+    hotel_lat,
+    hotel_lng
 )
 VALUES
 (
@@ -210,16 +215,19 @@ VALUES
     'Fort Arabesque The Villas',
     'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых
 Виллы с одной или двумя спальнями',
-    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых
-Виллы с одной или двумя спальнями',
+    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых. 65 вилл с одной или двумя спальнями, все с просторной стойкой регистрации и гостиной, современной ванной комнатой и частной террасой с доступом к бассейну с подогревом.
+
+Роскошные удобства включают широкий выбор кофе / чая и натуральных трав, полностью укомплектованный мини-бар, собственный DVD-плеер, ЖК-телевизор с плоским экраном и библиотеку последних международных фильмов.',
     105900.00,
     9,
-    5.0,
+    4.0,
     FALSE,
     TRUE,
     TRUE,
     'Макади Бей, Хургада',
-    'hotel'
+    'hotel',
+    26.991200,
+    33.899800
 ),
 (
     (SELECT id FROM directions WHERE country_slug = 'maldives'),
@@ -233,7 +241,9 @@ VALUES
     TRUE,
     TRUE,
     'Мальдивы, Южный Мале Атолл',
-    'hotel'
+    'hotel',
+    NULL,
+    NULL
 ),
 (
     (SELECT id FROM directions WHERE country_slug = 'egypt'),
@@ -247,50 +257,69 @@ VALUES
     TRUE,
     TRUE,
     'Шаркс Бей',
-    'hotel'
-),
-(
-    (SELECT id FROM directions WHERE country_slug = 'egypt'),
-    'Fort Arabesque Luxury Villas',
-    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых
-Виллы с одной или двумя спальнями',
-    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых
-Виллы с одной или двумя спальнями',
-    105900.00,
-    9,
-    5.0,
-    FALSE,
-    TRUE,
-    TRUE,
-    'Макади Бей, Хургада',
-    'hotel'
+    'hotel',
+    NULL,
+    NULL
 );
 
--- Изображения популярных туров: каждому туру своё изображение
+-- Главные изображения популярных туров
 INSERT INTO tour_images (tour_id, image_url, is_main)
 VALUES
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas'),
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
     '/uploads/popular/fort-arabesque-the-villas.png',
     TRUE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives'),
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
     '/uploads/popular/hard-rock-hotel-maldives.png',
     TRUE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites'),
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
     '/uploads/popular/pickalbatros-luxury-suites.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque Luxury Villas'),
-    '/uploads/popular/fort-arabesque-the-villas.png',
     TRUE
 );
 
--- Отзывы из Reviews.jsx
+-- Дополнительные изображения Fort Arabesque.
+-- Важно: все FALSE, чтобы у тура не было двух главных картинок.
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque2.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque3.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque4.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque5.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque/fort-arabesque-more.png',
+    FALSE
+);
+
+-- =========================
+-- ОТЗЫВЫ
+-- =========================
+
 INSERT INTO reviews (author_name, rating, review_text, sort_order, is_active)
 VALUES
 (
@@ -322,6 +351,10 @@ VALUES
     TRUE
 );
 
+-- =========================
+-- КАЛИНИНГРАДСКИЕ ТУРЫ
+-- Все is_popular = FALSE, чтобы они не попадали в главный свайпер
+-- =========================
 
 INSERT INTO tours (
     direction_id,
@@ -349,8 +382,8 @@ VALUES
     4.0,
     FALSE,
     TRUE,
-    TRUE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours'),
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
     'Экскурсионный',
     'Калининград'
 ),
@@ -364,8 +397,8 @@ VALUES
     4.0,
     FALSE,
     TRUE,
-    TRUE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours'),
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
     'Природный',
     'Куршская коса'
 ),
@@ -380,7 +413,7 @@ VALUES
     FALSE,
     TRUE,
     FALSE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours'),
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
     'Семейный',
     'Калининградская область'
 ),
@@ -394,12 +427,11 @@ VALUES
     4.0,
     TRUE,
     TRUE,
-    TRUE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours'),
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
     'Активный',
     'Калининград и побережье'
 );
-
 
 INSERT INTO tour_images (tour_id, image_url, is_main)
 VALUES
@@ -424,35 +456,10 @@ VALUES
     TRUE
 );
 
-UPDATE tours
-SET
-    title = 'Fort Arabesque The Villas',
-    hotel_rating = 4.0,
-    nights = 9,
-    location_name = 'Макади Бей, Хургада',
-    full_description = 'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых. 65 вилл с одной или двумя спальнями, все с просторной стойкой регистрации и гостиной, современной ванной комнатой и частной террасой с доступом к бассейну с подогревом.
-
-Роскошные удобства включают широкий выбор кофе / чая и натуральных трав, полностью укомплектованный мини-бар, собственный DVD-плеер, ЖК-телевизор с плоским экраном и библиотеку последних международных фильмов.',
-    hotel_lat = 26.991200,
-    hotel_lng = 33.899800
-WHERE id = 1;
-
-
-INSERT INTO tour_images (tour_id, image_url, is_main)
-VALUES
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque.png', TRUE),
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque2.png', FALSE),
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque3.png', FALSE),
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque4.png', FALSE),
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque5.png', FALSE),
-(1, '/uploads/hotels/fort-arabesque/fort-arabesque-more.png', FALSE);
-
-
-INSERT INTO directions (name, country_slug, is_domestic)
-VALUES
-('Мальдивы', 'maldives', FALSE),
-('Египет', 'egypt', FALSE)
-ON CONFLICT (country_slug) DO NOTHING;
+-- =========================
+-- ТУРЫ ДЛЯ СПЕЦПРЕДЛОЖЕНИЙ
+-- is_popular = FALSE, чтобы не попадали в главный свайпер
+-- =========================
 
 INSERT INTO tours (
     direction_id,
@@ -474,7 +481,7 @@ VALUES
     'Hard Rock Hotel Maldives',
     'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock',
     'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock.',
-    477900,
+    477900.00,
     9,
     5.0,
     TRUE,
@@ -488,7 +495,7 @@ VALUES
     'Pickalbatros Luxury Suites',
     'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа',
     'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа.',
-    110200,
+    110200.00,
     14,
     5.0,
     TRUE,
@@ -541,7 +548,10 @@ VALUES
     FALSE
 );
 
--- данные блога
+-- =========================
+-- БЛОГ
+-- =========================
+
 -- 1. 5 самых безопасных стран мира
 INSERT INTO blog_posts (
     title,
@@ -573,14 +583,14 @@ INSERT INTO blog_post_sections (
 )
 VALUES
 (
-    1,
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
     'Исландия',
     'На протяжении многих лет мировым лидером в этом вопросе остается Исландия, где практически отсутствует тяжкая преступность, а полиция традиционно не носит огнестрельное оружие, что создает атмосферу абсолютного спокойствия.',
     NULL,
     1
 ),
 (
-    1,
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
     'Ирландия',
     'Ирландия также занимает лидирующие позиции благодаря своему историческому нейтралитету и стабильной внутренней политике, обеспечивающей гражданам защиту от внешних и внутренних угроз.',
     'Страна славится не только красивыми пейзажами, рыжеволосыми жителями, пабами, народными танцами и легендами о лепреконах.
@@ -589,14 +599,14 @@ VALUES
     2
 ),
 (
-    1,
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
     'Дания',
     'Эту эстафету безопасности в Европе подхватывает Дания, которая считается одной из самых стабильных стран мира благодаря развитой системе социального обеспечения и минимальному уровню коррупции, что формирует у граждан высокое чувство ответственности и сопричастности к жизни общества. ',
     'Не менее важную роль в обеспечении глобального мира играет Ирландия, чей статус нейтралитета и успешные экономические реформы позволили создать общество с минимальным уровнем насильственных преступлений и высокой степенью внутренней гармонии.',
     3
 ),
 (
-    1,
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
     'Новая Зеландия',
     'В Южном полушарии эталоном мирного существования выступает Новая Зеландия, которая благодаря своей географической удаленности от мировых очагов напряженности и прогрессивной социальной политике обеспечивает своим жителям исключительный уровень личной безопасности и правопорядка. ',
     'Говоря о Новой Зеландии, многие вспомнят безмятежные зелёные долины из знаменитой экранизации «Властелина колец». Жизнь в этой стране так же стабильна и безопасна, как 
@@ -607,7 +617,7 @@ VALUES
     4
 ),
 (
-    1,
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
     'Сингапур',
     'Сингапур считается одной из самых безопасных стран мира благодаря сочетанию строгих законов и их последовательного применения, эффективной и хорошо финансируемой полиции, низкого уровня коррупции и высокого стандарта жизни, что вместе снижает мотивацию к преступности и повышает доверие к институтам. ',
     'Сингапур также известен своим высоким уровнем образования и социальной стабильности. Граждане страны, как правило, имеют доступ к качественному образованию, что способствует формированию ответственного отношения к обществу и окружающим. Местные жители проявляют высокий уровень уважения к другим, что создает дружественную атмосферу.',
@@ -616,13 +626,83 @@ VALUES
 
 INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
 VALUES
-(1, 1, '/uploads/blog/blog-inner-imgs/blog-inner-safe1.png', 1),
-(1, 2, '/uploads/blog/blog-inner-imgs/blog-inner-safe2.png', 1),
-(1, 2, '/uploads/blog/blog-inner-imgs/blog-inner-safe3.png', 2),
-(1, 3, '/uploads/blog/blog-inner-imgs/blog-inner-safe4.png', 1),
-(1, 4, '/uploads/blog/blog-inner-imgs/blog-inner-safe5.png', 1),
-(1, 4, '/uploads/blog/blog-inner-imgs/blog-inner-safe6.png', 2),
-(1, 5, '/uploads/blog/blog-inner-imgs/blog-inner-safe7.png', 1);
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe2.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe3.png',
+    2
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 3
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe4.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 4
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe5.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 4
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe6.png',
+    2
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 1 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 5
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-safe7.png',
+    1
+);
 
 -- 2. Как путешествовать по Европе в 2026 году
 INSERT INTO blog_posts (
@@ -810,7 +890,7 @@ VALUES
 (
     (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1),
     'Музей янтаря',
-    'Музей янтаря в Калининграде – это уникальное место, где можно узнать обо всех аспектах использования янтаря, добываемого в этом регионе.',
+    'Музей янтаря в Калининграде – это уникальное место, где можно узнать обо всех аспектах использования янтаря, добываемого только в этом регионе.',
     NULL,
     2
 );
