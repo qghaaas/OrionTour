@@ -75,50 +75,51 @@ export default function Directions() {
 
     return (
         <section className="directions">
-            <div className="directions-top">
-                <div className="directions-top_title">
-                    <div className="directions-top_title-inner">
-                        <h2>{tour.title}</h2>
-
-                        <div className="directions-top_title-rev">
-                            <span>{Number(tour.hotel_rating)}</span>
-                            <img src={star} alt="star" />
-                        </div>
-                    </div>
-
-                    <div className="directions-top_title-bot">
-                        <span>{tour.nights} ночей</span>
-                        <h3>{tour.location_name}</h3>
-                    </div>
-                </div>
-
-                <div className="directions-top_img">
-                    <div className="directions-gallery">
-                        <div className="directions-gallery-main">
-                            <img src={mainImage} alt={tour.title} />
-                        </div>
-
-                        <div className="directions-gallery-grid">
-                            {sideImages.map((img, index) => (
-                                <div
-                                    className={`directions-gallery-small ${index === 4 ? 'directions-gallery-more' : ''
-                                        }`}
-                                    key={img.id}
-                                >
-                                    <img src={img.image_url} alt={tour.title} />
-
-                                    {index === 4 && (
-                                        <div className="directions-gallery-overlay">
-                                            +40 <br /> фото
-                                        </div>
-                                    )}
-                                </div>
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </div>
             <div className="container">
+
+                <div className="directions-top">
+                    <div className="directions-top_title">
+                        <div className="directions-top_title-inner">
+                            <h2>{tour.title}</h2>
+
+                            <div className="directions-top_title-rev">
+                                <span>{Number(tour.hotel_rating)}</span>
+                                <img src={star} alt="star" />
+                            </div>
+                        </div>
+
+                        <div className="directions-top_title-bot">
+                            <span>{tour.nights} ночей</span>
+                            <h3>{tour.location_name}</h3>
+                        </div>
+                    </div>
+
+                    <div className="directions-top_img">
+                        <div className="directions-gallery">
+                            <div className="directions-gallery-main">
+                                <img src={mainImage} alt={tour.title} />
+                            </div>
+
+                            <div className="directions-gallery-grid">
+                                {sideImages.map((img, index) => (
+                                    <div
+                                        className={`directions-gallery-small ${index === 4 ? 'directions-gallery-more' : ''
+                                            }`}
+                                        key={img.id}
+                                    >
+                                        <img src={img.image_url} alt={tour.title} />
+
+                                        {index === 4 && (
+                                            <div className="directions-gallery-overlay">
+                                                +40 <br /> фото
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div className="directions-inner">
                     <div className="directions-des_loc">
                         <div className="directions-description">

@@ -18,6 +18,9 @@
 .domtour-page_card-content {
     width: 100%;
     max-width: 810px;
+    display: flex;
+    flex-direction: column;
+
 }
 
 .domtour-page_card h2,
@@ -67,6 +70,10 @@ span {
     z-index: -1;
 }
 
+
+.main-btn_site-DomestictTour{
+    margin-top: auto;
+}
 
 @media (max-width: 1024px) {
 

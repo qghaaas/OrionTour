@@ -144,16 +144,16 @@
 
 .popdes-btn {
     position: absolute;
-    top: 67%;
+    top: 60%;
     transform: translateY(-50%);
     z-index: 10;
 }
 
 .popdes-prev {
-    left: 8.5%;
+    left: 4.5%;
 }
 
 .popdes-next {
-    right: 8.5%;
+    right: 4.5%;
 }
 

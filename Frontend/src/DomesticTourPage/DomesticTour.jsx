@@ -69,7 +69,7 @@ export default function DomesticTour() {
                                 </span>
                                 <p>{card.description}</p>
 
-                                <button className="main-btn_site" type="button">
+                                <button className="main-btn_site main-btn_site-DomestictTour" type="button">
                                     Купить
                                 </button>
                             </div>
