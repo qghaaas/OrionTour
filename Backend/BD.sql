@@ -106,15 +106,29 @@ CREATE TABLE blog_posts (
     short_description TEXT,
     content TEXT NOT NULL,
     views INTEGER DEFAULT 0,
+    is_active BOOLEAN DEFAULT TRUE,
+    sort_order INTEGER DEFAULT 0,
+    main_image_url TEXT,
     published_at TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE blog_post_sections (
+    id BIGSERIAL PRIMARY KEY,
+    blog_post_id BIGINT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
+    title VARCHAR(255) NOT NULL,
+    text TEXT NOT NULL,
+    subtext TEXT,
+    sort_order INTEGER DEFAULT 0
 );
 
 -- Таблица изображений статьи
 CREATE TABLE blog_post_images (
     id BIGSERIAL PRIMARY KEY,
+    sort_order INTEGER DEFAULT 0,
     blog_post_id BIGINT NOT NULL REFERENCES blog_posts(id) ON DELETE CASCADE,
-    image_url TEXT NOT NULL
+    image_url TEXT NOT null,
+    section_id BIGINT REFERENCES blog_post_sections(id) ON DELETE CASCADE
 );
 
 -- Таблица избранных туров пользователя
@@ -525,4 +539,627 @@ VALUES
     (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
     '/uploads/offers/pickalbatros/pickalbatros-3.png',
     FALSE
+);
+
+-- данные блога
+-- 1. 5 самых безопасных стран мира
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    '5 самых безопасных стран мира',
+    'Подборка стран с высоким уровнем безопасности для путешествий',
+    'Статья о самых безопасных странах мира',
+    0,
+    '2026-04-11',
+    '/uploads/blog/blog-main-imgs/blog-main-safe.png',
+    TRUE,
+    1
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    1,
+    'Исландия',
+    'На протяжении многих лет мировым лидером в этом вопросе остается Исландия, где практически отсутствует тяжкая преступность, а полиция традиционно не носит огнестрельное оружие, что создает атмосферу абсолютного спокойствия.',
+    NULL,
+    1
+),
+(
+    1,
+    'Ирландия',
+    'Ирландия также занимает лидирующие позиции благодаря своему историческому нейтралитету и стабильной внутренней политике, обеспечивающей гражданам защиту от внешних и внутренних угроз.',
+    'Страна славится не только красивыми пейзажами, рыжеволосыми жителями, пабами, народными танцами и легендами о лепреконах.
+
+За последнее десятилетие качество жизни ирландцев непрерывно росло, достигнув 2-го места в мировом рейтинге.',
+    2
+),
+(
+    1,
+    'Дания',
+    'Эту эстафету безопасности в Европе подхватывает Дания, которая считается одной из самых стабильных стран мира благодаря развитой системе социального обеспечения и минимальному уровню коррупции, что формирует у граждан высокое чувство ответственности и сопричастности к жизни общества. ',
+    'Не менее важную роль в обеспечении глобального мира играет Ирландия, чей статус нейтралитета и успешные экономические реформы позволили создать общество с минимальным уровнем насильственных преступлений и высокой степенью внутренней гармонии.',
+    3
+),
+(
+    1,
+    'Новая Зеландия',
+    'В Южном полушарии эталоном мирного существования выступает Новая Зеландия, которая благодаря своей географической удаленности от мировых очагов напряженности и прогрессивной социальной политике обеспечивает своим жителям исключительный уровень личной безопасности и правопорядка. ',
+    'Говоря о Новой Зеландии, многие вспомнят безмятежные зелёные долины из знаменитой экранизации «Властелина колец». Жизнь в этой стране так же стабильна и безопасна, как 
+в уютном Хоббитоне.
+ 
+Удалённая от конфликтов внешнего мира Новая Зеландия обеспечивает своим гражданам комфорт, бесплатное медицинское обслуживание, образование и безупречную экологическую обстановку.
+',
+    4
+),
+(
+    1,
+    'Сингапур',
+    'Сингапур считается одной из самых безопасных стран мира благодаря сочетанию строгих законов и их последовательного применения, эффективной и хорошо финансируемой полиции, низкого уровня коррупции и высокого стандарта жизни, что вместе снижает мотивацию к преступности и повышает доверие к институтам. ',
+    'Сингапур также известен своим высоким уровнем образования и социальной стабильности. Граждане страны, как правило, имеют доступ к качественному образованию, что способствует формированию ответственного отношения к обществу и окружающим. Местные жители проявляют высокий уровень уважения к другим, что создает дружественную атмосферу.',
+    5
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(1, 1, '/uploads/blog/blog-inner-imgs/blog-inner-safe1.png', 1),
+(1, 2, '/uploads/blog/blog-inner-imgs/blog-inner-safe2.png', 1),
+(1, 2, '/uploads/blog/blog-inner-imgs/blog-inner-safe3.png', 2),
+(1, 3, '/uploads/blog/blog-inner-imgs/blog-inner-safe4.png', 1),
+(1, 4, '/uploads/blog/blog-inner-imgs/blog-inner-safe5.png', 1),
+(1, 4, '/uploads/blog/blog-inner-imgs/blog-inner-safe6.png', 2),
+(1, 5, '/uploads/blog/blog-inner-imgs/blog-inner-safe7.png', 1);
+
+-- 2. Как путешествовать по Европе в 2026 году
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Как путешествовать по Европе в 2026 году',
+    'Гид по путешествиям по Европе в 2026 году',
+    'Планируя путешествие по Европе в 2026 году, стоит обратить внимание на улучшение инфраструктуры и развитие транспорта. Современные поезда, экологически чистые автобусы и новые авиаперевозчики дают массу возможностей для комфортного перемещения.
+
+Кроме того, стоит ожидать значительных улучшений в системе виз, которая упростит процесс для многих стран. Повышение безопасности на границах, новые технологии для облегчения прохождения пограничного контроля, а также развитие культурного туризма окажут влияние на скорость и доступность путешествий по континенту.',
+    0,
+    '2026-05-04',
+    '/uploads/blog/blog-main-imgs/blog-main-europe-travel.png',
+    TRUE,
+    2
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1),
+    'Транспорт и новые возможности',
+    'Современные поезда, экологически чистые автобусы и новые авиаперевозчики открывают новые горизонты для путешественников, желающих исследовать Европу в 2026 году.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1),
+    'Визовые улучшения',
+    'Страны Европы обещают значительные улучшения в визовой системе, что значительно упростит процесс для путешественников и ускорит поездки.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-europe-transport1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 2 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-europe-visa1.png',
+    1
+);
+
+-- 3. Как купить дешёвые билеты на самолёт
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Как купить дешёвые билеты на самолёт',
+    'Рекомендации по поиску дешёвых авиабилетов',
+    'Чтобы сэкономить на авиабилетах, прежде всего важно заранее планировать поездки. Билеты на самолёт обычно дешевле, если они приобретаются за несколько месяцев до даты вылета. Использование специализированных сайтов и приложений для поиска дешёвых предложений также значительно сокращает расходы.
+
+Стоит также обратить внимание на выбор рейсов с пересадками и не самых популярных дней недели для вылета. Многие авиакомпании предлагают скидки на рейсы, которые не пользуются высоким спросом, а по срокам они вполне могут быть подходящими.',
+    0,
+    '2026-05-04',
+    '/uploads/blog/blog-main-imgs/blog-main-cheap-flights.png',
+    TRUE,
+    3
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1),
+    'Как заранее планировать поездки',
+    'Заранее приобретённые билеты на самолёт обойдутся значительно дешевле, чем те, которые покупаются в последний момент.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1),
+    'Использование специализированных сайтов',
+    'Использование специальных агрегаторов для поиска дешёвых билетов может существенно снизить расходы.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-cheap-flights1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 3 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-cheap-flights2.png',
+    1
+);
+
+-- 4. Достопримечательности Калининграда
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Достопримечательности Калининграда',
+    'Обзор достопримечательностей Калининграда',
+    'Калининград — это не только центр старинной истории, но и место для современных туристов, которые любят сочетать экскурсии по уникальным памятникам с отдыхом на природе. Город привлекает туристов благодаря своему уникальному расположению и яркой исторической атмосфере.
+
+Одной из главных достопримечательностей является Кёнигсбергский кафедральный собор, который стоит на острове Канта и олицетворяет собой богатое историческое наследие. Также стоит посетить Музей янтаря, где можно узнать об уникальных свойствах этого камня, который добывается только в этом регионе.',
+    0,
+    '2026-03-03',
+    '/uploads/blog/blog-main-imgs/blog-main-kaliningrad-sights.png',
+    TRUE,
+    4
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1),
+    'Кёнигсбергский кафедральный собор',
+    'Одной из главных достопримечательностей Калининграда является Кёнигсбергский кафедральный собор, символ города и культурное наследие региона.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1),
+    'Музей янтаря',
+    'Музей янтаря в Калининграде – это уникальное место, где можно узнать обо всех аспектах использования янтаря, добываемого в этом регионе.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-kaliningrad1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 4 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-kaliningrad2.png',
+    1
+);
+
+-- 5. Куда поехать в марте 2026 года
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Куда поехать в марте 2026 года',
+    'Лучшие направления для путешествий в марте',
+    'Март — это идеальное время для путешествий, когда зимний сезон ещё не закончился, а весна уже начинает ощущаться. Для любителей горных лыж март — это последний месяц для катания в Альпах и других горных регионах Европы. Также в марте начинают открываться пляжные курорты в южных странах.
+
+Любители культуры и искусства могут отправиться в столицу Франции, Париж, где в это время проходят театральные фестивали и выставки.',
+    0,
+    '2026-02-15',
+    '/uploads/blog/blog-main-imgs/blog-main-march-travel.png',
+    TRUE,
+    5
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1),
+    'Горнолыжные курорты в марте',
+    'Март — последний месяц сезона для катания на горных лыжах, и лучшие горнолыжные курорты Европы начинают принимать туристов.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1),
+    'Пляжные курорты в марте',
+    'Март — это отличное время для того, чтобы насладиться пляжным отдыхом в южных странах, таких как Турция и Египет.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-march-ski.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 5 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-march-beach.png',
+    1
+);
+
+-- 6. Лучшие отели Маккади Бей
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Лучшие отели Маккади Бей',
+    'Обзор лучших отелей в Маккади Бей',
+    'Маккади Бей — это роскошный курорт в Египте, который привлекает туристов своим качественным обслуживанием и высококлассными отелями. В этой статье мы рассмотрим лучшие отели Маккади Бей, которые предлагают высокий уровень комфорта и сервиса.
+
+Отель Fort Arabesque The Villas является одним из самых популярных на курорте. Виллы с частными бассейнами и шикарным видом на Красное море привлекают туристов со всего мира. Кроме того, отель предлагает разнообразные спа-процедуры и кухни разных стран.',
+    0,
+    '2026-02-05',
+    '/uploads/blog/blog-main-imgs/blog-main-makadi-bay-hotels.png',
+    TRUE,
+    6
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 6 ORDER BY id DESC LIMIT 1),
+    'Fort Arabesque The Villas',
+    'Виллы с частными бассейнами и шикарным видом на Красное море — популярный выбор для туристов, желающих насладиться комфортом и роскошью.',
+    NULL,
+    1
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 6 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 6 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-makadi-bay1.png',
+    1
+);
+
+-- 7. Где отдохнуть с детьми летом за границей
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Где отдохнуть с детьми летом за границей',
+    'Лучшие места для отдыха с детьми летом',
+    'Если вы планируете летний отдых с детьми, стоит обратить внимание на страны с развитой инфраструктурой для семейного отдыха. Например, в Испании и Италии можно найти множество курортов с детскими клубами, бассейнами и программами для детей всех возрастов.
+
+Для тех, кто любит активный отдых, можно поехать в горы, где дети смогут заниматься альпинизмом, катанием на велосипедах и других активных занятиях. Летний отдых на пляже также является отличным вариантом, особенно в Турции и Греции, где огромное количество семейных отелей.',
+    0,
+    '2026-01-24',
+    '/uploads/blog/blog-main-imgs/blog-main-family-vacation.png',
+    TRUE,
+    7
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1),
+    'Семейные курорты Европы',
+    'Испания и Италия предлагают отличные курорты для семейного отдыха с детьми, включая детские клубы и бассейны.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1),
+    'Активный отдых с детьми',
+    'Если ваши дети любят активный отдых, горы и приключенческие туры могут быть отличным выбором.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-family-vacation1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 7 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-family-vacation2.png',
+    1
+);
+
+-- 8. Что посмотреть в Турции
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Что посмотреть в Турции',
+    'Обзор туристических достопримечательностей Турции',
+    'Турция — это не только пляжи и курорты, но и богатая культура и история. Стамбул — это город, где встречаются Восток и Запад, и который представляет собой смесь древней истории с современным стилем жизни. В нем стоит посетить знаменитую Собор Святой Софии, Голубую мечеть и дворец Топкапы.
+
+Кроме того, для любителей природы стоит отправиться в Каппадокию, где вас ждут фантастические пейзажи и поездки на воздушных шарах. Также Турция известна своими античными памятниками и древними городами, такими как Эфес.',
+    0,
+    '2026-01-12',
+    '/uploads/blog/blog-main-imgs/blog-main-turkey-sights.png',
+    TRUE,
+    8
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1),
+    'Стамбул',
+    'Город, который объединяет Восток и Запад. Стамбул — это культурное сердце Турции, с множеством исторических достопримечательностей.',
+    NULL,
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1),
+    'Каппадокия и природные чудеса',
+    'Необычные пейзажи Каппадокии и поездки на воздушных шарах — это обязательные моменты для тех, кто ищет необычные приключения.',
+    NULL,
+    2
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-turkey1.png',
+    1
+),
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 8 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 2
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-turkey2.png',
+    1
+);
+
+-- 9. Страны, куда не нужна виза
+INSERT INTO blog_posts (
+    title,
+    short_description,
+    content,
+    views,
+    published_at,
+    main_image_url,
+    is_active,
+    sort_order
+)
+VALUES (
+    'Страны, куда не нужна виза',
+    'Обзор стран, в которые не нужна виза для граждан России',
+    'Для путешественников, которым не нравится тратить время на получение виз, существует множество стран, куда можно поехать без лишних формальностей. В этом списке есть как экзотические места, так и достаточно популярные направления для отдыха.
+
+Например, туристы из России могут свободно путешествовать в такие страны, как Турция, Израиль, Армения и Сербия, не оформляя визу. Эти страны предлагают массу достопримечательностей, комфортные курорты и удобное географическое расположение для краткосрочных поездок.',
+    0,
+    '2026-01-10',
+    '/uploads/blog/blog-main-imgs/blog-main-no-visa-countries.png',
+    TRUE,
+    9
+);
+
+INSERT INTO blog_post_sections (
+    blog_post_id,
+    title,
+    text,
+    subtext,
+    sort_order
+)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 9 ORDER BY id DESC LIMIT 1),
+    'Безвизовые страны для россиян',
+    'Россияне могут путешествовать без визы в несколько стран Европы и Азии, что делает путешествия ещё удобнее.',
+    NULL,
+    1
+);
+
+INSERT INTO blog_post_images (blog_post_id, section_id, image_url, sort_order)
+VALUES
+(
+    (SELECT id FROM blog_posts WHERE sort_order = 9 ORDER BY id DESC LIMIT 1),
+    (
+        SELECT id FROM blog_post_sections
+        WHERE blog_post_id = (SELECT id FROM blog_posts WHERE sort_order = 9 ORDER BY id DESC LIMIT 1)
+          AND sort_order = 1
+        LIMIT 1
+    ),
+    '/uploads/blog/blog-inner-imgs/blog-inner-no-visa1.png',
+    1
 );

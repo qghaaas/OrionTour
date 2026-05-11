@@ -1,23 +1,28 @@
 import '../../main.css'
 import './PopularDes.css'
 import arrowSwiper from '../../mainIMG/arrowSwiper.svg'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 import { Swiper, SwiperSlide } from 'swiper/react'
-import { Navigation } from 'swiper/modules'
 
 import 'swiper/css'
-import 'swiper/css/navigation'
 
 export default function PopularDes() {
     const [cards, setCards] = useState([])
+    const swiperRef = useRef(null)
 
     useEffect(() => {
         fetch('http://localhost:3010/api/popular-tours')
             .then((res) => res.json())
-            .then((data) => setCards(data))
+            .then((data) => {
+                if (Array.isArray(data)) {
+                    setCards(data.slice(0, 3))
+                }
+            })
             .catch((err) => console.error('Ошибка загрузки популярных туров:', err))
     }, [])
+
+    const swiperCards = cards.length === 3 ? [...cards, ...cards] : cards
 
     return (
         <section className="popdes">
@@ -25,16 +30,20 @@ export default function PopularDes() {
                 <div className="popdes-inner">
                     <h2>Популярные направления</h2>
 
-                    <button className="popdes-btn popdes-prev" type="button">
+                    <button
+                        className="popdes-btn popdes-prev"
+                        type="button"
+                        onClick={() => swiperRef.current?.slidePrev()}
+                    >
                         <img src={arrowSwiper} alt="Назад" />
                     </button>
 
                     <Swiper
-                        modules={[Navigation]}
-                        navigation={{
-                            prevEl: '.popdes-prev',
-                            nextEl: '.popdes-next',
+                        onSwiper={(swiper) => {
+                            swiperRef.current = swiper
                         }}
+                        loop={cards.length === 3}
+                        watchOverflow={false}
                         spaceBetween={71}
                         slidesPerView={3}
                         breakpoints={{
@@ -50,8 +59,8 @@ export default function PopularDes() {
                         }}
                         className="pop-swiper"
                     >
-                        {cards.map((card) => (
-                            <SwiperSlide key={card.id}>
+                        {swiperCards.map((card, index) => (
+                            <SwiperSlide key={`${card.id}-${index}`}>
                                 <div className="pop-card">
                                     <div className="pop-card_top">
                                         <img src={card.image} alt={card.title} />
@@ -66,6 +75,7 @@ export default function PopularDes() {
                                         </div>
 
                                         <span className="pop-card_time">{card.nights}</span>
+
                                         <button className="main-btn_site" type="button">
                                             Забронировать
                                         </button>
@@ -75,7 +85,11 @@ export default function PopularDes() {
                         ))}
                     </Swiper>
 
-                    <button className="popdes-btn popdes-next" type="button">
+                    <button
+                        className="popdes-btn popdes-next"
+                        type="button"
+                        onClick={() => swiperRef.current?.slideNext()}
+                    >
                         <img src={arrowSwiper} alt="Вперёд" />
                     </button>
                 </div>

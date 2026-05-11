@@ -377,6 +377,7 @@ app.get('/api/domestic-categories', async (req, res) => {
   }
 });
 
+
 app.get('/api/popular-tours', async (req, res) => {
   try {
     const result = await pool.query(`
@@ -387,19 +388,29 @@ app.get('/api/popular-tours', async (req, res) => {
         t.short_description AS description,
         t.price,
         t.nights,
-        CASE
-          WHEN ti.image_url IS NOT NULL
-            THEN CONCAT('http://localhost:${PORT}', ti.image_url)
-          ELSE ''
-        END AS image
+        COALESCE(
+          (
+            SELECT CONCAT('http://localhost:${PORT}', ti.image_url)
+            FROM tour_images ti
+            WHERE ti.tour_id = t.id
+              AND ti.is_main = TRUE
+            ORDER BY ti.id ASC
+            LIMIT 1
+          ),
+          ''
+        ) AS image
       FROM tours t
-      LEFT JOIN tour_images ti
-        ON ti.tour_id = t.id
-       AND ti.is_main = TRUE
       WHERE t.is_active = TRUE
         AND t.is_popular = TRUE
-      ORDER BY t.id ASC
-      LIMIT 12
+        AND t.tour_type = 'hotel'
+      ORDER BY
+        CASE t.title
+          WHEN 'Fort Arabesque The Villas' THEN 1
+          WHEN 'Hard Rock Hotel Maldives' THEN 2
+          WHEN 'Pickalbatros Luxury Suites' THEN 3
+          ELSE 4
+        END
+      LIMIT 3
     `);
 
     const formattedRows = result.rows.map((tour) => ({
@@ -703,6 +714,123 @@ app.get('/api/offers-des', async (req, res) => {
     return res.status(500).json({
       message: 'Ошибка получения предложений'
     });
+  }
+});
+
+app.get('/api/blog-posts', async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        bp.id,
+        bp.title,
+        bp.views,
+        TO_CHAR(bp.published_at, 'DD.MM.YYYY') AS date,
+        CASE
+          WHEN bp.main_image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', bp.main_image_url)
+          ELSE ''
+        END AS image
+      FROM blog_posts bp
+      WHERE bp.is_active = TRUE
+      ORDER BY bp.sort_order ASC, bp.published_at DESC, bp.id ASC
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения статей блога' });
+  }
+});
+
+app.get('/api/blog-posts/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const postResult = await pool.query(
+      `
+      SELECT
+        id,
+        title,
+        views,
+        TO_CHAR(published_at, 'DD.MM.YYYY') AS date,
+        CASE
+          WHEN main_image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', main_image_url)
+          ELSE ''
+        END AS main_image
+      FROM blog_posts
+      WHERE id = $1
+        AND is_active = TRUE
+      `,
+      [id]
+    );
+
+    if (postResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Статья не найдена' });
+    }
+
+    const sectionsResult = await pool.query(
+      `
+      SELECT
+        id,
+        title,
+        text,
+        subtext,
+        sort_order
+      FROM blog_post_sections
+      WHERE blog_post_id = $1
+      ORDER BY sort_order ASC, id ASC
+      `,
+      [id]
+    );
+
+    const imagesResult = await pool.query(
+      `
+      SELECT
+        section_id,
+        CASE
+          WHEN image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', image_url)
+          ELSE ''
+        END AS image_url
+      FROM blog_post_images
+      WHERE blog_post_id = $1
+      ORDER BY sort_order ASC, id ASC
+      `,
+      [id]
+    );
+
+    const sections = sectionsResult.rows.map((section) => ({
+      ...section,
+      images: imagesResult.rows
+        .filter((image) => image.section_id === section.id)
+        .map((image) => image.image_url)
+    }));
+
+    return res.status(200).json({
+      ...postResult.rows[0],
+      sections
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка получения статьи блога' });
+  }
+});
+
+app.post('/api/blog-posts/:id/increment-views', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    await pool.query(`
+      UPDATE blog_posts
+      SET views = views + 1
+      WHERE id = $1
+    `, [id]);
+
+    return res.status(200).json({ message: 'Просмотр увеличен' });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: 'Ошибка обновления просмотров' });
   }
 });
 

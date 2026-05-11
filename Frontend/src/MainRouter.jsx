@@ -24,7 +24,7 @@ export default function MainRouter() {
                     <Route path="/ContactInfo" element={<ContactInfoLink />} />
                     <Route path="/AboutUs" element={<AboutUsLink />} />
                     <Route path="/Blog" element={<BlogLink />} />
-                    <Route path="/BlogPage" element={<BlogPageLink />} />
+                    <Route path="/blogPage/:id" element={<BlogPageLink />} />
                     
                 </Routes>
             </HashRouter>
