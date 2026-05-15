@@ -346,14 +346,11 @@ export default function Hero() {
     return (
         <section className="hero">
             <Header />
-
             <div className="container hero-container">
                 <div className="hero-left">
                     <p className="hero-top-text">
-                        Откройте мир вместе с нами
-                        <span>
-                            Выберите направление на интерактивном глобусе и найдите тур за пару минут
-                        </span>
+                        Откройте мир вместе с нами<br/>
+                        Выберите направление на интерактивном глобусе и найдите тур за пару минут
                     </p>
 
                     <div className="hero-links">
@@ -388,7 +385,7 @@ export default function Hero() {
                                 className={`tour-filter_tab ${activeTab === 'hotels' ? 'active' : ''}`}
                                 onClick={() => handleTabChange('hotels')}
                             >
-                                <img src={Hotel} alt="" />
+                                <img src={Hotel} alt="Отели" />
                                 <span>Отели</span>
                             </button>
                         </div>
