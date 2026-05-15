@@ -8,6 +8,8 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 120px 0;
+    z-index: 11;
+    position: relative;
 }
 
 .domtour-page_card {
@@ -67,13 +69,14 @@ span {
     background-color: #F9F9F9;
     padding: 240px 0 40px;
     margin-top: -50px;
-    z-index: -1;
 }
 
 
-.main-btn_site-DomestictTour{
+.main-btn_site-DomestictTour {
     margin-top: auto;
 }
+
+
 
 @media (max-width: 1024px) {
 
@@ -96,9 +99,9 @@ span {
         padding-top: 80px;
     }
 
-    .footer-domestic-tour{
+    .footer-domestic-tour {
         padding: 160px 0 30px;
-         
+
     }
 }
 
@@ -123,7 +126,7 @@ span {
         width: 90%;
     }
 
-    .domtour-page_card-content p{
+    .domtour-page_card-content p {
         font-size: 15px;
     }
 

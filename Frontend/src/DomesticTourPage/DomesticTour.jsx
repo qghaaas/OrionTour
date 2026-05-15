@@ -2,6 +2,8 @@ import '../main.css'
 import './DomesticTour.css'
 import { useEffect, useState } from 'react'
 
+
+
 export default function DomesticTour() {
     const [domtourcard, setDomtourcard] = useState([])
     const [loading, setLoading] = useState(true)

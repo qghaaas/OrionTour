@@ -229,13 +229,14 @@ INSERT INTO tours (
 )
 VALUES
 (
-    (SELECT id FROM directions WHERE country_slug = 'egypt'),
+    (SELECT id FROM directions WHERE country_slug = 'egypt' LIMIT 1),
     'Fort Arabesque The Villas',
-    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых
-Виллы с одной или двумя спальнями',
-    'Простая элегантность для тех, кто ищет эксклюзивный, роскошный отдых. 65 вилл с одной или двумя спальнями, все с просторной стойкой регистрации и гостиной, современной ванной комнатой и частной террасой с доступом к бассейну с подогревом.
+    'Виллы у бассейна в Макади Бей: приватная терраса, спокойная территория и формат отдыха для тех, кто хочет больше тишины, сервиса и личного пространства.',
+    'Fort Arabesque The Villas — камерная вилловая зона курорта Fort Arabesque в Макади Бей, созданная для спокойного пляжного отдыха с повышенным уровнем приватности.
 
-Роскошные удобства включают широкий выбор кофе / чая и натуральных трав, полностью укомплектованный мини-бар, собственный DVD-плеер, ЖК-телевизор с плоским экраном и библиотеку последних международных фильмов.',
+Гостей ждут виллы с одной или двумя спальнями, просторная гостиная зона, современная ванная комната, частная терраса и прямой доступ к бассейну. Формат подходит для пар, семей и гостей, которые хотят отдыхать не в стандартном гостиничном корпусе, а в более уединённой атмосфере.
+
+Курорт расположен у Красного моря, рядом с пляжем Макади Бей. В концепции отеля сочетаются пляжный отдых, зелёная территория, бассейны, рестораны, спокойный ритм и удобный доступ к инфраструктуре Хургады.',
     105900.00,
     9,
     4.0,
@@ -248,10 +249,14 @@ VALUES
     33.899800
 ),
 (
-    (SELECT id FROM directions WHERE country_slug = 'maldives'),
+    (SELECT id FROM directions WHERE country_slug = 'maldives' LIMIT 1),
     'Hard Rock Hotel Maldives',
-    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock',
-    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock',
+    'Пляжные и водные виллы на Мальдивах, яркая музыкальная атмосфера Hard Rock, рестораны, бассейны и отдых на острове в Южном Мале Атолле.',
+    'Hard Rock Hotel Maldives — современный пятизвёздочный курорт в Южном Мале Атолле с фирменной атмосферой бренда Hard Rock.
+
+Отель подойдёт тем, кто хочет совместить классический мальдивский отдых с более живым и современным форматом: виллы у пляжа и над водой, бассейны, рестораны, бары, музыкальная концепция, spa-зоны и доступ к инфраструктуре CROSSROADS Maldives.
+
+Это вариант для романтической поездки, семейного отдыха, медового месяца или премиального тура на Мальдивы без ощущения полной изоляции.',
     477900.00,
     9,
     5.0,
@@ -264,73 +269,208 @@ VALUES
     NULL
 ),
 (
-    (SELECT id FROM directions WHERE country_slug = 'egypt'),
+    (SELECT id FROM directions WHERE country_slug = 'egypt' LIMIT 1),
     'Pickalbatros Luxury Suites',
-    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа',
-    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа',
+    'Пятизвёздочный курорт в Шарм-эль-Шейхе с просторной территорией, бассейнами, ресторанами, зонами отдыха и атмосферой премиального пляжного отпуска.',
+    'Pickalbatros Luxury Suites — пятизвёздочный курорт в Шарм-эль-Шейхе для комфортного отдыха у Красного моря.
+
+Отель сочетает просторную территорию, бассейны, рестораны, бары, зоны отдыха и сервис, ориентированный на гостей, которые хотят более спокойный и премиальный формат отдыха в Египте.
+
+Курорт подойдёт для семейного отпуска, романтической поездки и продолжительного отдыха. Локация удобна для тех, кто хочет совместить пляжный отдых, инфраструктуру отеля и доступ к популярным зонам Шарм-эль-Шейха.',
     110200.00,
     14,
     5.0,
     FALSE,
     TRUE,
     TRUE,
-    'Шаркс Бей',
+    'Шарм-эль-Шейх',
     'hotel',
     NULL,
     NULL
 );
 
--- Главные изображения популярных туров
+
 INSERT INTO tour_images (tour_id, image_url, is_main)
 VALUES
 (
     (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/popular/fort-arabesque-the-villas.png',
+    '/uploads/hotels/fort-arabesque-the-villas/main.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/1.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/2.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/3.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/4.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/5.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/6.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/7.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/8.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/9.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/10.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/11.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/12.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/13.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/fort-arabesque-the-villas/14.png',
+    FALSE
+);
+
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/main.png',
     TRUE
 ),
 (
     (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/popular/hard-rock-hotel-maldives.png',
+    '/uploads/hotels/hard-rock-hotel-maldives/1.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/2.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/3.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/4.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/5.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/6.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/7.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/8.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/hard-rock-hotel-maldives/9.png',
+    FALSE
+);
+
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/main.png',
     TRUE
 ),
 (
     (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/popular/pickalbatros-luxury-suites.png',
-    TRUE
-);
-
--- Дополнительные изображения Fort Arabesque.
--- Важно: все FALSE, чтобы у тура не было двух главных картинок.
-INSERT INTO tour_images (tour_id, image_url, is_main)
-VALUES
-(
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque.png',
+    '/uploads/hotels/pickalbatros-luxury-suites/1.png',
     FALSE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque2.png',
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/2.png',
     FALSE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque3.png',
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/3.png',
     FALSE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque4.png',
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/4.png',
     FALSE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque5.png',
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/5.png',
     FALSE
 ),
 (
-    (SELECT id FROM tours WHERE title = 'Fort Arabesque The Villas' AND tour_type = 'hotel' LIMIT 1),
-    '/uploads/hotels/fort-arabesque/fort-arabesque-more.png',
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/6.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/7.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/8.png',
+    FALSE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'hotel' LIMIT 1),
+    '/uploads/hotels/pickalbatros-luxury-suites/9.png',
     FALSE
 );
 
@@ -521,49 +661,6 @@ VALUES
     FALSE,
     'offer',
     'Шармс Бей'
-);
-
-INSERT INTO tour_images (tour_id, image_url, is_main)
-VALUES
-(
-    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/popular/hard-rock-hotel-maldives.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/hard-rock/hard-rock-1.png',
-    FALSE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/hard-rock/hard-rock-2.png',
-    FALSE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Hard Rock Hotel Maldives' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/hard-rock/hard-rock-3.png',
-    FALSE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/popular/pickalbatros-luxury-suites.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/pickalbatros/pickalbatros-1.png',
-    FALSE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/pickalbatros/pickalbatros-2.png',
-    FALSE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Pickalbatros Luxury Suites' AND tour_type = 'offer' ORDER BY id DESC LIMIT 1),
-    '/uploads/offers/pickalbatros/pickalbatros-3.png',
-    FALSE
 );
 
 -- =========================

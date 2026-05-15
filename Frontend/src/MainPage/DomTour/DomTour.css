@@ -37,6 +37,11 @@
     position: relative;
     overflow: hidden;
     border-radius: 25px;
+    transition: 1s;
+}
+
+.domtour-item:hover {
+    scale: calc(1.1);
 }
 
 .domtour-item img {
@@ -62,6 +67,13 @@
     background: linear-gradient(0deg, rgba(0, 0, 0, 0.45) 21.12%, rgba(0, 0, 0, 0) 39.88%);
 }
 
+.domtour-empty {
+    grid-column: 1 / -1;
+    text-align: center;
+    font-size: 18px;
+    color: #777;
+}
+
 .domcards1 {
     grid-area: 1 / 1 / 5 / 2;
 }
@@ -77,3 +89,4 @@
 .domcards4 {
     grid-area: 3 / 2 / 5 / 6;
 }
+

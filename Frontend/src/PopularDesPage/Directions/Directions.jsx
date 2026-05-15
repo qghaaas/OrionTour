@@ -1,13 +1,19 @@
 import '../../main.css'
 import './Directions.css'
 import star from '../../mainIMG/star.svg'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps'
+import GalleryModal from '../../GalleryModal/GalleryModal'
+
+
 
 export default function Directions() {
     const [tour, setTour] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+
+    const [isGalleryOpen, setIsGalleryOpen] = useState(false)
+    const [activeImageIndex, setActiveImageIndex] = useState(0)
 
     useEffect(() => {
         fetch('http://localhost:3010/api/tours/1/details')
@@ -15,6 +21,7 @@ export default function Directions() {
                 if (!res.ok) {
                     throw new Error('Ошибка загрузки данных тура')
                 }
+
                 return res.json()
             })
             .then((data) => {
@@ -27,6 +34,38 @@ export default function Directions() {
                 setLoading(false)
             })
     }, [])
+
+    const galleryImages = useMemo(() => {
+        if (!tour?.images?.length) return []
+
+        return tour.images.filter((img) => Boolean(img.image_url))
+    }, [tour])
+
+    const mainImageObject = useMemo(() => {
+        return galleryImages.find((img) => img.is_main) || galleryImages[0] || null
+    }, [galleryImages])
+
+    const mainImage = mainImageObject?.image_url || ''
+
+    const sideImages = useMemo(() => {
+        return galleryImages
+            .filter((img) => img.id !== mainImageObject?.id)
+            .slice(0, 5)
+    }, [galleryImages, mainImageObject])
+
+    const totalPhotos = Number(tour?.images_count) || galleryImages.length
+
+    const openGallery = (imageId) => {
+        const index = galleryImages.findIndex((img) => img.id === imageId)
+
+        setActiveImageIndex(index >= 0 ? index : 0)
+        setIsGalleryOpen(true)
+    }
+
+    const closeGallery = () => {
+        setIsGalleryOpen(false)
+        setActiveImageIndex(0)
+    }
 
     if (loading) {
         return (
@@ -58,25 +97,9 @@ export default function Directions() {
         )
     }
 
-    const mainImage =
-        tour.images?.find((img) => img.is_main)?.image_url ||
-        tour.images?.[0]?.image_url ||
-        ''
-
-    const sideImages =
-        tour.images
-            ?.filter((img) => img.image_url !== mainImage)
-            .slice(0, 5) || []
-
-    const morePhotoImage =
-        tour.images?.[5]?.image_url ||
-        sideImages[sideImages.length - 1]?.image_url ||
-        mainImage
-
     return (
         <section className="directions">
             <div className="container">
-
                 <div className="directions-top">
                     <div className="directions-top_title">
                         <div className="directions-top_title-inner">
@@ -96,30 +119,46 @@ export default function Directions() {
 
                     <div className="directions-top_img">
                         <div className="directions-gallery">
-                            <div className="directions-gallery-main">
-                                <img src={mainImage} alt={tour.title} />
-                            </div>
+                            <button
+                                className="directions-gallery-main"
+                                type="button"
+                                onClick={() => openGallery(mainImageObject?.id)}
+                                disabled={!mainImage}
+                            >
+                                {mainImage ? (
+                                    <img src={mainImage} alt={tour.title} />
+                                ) : (
+                                    <span>Нет изображения</span>
+                                )}
+                            </button>
 
                             <div className="directions-gallery-grid">
                                 {sideImages.map((img, index) => (
-                                    <div
-                                        className={`directions-gallery-small ${index === 4 ? 'directions-gallery-more' : ''
-                                            }`}
+                                    <button
+                                        className={`directions-gallery-small ${
+                                            index === 4 ? 'directions-gallery-more' : ''
+                                        }`}
                                         key={img.id}
+                                        type="button"
+                                        onClick={() => openGallery(img.id)}
                                     >
-                                        <img src={img.image_url} alt={tour.title} />
+                                        <img
+                                            src={img.image_url}
+                                            alt={`${tour.title} фото ${index + 2}`}
+                                        />
 
-                                        {index === 4 && (
-                                            <div className="directions-gallery-overlay">
-                                                +40 <br /> фото
-                                            </div>
+                                        {index === 4 && totalPhotos > 0 && (
+                                            <span className="directions-gallery-overlay">
+                                                +{totalPhotos} <br /> фото
+                                            </span>
                                         )}
-                                    </div>
+                                    </button>
                                 ))}
                             </div>
                         </div>
                     </div>
                 </div>
+
                 <div className="directions-inner">
                     <div className="directions-des_loc">
                         <div className="directions-description">
@@ -162,6 +201,15 @@ export default function Directions() {
                     </div>
                 </div>
             </div>
+
+            <GalleryModal
+                isOpen={isGalleryOpen}
+                title={tour.title}
+                images={galleryImages}
+                activeIndex={activeImageIndex}
+                onChangeIndex={setActiveImageIndex}
+                onClose={closeGallery}
+            />
         </section>
     )
 }

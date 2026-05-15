@@ -2,10 +2,10 @@ import '../../main.css'
 import './PopularDes.css'
 import arrowSwiper from '../../mainIMG/arrowSwiper.svg'
 import { useEffect, useRef, useState } from 'react'
-
 import { Swiper, SwiperSlide } from 'swiper/react'
-
 import 'swiper/css'
+
+
 
 export default function PopularDes() {
     const [cards, setCards] = useState([])

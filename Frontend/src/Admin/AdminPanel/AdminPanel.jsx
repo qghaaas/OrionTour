@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../Admin.css'
 
-const API_URL = 'http://localhost:3010';
+
 
 export default function AdminPanel() {
     const navigate = useNavigate();
@@ -12,8 +12,8 @@ export default function AdminPanel() {
     const [reviewStatus, setReviewStatus] = useState('pending');
     const [message, setMessage] = useState('');
     const [isLoading, setIsLoading] = useState(false);
-    
 
+    const API_URL = 'http://localhost:3010';  
     const token = localStorage.getItem('adminToken');
 
     const adminFetch = async (url, options = {}) => {

@@ -3,6 +3,8 @@ import "./BlogPage.css";
 import { useEffect, useRef, useState } from "react";
 import { useParams } from "react-router-dom";
 
+
+
 export default function BlogPage() {
     const { id } = useParams();
     const [blogPost, setBlogPost] = useState(null);

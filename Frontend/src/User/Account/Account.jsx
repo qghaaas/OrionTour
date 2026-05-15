@@ -1,15 +1,14 @@
 import '../../main.css';
 import './Account.css';
-
 import order from './img/order.svg';
 import favorites from './img/favorites.svg';
 import star from './img/star.svg';
 import wrench from './img/wrench.svg';
-
 import { useEffect, useState } from 'react';
-
 import OrdersContent from './Components/OrdersContent/OrdersContent';
 import FavoritesContent from './Components/FavoritesContent';
+
+
 
 const AVATAR_OPTIONS = [
     {

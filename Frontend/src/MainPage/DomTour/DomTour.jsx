@@ -1,6 +1,8 @@
 import '../../main.css'
 import './DomTour.css'
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
+
 
 export default function DomTour() {
     const [domtour, setDomtour] = useState([])
@@ -35,13 +37,17 @@ export default function DomTour() {
 
                     <div className="domtour-grid">
                         {domtour.map((tour, index) => (
-                            <div
+                            <Link
                                 key={tour.id}
+                                to="/DomesticTourism"
+                                state={{
+                                    categoryTitle: tour.title || tour.description,
+                                }}
                                 className={`domtour-item domcards${index + 1}`}
                             >
-                                <img src={tour.image_url} alt={tour.description} />
-                                <p>{tour.description}</p>
-                            </div>
+                                <img src={tour.image_url} alt={tour.title || tour.description} />
+                                <p>{tour.description || tour.title}</p>
+                            </Link>
                         ))}
                     </div>
                 </div>

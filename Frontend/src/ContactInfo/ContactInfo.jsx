@@ -4,6 +4,8 @@ import './ContactInfo.css';
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps';
 import plane from './img/plane.png'
 
+
+
 export default function ContactInfo() {
     const mapCenter = [54.720754, 20.499825];
     const initialContactForm = {

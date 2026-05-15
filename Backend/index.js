@@ -694,7 +694,12 @@ app.get('/api/tours/:id/details', async (req, res) => {
         t.short_description,
         t.full_description,
         t.hotel_lat,
-        t.hotel_lng
+        t.hotel_lng,
+        (
+          SELECT COUNT(*)::INTEGER
+          FROM tour_images ti
+          WHERE ti.tour_id = t.id
+        ) AS images_count
       FROM tours t
       WHERE t.id = $1
         AND t.is_active = TRUE
@@ -711,8 +716,8 @@ app.get('/api/tours/:id/details', async (req, res) => {
       SELECT
         id,
         CASE
-          WHEN image_url IS NOT NULL
-            THEN CONCAT('http://localhost:${PORT}', image_url)
+          WHEN image_url ~* '^https?://' THEN image_url
+          WHEN image_url IS NOT NULL THEN CONCAT('http://localhost:${PORT}', image_url)
           ELSE ''
         END AS image_url,
         is_main
@@ -743,6 +748,7 @@ app.get('/api/offers-des', async (req, res) => {
         t.short_description AS description,
         t.price,
         t.nights,
+        COUNT(ti.id)::INTEGER AS images_count,
         CASE
           WHEN t.title = 'Hard Rock Hotel Maldives'
             THEN 'с прямым вылетом из Москвы на BlackJet'
@@ -758,9 +764,27 @@ app.get('/api/offers-des', async (req, res) => {
           ELSE 'всё включено'
         END AS food
       FROM tours t
+      LEFT JOIN tour_images ti
+        ON ti.tour_id = t.id
       WHERE t.is_active = TRUE
-        AND t.tour_type = 'offer'
-      ORDER BY t.price DESC
+        AND t.tour_type = 'hotel'
+        AND t.title IN (
+          'Hard Rock Hotel Maldives',
+          'Pickalbatros Luxury Suites'
+        )
+      GROUP BY
+        t.id,
+        t.title,
+        t.location_name,
+        t.short_description,
+        t.price,
+        t.nights
+      ORDER BY
+        CASE
+          WHEN t.title = 'Hard Rock Hotel Maldives' THEN 1
+          WHEN t.title = 'Pickalbatros Luxury Suites' THEN 2
+          ELSE 3
+        END
     `);
 
     const tourIds = toursResult.rows.map((tour) => tour.id);
@@ -775,13 +799,13 @@ app.get('/api/offers-des', async (req, res) => {
         id,
         tour_id,
         CASE
-          WHEN image_url IS NOT NULL
-            THEN CONCAT('http://localhost:${PORT}', image_url)
+          WHEN image_url ~* '^https?://' THEN image_url
+          WHEN image_url IS NOT NULL THEN CONCAT('http://localhost:${PORT}', image_url)
           ELSE ''
         END AS image_url,
         is_main
       FROM tour_images
-      WHERE tour_id = ANY($1)
+      WHERE tour_id = ANY($1::bigint[])
       ORDER BY is_main DESC, id ASC
       `,
       [tourIds]
@@ -789,7 +813,7 @@ app.get('/api/offers-des', async (req, res) => {
 
     const formattedTours = toursResult.rows.map((tour) => ({
       ...tour,
-      images: imagesResult.rows.filter((image) => image.tour_id === tour.id)
+      images: imagesResult.rows.filter((image) => Number(image.tour_id) === Number(tour.id))
     }));
 
     return res.status(200).json(formattedTours);

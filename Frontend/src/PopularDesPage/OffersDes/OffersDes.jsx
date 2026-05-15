@@ -1,13 +1,19 @@
 import '../../main.css'
 import './OffersDes.css'
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import done from './img/Done.png'
+import GalleryModal from '../../GalleryModal/GalleryModal'
+
+
 
 export default function OffersDes() {
     const [offers, setOffers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
+
+    const [activeOfferId, setActiveOfferId] = useState(null)
+    const [activeImageIndex, setActiveImageIndex] = useState(0)
 
     useEffect(() => {
         fetch('http://localhost:3010/api/offers-des')
@@ -28,6 +34,34 @@ export default function OffersDes() {
                 setLoading(false)
             })
     }, [])
+
+    const activeOffer = useMemo(() => {
+        return offers.find((offer) => offer.id === activeOfferId) || null
+    }, [offers, activeOfferId])
+
+    const activeGalleryImages = useMemo(() => {
+        if (!activeOffer?.images?.length) return []
+
+        return activeOffer.images.filter((image) => Boolean(image.image_url))
+    }, [activeOffer])
+
+    const isGalleryOpen = Boolean(activeOffer && activeGalleryImages.length > 0)
+
+    const openGallery = (offerId, imageId) => {
+        const currentOffer = offers.find((offer) => offer.id === offerId)
+        const currentImages =
+            currentOffer?.images?.filter((image) => Boolean(image.image_url)) || []
+
+        const imageIndex = currentImages.findIndex((image) => image.id === imageId)
+
+        setActiveOfferId(offerId)
+        setActiveImageIndex(imageIndex >= 0 ? imageIndex : 0)
+    }
+
+    const closeGallery = () => {
+        setActiveOfferId(null)
+        setActiveImageIndex(0)
+    }
 
     if (loading) {
         return (
@@ -54,20 +88,28 @@ export default function OffersDes() {
             <div className="container">
                 <div className="offersdes-inner">
                     {offers.map((offer) => {
-                        const mainImage =
-                            offer.images.find((image) => image.is_main) ||
-                            offer.images[0]
+                        const offerImages =
+                            offer.images?.filter((image) => Boolean(image.image_url)) || []
 
-                        const previewImages = offer.images
-                            .filter((image) => !image.is_main)
+                        const mainImage =
+                            offerImages.find((image) => image.is_main) ||
+                            offerImages[0]
+
+                        const previewImages = offerImages
+                            .filter((image) => image.id !== mainImage?.id)
                             .slice(0, 3)
 
-                        const remainingCount = offer.images.length - 4
+                        const totalPhotos = Number(offer.images_count) || offerImages.length
 
                         return (
                             <div className="offersdes-card" key={offer.id}>
                                 <div className="offersdes-gallery">
-                                    <div className="offersdes-gallery_main">
+                                    <button
+                                        className="offersdes-gallery_main"
+                                        type="button"
+                                        onClick={() => openGallery(offer.id, mainImage?.id)}
+                                        disabled={!mainImage}
+                                    >
                                         {mainImage && (
                                             <img
                                                 src={mainImage.image_url}
@@ -78,28 +120,31 @@ export default function OffersDes() {
                                         <span className="offersdes-price">
                                             от {Number(offer.price).toLocaleString('ru-RU')} ₽
                                         </span>
-                                    </div>
+                                    </button>
 
                                     <div className="offersdes-gallery_preview">
                                         {previewImages.map((image, index) => {
-                                            const isLast = index === 2 && remainingCount > 0
+                                            const isLastPreview =
+                                                index === previewImages.length - 1
 
                                             return (
-                                                <div
+                                                <button
                                                     className="offersdes-gallery_thumb"
                                                     key={image.id}
+                                                    type="button"
+                                                    onClick={() => openGallery(offer.id, image.id)}
                                                 >
                                                     <img
                                                         src={image.image_url}
-                                                        alt={offer.title}
+                                                        alt={`${offer.title} фото ${index + 2}`}
                                                     />
 
-                                                    {isLast && (
-                                                        <div className="offersdes-gallery_overlay">
-                                                            +{remainingCount}
-                                                        </div>
+                                                    {isLastPreview && totalPhotos > 0 && (
+                                                        <span className="offersdes-gallery_overlay">
+                                                            +{totalPhotos} <br /> фото
+                                                        </span>
                                                     )}
-                                                </div>
+                                                </button>
                                             )
                                         })}
                                     </div>
@@ -139,6 +184,15 @@ export default function OffersDes() {
                     })}
                 </div>
             </div>
+
+            <GalleryModal
+                isOpen={isGalleryOpen}
+                title={activeOffer?.title || ''}
+                images={activeGalleryImages}
+                activeIndex={activeImageIndex}
+                onChangeIndex={setActiveImageIndex}
+                onClose={closeGallery}
+            />
         </section>
     )
 }

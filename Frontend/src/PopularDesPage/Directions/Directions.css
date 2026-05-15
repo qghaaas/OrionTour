@@ -8,9 +8,8 @@
 .directions-inner {}
 
 .directions-top {
-    padding: 58px 0% 100px;
+    padding: 58px 0 100px;
     background-color: #F9F9F9;
-
 }
 
 .directions-top_title {
@@ -26,6 +25,10 @@
     font-weight: 700;
     font-size: 40px;
     line-height: 1.5;
+}
+
+.directions-top_title-inner h2 {
+    margin: 0;
 }
 
 .directions-top_title-rev {
@@ -58,6 +61,7 @@
 .directions-top_title-bot h3 {
     color: #A4A4A4;
     font-weight: 500;
+    margin: 0;
 }
 
 .directions-gallery {
@@ -65,7 +69,7 @@
     display: grid;
     grid-template-columns: 2fr 2.85fr;
     gap: 14px;
-    height: fit-content;
+    min-height: 430px;
 }
 
 .directions-gallery-main,
@@ -73,6 +77,19 @@
     position: relative;
     overflow: hidden;
     border-radius: 15px;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    cursor: pointer;
+    display: block;
+    width: 100%;
+    height: 100%;
+    font: inherit;
+}
+
+.directions-gallery-main:disabled {
+    cursor: default;
 }
 
 .directions-gallery-main img,
@@ -81,6 +98,12 @@
     height: 100%;
     display: block;
     object-fit: cover;
+    transition: transform 0.35s ease;
+}
+
+.directions-gallery-main:hover img,
+.directions-gallery-small:hover img {
+    transform: scale(1.04);
 }
 
 .directions-gallery-grid {
@@ -100,7 +123,9 @@
     content: "";
     position: absolute;
     inset: 0;
-    background: rgba(0, 0, 0, 0.45);
+    z-index: 1;
+    background: rgba(0, 0, 0, 0.48);
+    pointer-events: none;
 }
 
 .directions-gallery-overlay {
@@ -117,6 +142,7 @@
     line-height: 1.1;
     color: #fff;
     letter-spacing: 1%;
+    pointer-events: none;
 }
 
 .directions-des_loc {
@@ -135,8 +161,13 @@
     line-height: 1.85;
 }
 
+.directions-description p {
+    margin: 0;
+}
+
 .directions-loc {
     width: 400px;
+    flex-shrink: 0;
 }
 
 .directions-loc p {
@@ -151,4 +182,151 @@
     height: 245px;
     border-radius: 15px;
     overflow: hidden;
+}
+
+@media (max-width: 1100px) {
+    .directions-gallery {
+        grid-template-columns: 1fr;
+        min-height: auto;
+    }
+
+    .directions-gallery-main {
+        height: 420px;
+    }
+
+    .directions-gallery-grid {
+        height: 300px;
+    }
+
+    .directions-des_loc {
+        gap: 40px;
+    }
+
+    .directions-description {
+        width: 100%;
+    }
+}
+
+@media (max-width: 900px) {
+    .directions-top {
+        padding: 40px 0 70px;
+    }
+
+    .directions-top_title-inner {
+        flex-wrap: wrap;
+        gap: 10px 24px;
+        font-size: 32px;
+    }
+
+    .directions-top_title-bot {
+        flex-wrap: wrap;
+        gap: 12px;
+        font-size: 18px;
+    }
+
+    .directions-des_loc {
+        flex-direction: column;
+        gap: 34px;
+    }
+
+    .directions-description {
+        font-size: 18px;
+        line-height: 1.65;
+    }
+
+    .directions-loc {
+        width: 100%;
+    }
+
+    .directions-loc p {
+        font-size: 32px;
+    }
+
+    .directions-map {
+        width: 100%;
+        height: 300px;
+    }
+}
+
+@media (max-width: 700px) {
+    .directions {
+        padding-bottom: 55px;
+    }
+
+    .directions-top {
+        padding: 32px 0 48px;
+    }
+
+    .directions-top_title-inner {
+        font-size: 26px;
+    }
+
+    .directions-top_title-bot {
+        font-size: 16px;
+    }
+
+    .directions-gallery-main {
+        height: 300px;
+    }
+
+    .directions-gallery-grid {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: repeat(3, 145px);
+        height: auto;
+    }
+
+    .directions-gallery-more {
+        grid-column: 1 / 3;
+        grid-row: auto;
+    }
+
+    .directions-gallery-overlay {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    .directions-top_title-inner {
+        font-size: 22px;
+    }
+
+    .directions-top_title-rev img {
+        width: 22px;
+        height: 22px;
+    }
+
+    .directions-top_title-bot span {
+        height: 34px;
+        padding: 0 14px;
+    }
+
+    .directions-gallery-main {
+        height: 240px;
+    }
+
+    .directions-gallery-grid {
+        grid-template-rows: repeat(3, 120px);
+        gap: 10px;
+    }
+
+    .directions-gallery {
+        gap: 10px;
+    }
+
+    .directions-gallery-main,
+    .directions-gallery-small {
+        border-radius: 12px;
+    }
+
+    .directions-description {
+        font-size: 16px;
+    }
+
+    .directions-loc p {
+        font-size: 26px;
+    }
+
+    .directions-map {
+        height: 240px;
+    }
 }

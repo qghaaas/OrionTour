@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import "../Admin.css";
 
+
+
 export default function AdminAuth() {
     const navigate = useNavigate();
-
     const [login, setLogin] = useState('');
     const [password, setPassword] = useState('');
     const [message, setMessage] = useState('');
@@ -46,6 +47,7 @@ export default function AdminAuth() {
 
     return (
         <section className="admin-login-page">
+            
             <form className="admin-login-form" onSubmit={handleSubmit}>
                 <h1>Вход в админ-панель</h1>
 
@@ -75,6 +77,7 @@ export default function AdminAuth() {
                     {isLoading ? 'Вход...' : 'Войти'}
                 </button>
             </form>
+
         </section>
     );
 }

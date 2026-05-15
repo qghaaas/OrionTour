@@ -6,9 +6,44 @@ const API_URL = "http://localhost:3010/api/auth";
 
 const isValidEmail = (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
 
+const NETWORK_ERROR_MESSAGE =
+  "Не удалось подключиться к серверу. Проверьте интернет-соединение, отключите VPN или прокси и попробуйте снова.";
+
+const getLoginErrorMessage = (status, serverMessage) => {
+  if (serverMessage) return serverMessage;
+
+  switch (status) {
+    case 400:
+      return "Проверьте корректность email и пароля.";
+    case 401:
+    case 403:
+      return "Неверный email или пароль.";
+    case 404:
+      return "Аккаунт с такой почтой не найден.";
+    case 429:
+      return "Слишком много попыток входа. Подождите несколько минут и попробуйте снова.";
+    case 500:
+    case 502:
+    case 503:
+    case 504:
+      return "Сервер временно недоступен. Попробуйте войти позже.";
+    default:
+      return "Не удалось войти в аккаунт. Проверьте данные и попробуйте снова.";
+  }
+};
+
+const getResponseData = async (response) => {
+  try {
+    return await response.json();
+  } catch {
+    return {};
+  }
+};
+
 export default function LoginForm({ onOpenRegistration, onSuccess }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -21,12 +56,12 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
     const normalizedPassword = password.trim();
 
     if (!normalizedEmail || !normalizedPassword) {
-      setError("Введите email и пароль");
+      setError("Введите email и пароль.");
       return;
     }
 
     if (!isValidEmail(normalizedEmail)) {
-      setError("Введите корректный email");
+      setError("Введите корректный email.");
       return;
     }
 
@@ -42,10 +77,15 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
         }),
       });
 
-      const data = await response.json();
+      const data = await getResponseData(response);
 
       if (!response.ok) {
-        setError(data.message || "Ошибка входа");
+        setError(getLoginErrorMessage(response.status, data.message));
+        return;
+      }
+
+      if (!data.user) {
+        setError("Сервер не вернул данные пользователя. Попробуйте войти позже.");
         return;
       }
 
@@ -54,9 +94,10 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
 
       setEmail("");
       setPassword("");
+
       onSuccess?.(data.user);
     } catch {
-      setError("Ошибка соединения с сервером");
+      setError(NETWORK_ERROR_MESSAGE);
     } finally {
       setLoading(false);
     }
@@ -71,6 +112,7 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
           type="email"
           placeholder="E-mail"
           value={email}
+          autoComplete="email"
           onChange={(e) => setEmail(e.target.value)}
         />
 
@@ -79,17 +121,21 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
             type={showPassword ? "text" : "password"}
             placeholder="Пароль"
             value={password}
+            autoComplete="current-password"
             onChange={(e) => setPassword(e.target.value)}
           />
-
-
 
           <button
             type="button"
             className="password-toggle"
+            aria-label={showPassword ? "Скрыть пароль" : "Показать пароль"}
             onClick={() => setShowPassword((prev) => !prev)}
           >
-            <img src={showPassword ? eyeClose : eyeOpen} alt="Показать пароль" />
+            <img
+              src={showPassword ? eyeClose : eyeOpen}
+              alt=""
+              aria-hidden="true"
+            />
           </button>
         </div>
 
@@ -98,7 +144,6 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
         <button className="auth-activeBTN" type="submit" disabled={loading}>
           {loading ? "Вход..." : "Войти в кабинет"}
         </button>
-
       </form>
 
       <button className="auth-notreg" type="button" onClick={onOpenRegistration}>

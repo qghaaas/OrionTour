@@ -1,0 +1,236 @@
+.gallery-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 3000;
+    padding: 28px;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(7px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-modal-content {
+    width: min(1180px, 100%);
+    max-height: 92vh;
+    background: #fff;
+    border-radius: 28px;
+    padding: 22px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
+}
+
+.gallery-modal-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    font-family: "Raleway", sans-serif;
+}
+
+.gallery-modal-top h3 {
+    margin: 0 0 6px;
+    font-weight: 700;
+    font-size: 24px;
+    line-height: 1.25;
+    color: #171717;
+}
+
+.gallery-modal-top span {
+    font-family: "Arimo", sans-serif;
+    font-size: 16px;
+    color: #777;
+}
+
+.gallery-modal-close {
+    width: 44px;
+    height: 44px;
+    border: none;
+    border-radius: 50%;
+    background: #F1F1F1;
+    color: #151515;
+    font-size: 34px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.gallery-modal-close:hover {
+    background: #E3E3E3;
+    transform: rotate(90deg);
+}
+
+.gallery-modal-view {
+    position: relative;
+    width: 100%;
+    height: min(62vh, 650px);
+    border-radius: 22px;
+    overflow: hidden;
+    background: #F4F4F4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.gallery-modal-view img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    display: block;
+}
+
+.gallery-modal-arrow {
+    position: absolute;
+    top: 50%;
+    z-index: 3;
+    transform: translateY(-50%);
+    width: 52px;
+    height: 52px;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: #111;
+    font-size: 44px;
+    line-height: 1;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding-bottom: 5px;
+    transition: background-color 0.25s ease, transform 0.25s ease;
+}
+
+.gallery-modal-arrow:hover {
+    background: #fff;
+    transform: translateY(-50%) scale(1.06);
+}
+
+.gallery-modal-arrow-left {
+    left: 18px;
+}
+
+.gallery-modal-arrow-right {
+    right: 18px;
+}
+
+.gallery-modal-thumbs {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 4px;
+}
+
+.gallery-modal-thumbs::-webkit-scrollbar {
+    height: 6px;
+}
+
+.gallery-modal-thumbs::-webkit-scrollbar-track {
+    background: #F1F1F1;
+    border-radius: 10px;
+}
+
+.gallery-modal-thumbs::-webkit-scrollbar-thumb {
+    background: #C9C9C9;
+    border-radius: 10px;
+}
+
+.gallery-modal-thumb {
+    flex: 0 0 96px;
+    width: 96px;
+    height: 68px;
+    border: 2px solid transparent;
+    border-radius: 14px;
+    padding: 0;
+    margin: 0;
+    background: transparent;
+    overflow: hidden;
+    cursor: pointer;
+    opacity: 0.6;
+    transition: opacity 0.25s ease, border-color 0.25s ease;
+}
+
+.gallery-modal-thumb:hover {
+    opacity: 1;
+}
+
+.gallery-modal-thumb-active {
+    opacity: 1;
+    border-color: #111;
+}
+
+.gallery-modal-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+@media (max-width: 700px) {
+    .gallery-modal {
+        padding: 12px;
+    }
+
+    .gallery-modal-content {
+        max-height: 96vh;
+        border-radius: 20px;
+        padding: 14px;
+        gap: 14px;
+    }
+
+    .gallery-modal-top h3 {
+        font-size: 18px;
+    }
+
+    .gallery-modal-top span {
+        font-size: 14px;
+    }
+
+    .gallery-modal-close {
+        width: 38px;
+        height: 38px;
+        font-size: 30px;
+    }
+
+    .gallery-modal-view {
+        height: 58vh;
+        border-radius: 16px;
+    }
+
+    .gallery-modal-arrow {
+        width: 40px;
+        height: 40px;
+        font-size: 34px;
+    }
+
+    .gallery-modal-arrow-left {
+        left: 10px;
+    }
+
+    .gallery-modal-arrow-right {
+        right: 10px;
+    }
+
+    .gallery-modal-thumb {
+        flex-basis: 78px;
+        width: 78px;
+        height: 56px;
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .gallery-modal-view {
+        height: 52vh;
+    }
+
+    .gallery-modal-arrow {
+        width: 34px;
+        height: 34px;
+        font-size: 30px;
+    }
+}
