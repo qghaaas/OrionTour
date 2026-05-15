@@ -346,7 +346,6 @@
     background-color: #fff;
     color: #202020;
 }
-
 @media (max-width: 1000px) {
     .admin-panel {
         padding: 50px 4% 90px;

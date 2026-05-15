@@ -1316,67 +1316,348 @@ app.patch('/api/users/:userId/profile', async (req, res) => {
   }
 });
 
-// Получение всех стран/направлений для глобуса
+
+const PUBLIC_BASE_URL = process.env.PUBLIC_BASE_URL || `http://localhost:${PORT}`;
+
+function buildPublicUrl(url = '') {
+  if (!url) return '';
+
+  if (/^https?:\/\//i.test(url)) {
+    return url;
+  }
+
+  const normalizedUrl = url.startsWith('/') ? url : `/${url}`;
+  return `${PUBLIC_BASE_URL}${normalizedUrl}`;
+}
+
+function formatPriceValue(value) {
+  const numericValue = Number(value) || 0;
+  return `от ${numericValue.toLocaleString('ru-RU')} ₽`;
+}
+
+function formatNightsValue(value) {
+  const nights = Number(value) || 0;
+  const lastDigit = nights % 10;
+  const lastTwoDigits = nights % 100;
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) {
+    return `${nights} ночей`;
+  }
+
+  if (lastDigit === 1) {
+    return `${nights} ночь`;
+  }
+
+  if (lastDigit >= 2 && lastDigit <= 4) {
+    return `${nights} ночи`;
+  }
+
+  return `${nights} ночей`;
+}
+
+function normalizeCatalogType(value = 'tours') {
+  return value === 'hotels' ? 'hotels' : 'tours';
+}
+
+function normalizeBoolean(value) {
+  return value === true || value === 'true' || value === '1' || value === 1;
+}
+
+function mapCatalogRows(rows) {
+  return rows.map((tour) => ({
+    ...tour,
+    price: Number(tour.price) || 0,
+    nights: Number(tour.nights) || 0,
+    hotel_rating: tour.hotel_rating === null ? null : Number(tour.hotel_rating),
+    hotel_lat: tour.hotel_lat === null ? null : Number(tour.hotel_lat),
+    hotel_lng: tour.hotel_lng === null ? null : Number(tour.hotel_lng),
+    price_formatted: formatPriceValue(tour.price),
+    nights_label: formatNightsValue(tour.nights),
+    image: buildPublicUrl(tour.image || ''),
+  }));
+}
+
+function addCatalogTypeWhere(whereParts, params, type) {
+  if (normalizeCatalogType(type) !== 'hotels') return;
+
+  whereParts.push(`LOWER(COALESCE(t.tour_type, '')) IN ('hotel', 'offer')`);
+}
+
+// Получение всех стран/направлений для глобуса и каталога
 app.get('/api/directions', async (req, res) => {
   try {
     const { rows } = await pool.query(`
       SELECT
-        id,
-        name_ru,
-        name_en,
-        name,
-        country_slug,
-        globe_lat,
-        globe_lng,
-        flag_url,
-        is_popular,
-        popularity_score,
-        is_domestic
-      FROM directions
-      ORDER BY is_popular DESC, name_en ASC;
+        d.id,
+        d.name_ru,
+        d.name_en,
+        d.name,
+        d.country_slug,
+        d.globe_lat,
+        d.globe_lng,
+        d.flag_url,
+        d.is_popular,
+        d.popularity_score,
+        d.is_domestic,
+        COUNT(t.id)::int AS tours_count,
+        COUNT(t.id) FILTER (
+          WHERE LOWER(COALESCE(t.tour_type, '')) IN ('hotel', 'offer')
+        )::int AS hotels_count,
+        COALESCE(MIN(t.price), 0)::numeric(12,2) AS price_from,
+        CASE
+          WHEN d.popularity_score >= 80 THEN 'high'
+          WHEN d.popularity_score >= 60 THEN 'medium'
+          ELSE 'low'
+        END AS popularity_level,
+        CASE
+          WHEN d.popularity_score >= 80 THEN '#e74c3c'
+          WHEN d.popularity_score >= 60 THEN '#f1c40f'
+          ELSE '#27ae60'
+        END AS popularity_color
+      FROM directions d
+      LEFT JOIN tours t
+        ON t.direction_id = d.id
+       AND t.is_active = TRUE
+      WHERE d.globe_lat IS NOT NULL
+        AND d.globe_lng IS NOT NULL
+      GROUP BY d.id
+      ORDER BY
+        d.is_popular DESC,
+        tours_count DESC,
+        d.popularity_score DESC,
+        COALESCE(d.name_ru, d.name, d.name_en, d.country_slug) ASC;
     `);
 
-    res.json(rows);
+    return res.status(200).json(rows);
   } catch (error) {
     console.error('Ошибка при получении направлений:', error);
-    res.status(500).json({ message: 'Ошибка при получении направлений' });
+    return res.status(500).json({ message: 'Ошибка при получении направлений' });
   }
 });
 
-// Получение туров для конкретной страны
-app.get('/api/directions/:id/tours', async (req, res) => {
-  const countryId = Number(req.params.id);
-
-  if (!Number.isFinite(countryId)) {
-    return res.status(400).json({ message: 'Некорректный id страны' });
-  }
-
+// Универсальный каталог для Hero и полноэкранного глобуса
+app.get('/api/catalog', async (req, res) => {
   try {
+    const {
+      direction_id,
+      country_slug,
+      q = '',
+      max_price,
+      type = 'tours',
+      domestic,
+      popular,
+      limit = 6,
+      page = 1,
+    } = req.query;
+
+    const params = [];
+    const whereParts = ['t.is_active = TRUE'];
+
+    addCatalogTypeWhere(whereParts, params, type);
+
+    if (direction_id) {
+      const directionId = Number(direction_id);
+
+      if (!Number.isFinite(directionId)) {
+        return res.status(400).json({ message: 'Некорректный id направления' });
+      }
+
+      params.push(directionId);
+      whereParts.push(`d.id = $${params.length}`);
+    }
+
+    if (country_slug) {
+      params.push(String(country_slug).trim().toLowerCase());
+      whereParts.push(`LOWER(d.country_slug) = $${params.length}`);
+    }
+
+    const searchQuery = String(q).trim();
+
+    if (searchQuery) {
+      params.push(`%${searchQuery}%`);
+      whereParts.push(`(
+        d.name_ru ILIKE $${params.length}
+        OR d.name_en ILIKE $${params.length}
+        OR d.name ILIKE $${params.length}
+        OR d.country_slug ILIKE $${params.length}
+        OR t.title ILIKE $${params.length}
+        OR t.location_name ILIKE $${params.length}
+        OR t.tour_type ILIKE $${params.length}
+      )`);
+    }
+
+    if (max_price) {
+      const maxPrice = Number(max_price);
+
+      if (!Number.isFinite(maxPrice) || maxPrice < 0) {
+        return res.status(400).json({ message: 'Некорректная стоимость' });
+      }
+
+      params.push(maxPrice);
+      whereParts.push(`t.price <= $${params.length}`);
+    }
+
+    if (domestic !== undefined) {
+      params.push(normalizeBoolean(domestic));
+      whereParts.push(`d.is_domestic = $${params.length}`);
+    }
+
+    if (normalizeBoolean(popular)) {
+      whereParts.push(`(t.is_popular = TRUE OR d.is_popular = TRUE OR t.is_hot = TRUE)`);
+    }
+
+    const safeLimit = Math.min(Math.max(Number(limit) || 6, 1), 48);
+    const safePage = Math.max(Number(page) || 1, 1);
+    const offset = (safePage - 1) * safeLimit;
+
+    const whereSql = whereParts.join('\n        AND ');
+
+    const countResult = await pool.query(`
+      SELECT COUNT(*)::int AS total
+      FROM tours t
+      JOIN directions d
+        ON d.id = t.direction_id
+      WHERE ${whereSql};
+    `, params);
+
+    const total = Number(countResult.rows[0]?.total || 0);
+    const listParams = [...params, safeLimit, offset];
+    const limitIndex = listParams.length - 1;
+    const offsetIndex = listParams.length;
+
     const { rows } = await pool.query(`
       SELECT
         t.id,
+        t.direction_id,
+        d.name_ru AS direction_name_ru,
+        d.name_en AS direction_name_en,
+        COALESCE(d.name_ru, d.name, d.name_en, d.country_slug) AS direction_name,
+        d.country_slug,
+        d.globe_lat,
+        d.globe_lng,
+        d.is_domestic,
         t.title,
-        t.short_desc,
-        t.image_url,
+        t.short_description AS description,
+        t.full_description,
+        t.price,
+        t.nights,
+        t.hotel_rating,
         t.is_hot,
-        COALESCE(MIN(o.price), 0) AS price_from,
-        COALESCE(AVG(hl.rating_avg), 0)::numeric(3,1) AS rating_avg,
-        COUNT(o.id) AS offers_count
-      FROM tour t
-      LEFT JOIN tour_offer o
-        ON o.tour_id = t.id
-       AND o.is_available = TRUE
-      LEFT JOIN hotel_listing hl
-        ON hl.hotel_id = o.hotel_id
-      WHERE t.country_id = $1
-      GROUP BY t.id
-      ORDER BY t.is_hot DESC, rating_avg DESC NULLS LAST, price_from ASC;
-    `, [countryId]);
+        t.is_popular,
+        t.tour_type,
+        t.location_name,
+        t.hotel_lat,
+        t.hotel_lng,
+        COALESCE((
+          SELECT ti.image_url
+          FROM tour_images ti
+          WHERE ti.tour_id = t.id
+            AND ti.is_main = TRUE
+          ORDER BY ti.id ASC
+          LIMIT 1
+        ), (
+          SELECT ti.image_url
+          FROM tour_images ti
+          WHERE ti.tour_id = t.id
+          ORDER BY ti.id ASC
+          LIMIT 1
+        ), '') AS image
+      FROM tours t
+      JOIN directions d
+        ON d.id = t.direction_id
+      WHERE ${whereSql}
+      ORDER BY
+        t.is_hot DESC,
+        t.is_popular DESC,
+        t.price ASC,
+        t.id ASC
+      LIMIT $${limitIndex}
+      OFFSET $${offsetIndex};
+    `, listParams);
 
-    res.json(rows);
+    return res.status(200).json({
+      items: mapCatalogRows(rows),
+      total,
+      page: safePage,
+      limit: safeLimit,
+      has_more: safePage * safeLimit < total,
+      type: normalizeCatalogType(type),
+      message: total === 0 ? 'Данные о турах пока не добавили' : null,
+    });
+  } catch (error) {
+    console.error('Ошибка при получении каталога:', error);
+    return res.status(500).json({ message: 'Ошибка при получении каталога' });
+  }
+});
+
+// Получение туров для конкретной страны/направления
+app.get('/api/directions/:id/tours', async (req, res) => {
+  const directionId = Number(req.params.id);
+
+  if (!Number.isFinite(directionId)) {
+    return res.status(400).json({ message: 'Некорректный id направления' });
+  }
+
+  try {
+    const type = normalizeCatalogType(req.query.type);
+    const params = [directionId];
+    const whereParts = [
+      't.direction_id = $1',
+      't.is_active = TRUE',
+    ];
+
+    addCatalogTypeWhere(whereParts, params, type);
+
+    const { rows } = await pool.query(`
+      SELECT
+        t.id,
+        t.direction_id,
+        COALESCE(d.name_ru, d.name, d.name_en, d.country_slug) AS direction_name,
+        d.country_slug,
+        d.globe_lat,
+        d.globe_lng,
+        d.is_domestic,
+        t.title,
+        t.short_description AS description,
+        t.full_description,
+        t.price,
+        t.nights,
+        t.hotel_rating,
+        t.is_hot,
+        t.is_popular,
+        t.tour_type,
+        t.location_name,
+        t.hotel_lat,
+        t.hotel_lng,
+        COALESCE((
+          SELECT ti.image_url
+          FROM tour_images ti
+          WHERE ti.tour_id = t.id
+            AND ti.is_main = TRUE
+          ORDER BY ti.id ASC
+          LIMIT 1
+        ), (
+          SELECT ti.image_url
+          FROM tour_images ti
+          WHERE ti.tour_id = t.id
+          ORDER BY ti.id ASC
+          LIMIT 1
+        ), '') AS image
+      FROM tours t
+      JOIN directions d
+        ON d.id = t.direction_id
+      WHERE ${whereParts.join('\n        AND ')}
+      ORDER BY
+        t.is_hot DESC,
+        t.is_popular DESC,
+        t.price ASC,
+        t.id ASC;
+    `, params);
+
+    return res.status(200).json(mapCatalogRows(rows));
   } catch (error) {
     console.error('Ошибка при получении туров для направления:', error);
-    res.status(500).json({ message: 'Ошибка при получении туров для направления' });
+    return res.status(500).json({ message: 'Ошибка при получении туров для направления' });
   }
 });
 
