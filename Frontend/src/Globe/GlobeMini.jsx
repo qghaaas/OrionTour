@@ -1,48 +1,92 @@
-import React, { useRef } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
-import { TextureLoader } from "three";
+import React, { memo, Suspense, useRef } from 'react';
+import { Canvas, useFrame } from '@react-three/fiber';
+import { useTexture } from '@react-three/drei';
+import { Link } from 'react-router-dom';
+import * as THREE from 'three';
+
 import earthDayImg from './img/earthDay.jpg';
-import earthBumpImg from './img/earthNight.jpg';
+import earthBumpImg from './img/earthBump.jpg';
+
 import './Globe.css';
-import { Link } from 'react-router-dom'
 
+const MINI_GLOBE_RADIUS = 1.2;
+const ROTATION_SPEED = 0.25;
 
-function MiniGlobeScene() {
-  const globeRef = useRef();
-  const dayTexture = new TextureLoader().load(earthDayImg);
-  const bumpTexture = new TextureLoader().load(earthBumpImg);
+useTexture.preload(earthDayImg);
+useTexture.preload(earthBumpImg);
 
-  // Вращение глобуса
-  useFrame(() => {
-    if (globeRef.current) globeRef.current.rotation.y += 0.002;
-  });
-
+function MiniGlobeFallback() {
   return (
     <>
-      <ambientLight intensity={0.7} />
+      <ambientLight intensity={0.9} />
       <directionalLight position={[5, 5, 5]} intensity={1.2} />
 
-      <mesh ref={globeRef}>
-        <sphereGeometry args={[1.2, 64, 64]} />
-        <meshPhongMaterial
-          map={dayTexture}
-          bumpMap={bumpTexture}
-          bumpScale={0.05}
-          shininess={5}
+      <mesh>
+        <sphereGeometry args={[MINI_GLOBE_RADIUS, 32, 32]} />
+        <meshStandardMaterial
+          color="#dbeafe"
+          roughness={0.9}
+          metalness={0}
         />
       </mesh>
     </>
   );
 }
 
-export default function GlobeMini({ onClick }) {
+const MiniGlobeScene = memo(function MiniGlobeScene() {
+  const globeRef = useRef(null);
+  const [earthTexture, bumpTexture] = useTexture([earthDayImg, earthBumpImg]);
+
+  earthTexture.colorSpace = THREE.SRGBColorSpace;
+
+  useFrame((_, delta) => {
+    if (!globeRef.current) return;
+
+    globeRef.current.rotation.y += delta * ROTATION_SPEED;
+  });
+
+  return (
+    <>
+      <ambientLight intensity={0.9} />
+      <directionalLight position={[5, 5, 5]} intensity={1.25} />
+
+      <mesh ref={globeRef}>
+        <sphereGeometry args={[MINI_GLOBE_RADIUS, 48, 48]} />
+
+        <meshStandardMaterial
+          map={earthTexture}
+          bumpMap={bumpTexture}
+          bumpScale={1.04}
+          roughness={0.85}
+          metalness={0}
+        />
+      </mesh>
+    </>
+  );
+});
+
+export default function GlobeMini() {
   return (
     <div className="globe-mini-wrapper">
-      <Canvas className="globe-mini-canvas" camera={{ position: [0, 0, 3.2], fov: 50 }}>
-        <MiniGlobeScene />
+      <Canvas
+        className="globe-mini-canvas"
+        camera={{ position: [0, 0, 3.2], fov: 50 }}
+        dpr={[1, 1.5]}
+        gl={{
+          antialias: true,
+          alpha: true,
+          powerPreference: 'high-performance',
+        }}
+      >
+        <Suspense fallback={<MiniGlobeFallback />}>
+          <MiniGlobeScene />
+        </Suspense>
       </Canvas>
+
       <div className="globe-mini-link">
-        <Link to="/interactive-globe">Открыть интерактивную карту</Link>
+        <Link to="/interactive-globe">
+          Открыть интерактивную карту
+        </Link>
       </div>
     </div>
   );

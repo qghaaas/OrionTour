@@ -1,89 +1,148 @@
-import React, { useEffect, useState, useMemo, useRef } from 'react';
+import React, {
+  memo,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
-import { OrbitControls, Stars, Html, useTexture } from '@react-three/drei';
+import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
+
 import { latLngToCartesian } from './spherical';
-import earthNight from './img/earthNight.jpg';
+
 import earthDay from './img/earthDay.jpg';
-import search from './img/search.svg';
-import close from './img/close.svg';
-import './Globe.css';
+import earthNight from './img/earthNight.jpg';
+import earthBump from './img/earthBump.jpg';
+
+import searchIcon from './img/search.svg';
+import closeIcon from './img/close.svg';
 import SunIcon from './img/SunIcon.svg';
 import MoonIcon from './img/MoonIcon.svg';
-import earthBump from './img/earthBump.jpg';
-import Header from '../MainPage/Header/Header'
 
+import './Globe.css';
 
 const API_URL = 'http://localhost:3010/api';
 
+const GLOBE_RADIUS = 4;
+const CAMERA_START_Z = 12;
+const CAMERA_END_Z = 8;
+
+const LIGHTS = {
+  light: {
+    ambient: { intensity: 0.55, color: '#ffffff' },
+    directional: { intensity: 1.15, color: '#ffffff' },
+  },
+  dark: {
+    ambient: { intensity: 1.1, color: '#777777' },
+    directional: { intensity: 1.25, color: '#aaaaaa' },
+  },
+};
+
+function toNumber(value) {
+  const num = Number(value);
+  return Number.isFinite(num) ? num : null;
+}
+
 function normalizeDirection(row) {
-  const lat = Number(row.globe_lat ?? row.lat);
-  const lng = Number(row.globe_lng ?? row.lng);
+  const lat = toNumber(row.globe_lat ?? row.lat);
+  const lng = toNumber(row.globe_lng ?? row.lng);
+
+  if (lat === null || lng === null) return null;
 
   return {
     id: row.id,
-    name_ru: row.name_ru || row.name || '',
-    name_en: row.name_en || row.name || row.country_slug || '',
-    name: row.name || row.name_ru || row.name_en || '',
-    iso_code: row.iso_code || row.country_slug,
-    country_slug: row.country_slug,
     lat,
     lng,
-    globe_lat: row.globe_lat,
-    globe_lng: row.globe_lng,
-    flag_url: row.flag_url,
-    is_popular: Boolean(row.is_popular),
-    popularity_score: Number(row.popularity_score) || 0,
-    popularity_level: row.popularity_level,
-    popularity_color: row.popularity_color,
-    hotels_count: Number(row.hotels_count ?? 0),
-    offers_count: Number(row.offers_count ?? 0),
-    tours_count: Number(row.tours_count ?? 0),
-    is_domestic: Boolean(row.is_domestic),
+    nameRu: row.name_ru || row.name || '',
+    nameEn: row.name_en || row.name || row.country_slug || '',
+    name: row.name || row.name_ru || row.name_en || row.country_slug || '',
+    slug: row.country_slug,
+    flagUrl: row.flag_url,
+    popularityScore: Number(row.popularity_score) || 0,
+    popularityLevel: row.popularity_level || null,
+    popularityColor: row.popularity_color || null,
+    toursCount: Number(row.tours_count ?? 0),
   };
 }
 
-function getMarkerName(marker, language = 'ru') {
-  if (language === 'en') {
-    return marker.name_en || marker.name_ru || marker.name || marker.country_slug;
-  }
-
-  return marker.name_ru || marker.name || marker.name_en || marker.country_slug;
+function getMarkerName(marker, language) {
+  return language === 'en'
+    ? marker.nameEn || marker.nameRu || marker.name || marker.slug
+    : marker.nameRu || marker.name || marker.nameEn || marker.slug;
 }
 
 function getPopularityLevel(marker) {
-  if (marker.popularity_level) return marker.popularity_level;
+  if (marker.popularityLevel) return marker.popularityLevel;
 
-  const score = Number(marker.popularity_score) || 0;
-
-  if (score < 60) return 'low';
-  if (score < 80) return 'medium';
+  if (marker.popularityScore < 60) return 'low';
+  if (marker.popularityScore < 80) return 'medium';
   return 'high';
 }
 
 function getPopularityColor(level) {
-  switch (level) {
-    case 'low':
-      return '#27ae60';
-    case 'medium':
-      return '#f1c40f';
-    case 'high':
-      return '#e74c3c';
-    default:
-      return 'rgba(255, 255, 255, 0.6)';
+  if (level === 'low') return '#27ae60';
+  if (level === 'medium') return '#f1c40f';
+  if (level === 'high') return '#e74c3c';
+
+  return 'rgba(255, 255, 255, 0.6)';
+}
+
+const FLAG_CODE_BY_SLUG = {
+  ru: 'ru',
+  russia: 'ru',
+  kaliningrad: 'ru',
+
+  fr: 'fr',
+  france: 'fr',
+
+  de: 'de',
+  germany: 'de',
+
+  egypt: 'eg',
+  maldives: 'mv',
+};
+
+function getFlagCode(marker) {
+  const slug = marker.slug?.toLowerCase();
+
+  if (!slug) return '';
+
+  if (/^[a-z]{2}$/.test(slug)) {
+    return slug;
   }
+
+  return FLAG_CODE_BY_SLUG[slug] || '';
+}
+
+function getFlagSrc(marker) {
+  const code = getFlagCode(marker);
+
+  if (!code) return '';
+
+  return `https://flagcdn.com/w40/${code}.png`;
+}
+
+function markerMatchesSearch(marker, query) {
+  const searchableText = [
+    marker.nameRu,
+    marker.nameEn,
+    marker.name,
+    marker.slug,
+  ]
+    .filter(Boolean)
+    .join(' ')
+    .toLowerCase();
+
+  return searchableText.includes(query);
 }
 
 function Earth({ radius, theme }) {
   const textures = useTexture(
     theme === 'light'
-      ? {
-          map: earthDay,
-          bumpMap: earthBump,
-        }
-      : {
-          map: earthNight,
-        }
+      ? { map: earthDay, bumpMap: earthBump }
+      : { map: earthNight }
   );
 
   return (
@@ -94,195 +153,168 @@ function Earth({ radius, theme }) {
         bumpMap={theme === 'light' ? textures.bumpMap : null}
         bumpScale={theme === 'light' ? 0.25 : 0}
         roughness={0.9}
-        metalness={0.0}
+        metalness={0}
       />
     </mesh>
   );
 }
 
-function CountryMarker({
+const CountryMarker = memo(function CountryMarker({
   marker,
   radius,
-  onClick,
+  language,
   isActive,
+  onClick,
   onHover,
   onHoverEnd,
-  language,
 }) {
   const { camera } = useThree();
-  const [isVisible, setIsVisible] = useState(true);
+  const [visible, setVisible] = useState(true);
   const visibleRef = useRef(true);
 
-  const position = useMemo(
-    () => latLngToCartesian(marker.globe_lat, marker.globe_lng, radius + 0),
-    [marker.globe_lat, marker.globe_lng, radius]
-  );
+  const position = useMemo(() => {
+    return latLngToCartesian(marker.lat, marker.lng, radius + 0.08);
+  }, [marker.lat, marker.lng, radius]);
 
   useFrame(() => {
-    const markerDir = new THREE.Vector3(...position).normalize();
-    const camDir = camera.position.clone().normalize();
-    const visible = markerDir.dot(camDir) > 0;
+    const markerDirection = new THREE.Vector3(...position).normalize();
+    const cameraDirection = camera.position.clone().normalize();
 
-    if (visible !== visibleRef.current) {
-      visibleRef.current = visible;
-      setIsVisible(visible);
+    const nextVisible = markerDirection.dot(cameraDirection) > 0.05;
+
+    if (nextVisible !== visibleRef.current) {
+      visibleRef.current = nextVisible;
+      setVisible(nextVisible);
     }
   });
 
-  if (!isVisible) return null;
+  if (!visible) return null;
 
-  const popularityLevel = getPopularityLevel(marker);
-  const borderColor = marker.popularity_color || getPopularityColor(popularityLevel);
-  const tours = Number(marker.tours_count ?? 0);
   const markerName = getMarkerName(marker, language);
+  const popularityLevel = getPopularityLevel(marker);
+  const borderColor = marker.popularityColor || getPopularityColor(popularityLevel);
+  const flagSrc = getFlagSrc(marker);
 
   return (
     <group position={position}>
-      <Html distanceFactor={10}>
+      <Html center distanceFactor={9} zIndexRange={[20, 0]}>
         <div
-          style={{ borderColor }}
           className={`marker-pill ${isActive ? 'marker-pill--active' : ''}`}
-          onMouseEnter={(e) => {
-            e.stopPropagation();
-            onHover?.(marker);
+          style={{ borderColor }}
+          onMouseEnter={(event) => {
+            event.stopPropagation();
+            onHover(marker);
           }}
-          onMouseLeave={() => onHoverEnd?.(marker)}
-          onClick={(e) => {
-            e.stopPropagation();
+          onMouseLeave={(event) => {
+            event.stopPropagation();
+            onHoverEnd(marker);
+          }}
+          onClick={(event) => {
+            event.stopPropagation();
             onClick?.(marker);
           }}
         >
           <div className="marker-flag-wrapper">
-            {marker.flag_url && (
+            {flagSrc ? (
               <img
-                src={marker.flag_url}
-                alt={marker.name_en || marker.name_ru || marker.name || marker.country_slug}
+                src={flagSrc}
+                alt={markerName}
                 className="marker-flag"
+              />
+            ) : (
+              <span
+                style={{
+                  width: 10,
+                  height: 10,
+                  display: 'block',
+                  borderRadius: '50%',
+                  background: borderColor,
+                }}
               />
             )}
           </div>
 
           <div className="marker-info">
             <span className="marker-country">{markerName}</span>
-
             <span className="marker-tours">
-              {tours} туров
+              {marker.toursCount} {language === 'en' ? 'tours' : 'туров'}
             </span>
           </div>
         </div>
       </Html>
     </group>
   );
-}
+});
 
 function GlobeScene({
   markers,
-  radius,
-  onCountrySelect,
+  selectedMarkerId,
   hoveredMarkerId,
-  searchMarkerId,
-  setHoveredMarkerId,
-  onInterruptSearch,
   theme,
   language,
+  onMarkerSelect,
+  onMarkerHover,
+  onMarkerHoverEnd,
+  onSearchInterrupt,
 }) {
-  const controlsRef = useRef();
-  const { camera } = useThree();
+  const controlsRef = useRef(null);
   const flyRef = useRef(null);
-  const initialDoneRef = useRef(false);
-  const initialProgressRef = useRef(0);
+  const introProgressRef = useRef(0);
+  const introDoneRef = useRef(false);
 
-  const LIGHT_PRESETS = {
-    light: {
-      ambient: {
-        intensity: 0.5,
-        color: '#ffffff',
-      },
-      directional: {
-        intensity: 1.1,
-        color: '#ffffff',
-        position: [5, 5, 5],
-      },
-    },
-    dark: {
-      ambient: {
-        intensity: 10.2,
-        color: '#888888',
-      },
-      directional: {
-        intensity: 10.2,
-        color: '#888888',
-        position: [5, 5, 5],
-      },
-    },
-  };
-
-  const light = LIGHT_PRESETS[theme];
+  const { camera } = useThree();
+  const light = LIGHTS[theme];
 
   useEffect(() => {
-    if (controlsRef.current) {
-      controlsRef.current.target.set(0, 0, 0);
-      controlsRef.current.update();
-    }
+    controlsRef.current?.target.set(0, 0, 0);
+    controlsRef.current?.update();
   }, []);
 
   useEffect(() => {
-    if (!searchMarkerId) return;
+    if (!selectedMarkerId) return;
 
-    const marker = markers.find((m) => m.id === searchMarkerId);
+    const marker = markers.find((item) => item.id === selectedMarkerId);
     if (!marker) return;
 
-    const posArr = latLngToCartesian(marker.globe_lat, marker.globe_lng, radius);
-    const markerDir = new THREE.Vector3(posArr[0], posArr[1], posArr[2]).normalize();
-    const distance = radius + 2.5;
-    const endPos = markerDir.clone().multiplyScalar(distance);
-
-    if (controlsRef.current) {
-      controlsRef.current.target.set(0, 0, 0);
-      controlsRef.current.update();
-    }
+    const position = latLngToCartesian(marker.lat, marker.lng, GLOBE_RADIUS);
+    const direction = new THREE.Vector3(...position).normalize();
 
     flyRef.current = {
-      startPos: camera.position.clone(),
-      endPos,
       progress: 0,
+      start: camera.position.clone(),
+      end: direction.multiplyScalar(GLOBE_RADIUS + 3.2),
     };
-  }, [searchMarkerId, markers, radius, camera]);
+
+    introDoneRef.current = true;
+  }, [selectedMarkerId, markers, camera]);
 
   useFrame((_, delta) => {
-    if (!initialDoneRef.current && !flyRef.current) {
-      const speed = 0.6;
-      initialProgressRef.current += delta * speed;
-      const t = Math.min(initialProgressRef.current, 1);
+    if (!introDoneRef.current && !flyRef.current) {
+      introProgressRef.current = Math.min(introProgressRef.current + delta * 0.6, 1);
 
-      const startZ = 12;
-      const endZ = 8;
-      const z = startZ + (endZ - startZ) * t;
+      const t = introProgressRef.current;
+      camera.position.set(0, 0, CAMERA_START_Z + (CAMERA_END_Z - CAMERA_START_Z) * t);
 
-      camera.position.set(0, 0, z);
-      if (controlsRef.current) {
-        controlsRef.current.update();
-      }
+      controlsRef.current?.update();
 
       if (t >= 1) {
-        initialDoneRef.current = true;
+        introDoneRef.current = true;
       }
+
       return;
     }
 
     if (!flyRef.current) return;
 
-    const speed = 0.8;
-    flyRef.current.progress += delta * speed;
-    const t = Math.min(flyRef.current.progress, 1);
+    flyRef.current.progress = Math.min(flyRef.current.progress + delta * 0.85, 1);
 
-    const { startPos, endPos } = flyRef.current;
-    const newPos = startPos.clone().lerp(endPos, t);
+    const t = flyRef.current.progress;
+    const smoothT = t * t * (3 - 2 * t);
 
-    camera.position.copy(newPos);
-    if (controlsRef.current) {
-      controlsRef.current.update();
-    }
+    camera.position.copy(flyRef.current.start.clone().lerp(flyRef.current.end, smoothT));
+
+    controlsRef.current?.target.set(0, 0, 0);
+    controlsRef.current?.update();
 
     if (t >= 1) {
       flyRef.current = null;
@@ -295,257 +327,326 @@ function GlobeScene({
         intensity={light.ambient.intensity}
         color={light.ambient.color}
       />
+
       <directionalLight
-        position={light.directional.position}
+        position={[5, 5, 5]}
         intensity={light.directional.intensity}
         color={light.directional.color}
       />
-      <Stars radius={100} depth={50} count={5000} factor={3} saturation={0} fade />
 
-      <Earth radius={radius} theme={theme} />
+      <Stars
+        radius={100}
+        depth={50}
+        count={5000}
+        factor={3}
+        saturation={0}
+        fade
+      />
 
-      {markers.map((m) => (
+      <Earth radius={GLOBE_RADIUS} theme={theme} />
+
+      {markers.map((marker) => (
         <CountryMarker
-          key={m.id}
-          marker={m}
-          radius={radius}
-          onClick={onCountrySelect}
-          isActive={hoveredMarkerId === m.id || searchMarkerId === m.id}
-          onHover={() => setHoveredMarkerId(m.id)}
-          onHoverEnd={(marker) => {
-            setHoveredMarkerId((cur) => (cur === marker.id ? null : cur));
-          }}
+          key={marker.id}
+          marker={marker}
+          radius={GLOBE_RADIUS}
           language={language}
+          isActive={selectedMarkerId === marker.id || hoveredMarkerId === marker.id}
+          onClick={onMarkerSelect}
+          onHover={onMarkerHover}
+          onHoverEnd={onMarkerHoverEnd}
         />
       ))}
 
       <OrbitControls
         ref={controlsRef}
         enablePan={false}
-        enableZoom={true}
-        enableRotate={true}
+        enableZoom
+        enableRotate
         minDistance={7}
         maxDistance={15}
+        rotateSpeed={0.6}
+        zoomSpeed={0.7}
         onStart={() => {
           flyRef.current = null;
-          initialDoneRef.current = true;
+          introDoneRef.current = true;
 
-          if (controlsRef.current) {
-            controlsRef.current.target.set(0, 0, 0);
-            controlsRef.current.update();
-          }
+          controlsRef.current?.target.set(0, 0, 0);
+          controlsRef.current?.update();
 
-          onInterruptSearch?.();
+          onSearchInterrupt();
         }}
       />
     </>
   );
 }
 
-function Globe({ onCountrySelect, language = 'ru' }) {
-  const [markers, setMarkers] = useState([]);
-  const [hoveredMarkerId, setHoveredMarkerId] = useState(null);
-  const [searchMarkerId, setSearchMarkerId] = useState(null);
-  const [searchValue, setSearchValue] = useState('');
-  const [theme, setTheme] = useState('dark');
-
-  const radius = 4;
-
-  const toggleTheme = () => {
-    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
-  };
-
-  useEffect(() => {
-    (async () => {
-      try {
-        const res = await fetch(`${API_URL}/directions`);
-
-        if (!res.ok) {
-          throw new Error(`Directions API error: ${res.status}`);
-        }
-
-        const data = await res.json();
-        const normalizedMarkers = data
-          .map(normalizeDirection)
-          .filter((marker) => Number.isFinite(marker.globe_lat) && Number.isFinite(marker.globe_lng));
-
-        setMarkers(normalizedMarkers);
-      } catch (e) {
-        console.error('Ошибка при загрузке маркеров глобуса:', e);
-      }
-    })();
-  }, []);
-
-  const suggestions = useMemo(() => {
-    const query = searchValue.trim().toLowerCase();
-    if (!query) return [];
-
-    return markers
-      .filter((m) => {
-        const ru = m.name_ru?.toLowerCase() || '';
-        const en = m.name_en?.toLowerCase() || '';
-        const name = m.name?.toLowerCase() || '';
-        const slug = m.country_slug?.toLowerCase() || '';
-
-        return (
-          ru.includes(query) ||
-          en.includes(query) ||
-          name.includes(query) ||
-          slug.includes(query)
-        );
-      })
-      .slice(0, 7);
-  }, [searchValue, markers]);
-
-  const handleSearch = () => {
-    if (!searchValue.trim()) return;
-
-    const foundFromSuggestions = suggestions[0];
-
-    if (foundFromSuggestions) {
-      setSearchMarkerId(foundFromSuggestions.id);
-      return;
-    }
-
-    const query = searchValue.trim().toLowerCase();
-    const found = markers.find((m) => {
-      const ru = m.name_ru?.toLowerCase() || '';
-      const en = m.name_en?.toLowerCase() || '';
-      const name = m.name?.toLowerCase() || '';
-      const slug = m.country_slug?.toLowerCase() || '';
-
-      return (
-        ru.includes(query) ||
-        en.includes(query) ||
-        name.includes(query) ||
-        slug.includes(query)
-      );
-    });
-
-    if (!found) return;
-
-    setSearchMarkerId(found.id);
-  };
-
-  const handleKeyDown = (e) => {
-    if (e.key === 'Enter') {
-      handleSearch();
-    }
-  };
-
-  const handleSuggestionClick = (marker) => {
-    setSearchValue(getMarkerName(marker, language));
-    setSearchMarkerId(marker.id);
-  };
-
+function ThemeToggle({ theme, onToggle }) {
   return (
-    <div className={`globe-wrapper ${theme}`}>
-      <div className="globe-theme-toggle">
-        <img
-          src={theme === 'dark' ? SunIcon : MoonIcon}
-          alt="theme toggle"
-          onClick={toggleTheme}
-          className="theme-toggle-icon"
+    <div className="globe-theme-toggle">
+      <img
+        src={theme === 'dark' ? SunIcon : MoonIcon}
+        alt="theme toggle"
+        onClick={onToggle}
+        className="theme-toggle-icon"
+      />
+    </div>
+  );
+}
+
+function SearchPanel({
+  value,
+  language,
+  suggestions,
+  onChange,
+  onClear,
+  onSearch,
+  onSuggestionClick,
+}) {
+  return (
+    <div className="globe-search">
+      <div className="globe-search-input-wrapper">
+        <input
+          className="globe-search-input"
+          type="text"
+          placeholder={language === 'en' ? 'Search country...' : 'Поиск страны...'}
+          value={value}
+          onChange={(event) => onChange(event.target.value)}
+          onKeyDown={(event) => {
+            if (event.key === 'Enter') onSearch();
+          }}
         />
-      </div>
 
-      <div className="globe-search">
-        <div className="globe-search-input-wrapper">
-          <input
-            className="globe-search-input"
-            type="text"
-            placeholder={language === 'en' ? 'Search country...' : 'Поиск страны...'}
-            value={searchValue}
-            onChange={(e) => setSearchValue(e.target.value)}
-            onKeyDown={handleKeyDown}
+        {value ? (
+          <img
+            src={closeIcon}
+            alt="clear"
+            className="globe-search-icon globe-search-icon--clear"
+            onClick={onClear}
           />
-
-          {searchValue.length === 0 ? (
-            <img
-              src={search}
-              alt="search"
-              className="globe-search-icon"
-            />
-          ) : (
-            <img
-              src={close}
-              alt="clear"
-              className="globe-search-icon globe-search-icon--clear"
-              onClick={() => {
-                setSearchValue('');
-                setSearchMarkerId(null);
-              }}
-            />
-          )}
-        </div>
-
-        <button
-          className="globe-search-btn"
-          type="button"
-          onClick={handleSearch}
-        >
-          {language === 'en' ? 'Search' : 'Найти'}
-        </button>
+        ) : (
+          <img
+            src={searchIcon}
+            alt="search"
+            className="globe-search-icon"
+          />
+        )}
 
         {suggestions.length > 0 && (
           <ul className="globe-search-suggestions">
-            {suggestions.map((m) => (
-              <li
-                key={m.id}
-                className="globe-search-suggestion"
-                onMouseDown={() => handleSuggestionClick(m)}
-              >
-                {m.flag_url && (
-                  <img
-                    src={m.flag_url}
-                    alt={m.name_en || m.name_ru || m.name || m.country_slug}
-                    className="globe-search-suggestion-flag"
-                  />
-                )}
-                <span className="globe-search-suggestion-name">
-                  {getMarkerName(m, language)}
-                  {m.name_en && m.name_ru && m.name_en !== m.name_ru && language !== 'en' && (
-                    <span className="globe-search-suggestion-name-en">
-                      {' '}
-                      ({m.name_en})
-                    </span>
+            {suggestions.map((marker) => {
+              const markerName = getMarkerName(marker, language);
+              const flagSrc = getFlagSrc(marker);
+
+              return (
+                <li
+                  key={marker.id}
+                  className="globe-search-suggestion"
+                  onMouseDown={() => onSuggestionClick(marker)}
+                >
+                  {flagSrc && (
+                    <img
+                      src={flagSrc}
+                      alt={markerName}
+                      className="globe-search-suggestion-flag"
+                    />
                   )}
-                </span>
-              </li>
-            ))}
+
+                  <span className="globe-search-suggestion-name">
+                    {markerName}
+
+                    {language !== 'en' &&
+                      marker.nameEn &&
+                      marker.nameRu &&
+                      marker.nameEn !== marker.nameRu && (
+                        <span className="globe-search-suggestion-name-en">
+                          {' '}
+                          ({marker.nameEn})
+                        </span>
+                      )}
+                  </span>
+                </li>
+              );
+            })}
           </ul>
         )}
       </div>
 
-      <div className="globe-legend">
-        <div className="globe-legend-item">
-          <span className="globe-legend-dot globe-legend-dot--low" />
-          <span>Низкая популярность</span>
-        </div>
-        <div className="globe-legend-item">
-          <span className="globe-legend-dot globe-legend-dot--medium" />
-          <span>Средняя популярность</span>
-        </div>
-        <div className="globe-legend-item">
-          <span className="globe-legend-dot globe-legend-dot--high" />
-          <span>Высокая популярность</span>
-        </div>
+      <button
+        className="globe-search-btn"
+        type="button"
+        onClick={onSearch}
+      >
+        {language === 'en' ? 'Search' : 'Найти'}
+      </button>
+    </div>
+  );
+}
+
+function PopularityLegend({ language }) {
+  const labels = {
+    ru: {
+      low: 'Низкая популярность',
+      medium: 'Средняя популярность',
+      high: 'Высокая популярность',
+    },
+    en: {
+      low: 'Low popularity',
+      medium: 'Medium popularity',
+      high: 'High popularity',
+    },
+  };
+
+  const text = language === 'en' ? labels.en : labels.ru;
+
+  return (
+    <div className="globe-legend">
+      <div className="globe-legend-item">
+        <span className="globe-legend-dot globe-legend-dot--low" />
+        <span>{text.low}</span>
       </div>
 
+      <div className="globe-legend-item">
+        <span className="globe-legend-dot globe-legend-dot--medium" />
+        <span>{text.medium}</span>
+      </div>
+
+      <div className="globe-legend-item">
+        <span className="globe-legend-dot globe-legend-dot--high" />
+        <span>{text.high}</span>
+      </div>
+    </div>
+  );
+}
+
+function Globe({ onCountrySelect, language = 'ru' }) {
+  const [markers, setMarkers] = useState([]);
+  const [theme, setTheme] = useState('dark');
+  const [searchValue, setSearchValue] = useState('');
+  const [selectedMarkerId, setSelectedMarkerId] = useState(null);
+  const [hoveredMarkerId, setHoveredMarkerId] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+
+    async function loadMarkers() {
+      try {
+        const response = await fetch(`${API_URL}/directions`);
+
+        if (!response.ok) {
+          throw new Error(`Directions API error: ${response.status}`);
+        }
+
+        const data = await response.json();
+        const normalizedMarkers = data
+          .map(normalizeDirection)
+          .filter(Boolean);
+
+        if (isMounted) {
+          setMarkers(normalizedMarkers);
+        }
+      } catch (error) {
+        console.error('Ошибка при загрузке маркеров глобуса:', error);
+      }
+    }
+
+    loadMarkers();
+
+    return () => {
+      isMounted = false;
+    };
+  }, []);
+
+  const suggestions = useMemo(() => {
+    const query = searchValue.trim().toLowerCase();
+
+    if (!query) return [];
+
+    return markers
+      .filter((marker) => markerMatchesSearch(marker, query))
+      .slice(0, 7);
+  }, [markers, searchValue]);
+
+  const handleSearch = useCallback(() => {
+    const query = searchValue.trim().toLowerCase();
+
+    if (!query) return;
+
+    const foundMarker =
+      suggestions[0] ||
+      markers.find((marker) => markerMatchesSearch(marker, query));
+
+    if (!foundMarker) return;
+
+    setSelectedMarkerId(foundMarker.id);
+    setHoveredMarkerId(foundMarker.id);
+  }, [markers, searchValue, suggestions]);
+
+  const handleClearSearch = useCallback(() => {
+    setSearchValue('');
+    setSelectedMarkerId(null);
+    setHoveredMarkerId(null);
+  }, []);
+
+  const handleSuggestionClick = useCallback((marker) => {
+    setSearchValue(getMarkerName(marker, language));
+    setSelectedMarkerId(marker.id);
+    setHoveredMarkerId(marker.id);
+  }, [language]);
+
+  const handleMarkerSelect = useCallback((marker) => {
+    setSelectedMarkerId(marker.id);
+    setHoveredMarkerId(marker.id);
+    onCountrySelect?.(marker);
+  }, [onCountrySelect]);
+
+  const handleMarkerHover = useCallback((marker) => {
+    setHoveredMarkerId(marker.id);
+  }, []);
+
+  const handleMarkerHoverEnd = useCallback((marker) => {
+    setHoveredMarkerId((currentId) => (
+      currentId === marker.id ? null : currentId
+    ));
+  }, []);
+
+  return (
+    <div className={`globe-wrapper ${theme}`}>
+      <ThemeToggle
+        theme={theme}
+        onToggle={() => {
+          setTheme((currentTheme) => (
+            currentTheme === 'dark' ? 'light' : 'dark'
+          ));
+        }}
+      />
+
+      <SearchPanel
+        value={searchValue}
+        language={language}
+        suggestions={suggestions}
+        onChange={setSearchValue}
+        onClear={handleClearSearch}
+        onSearch={handleSearch}
+        onSuggestionClick={handleSuggestionClick}
+      />
+
+      <PopularityLegend language={language} />
+
       <Canvas
-        camera={{ position: [0, 0, 12], fov: 45 }}
+        camera={{ position: [0, 0, CAMERA_START_Z], fov: 45 }}
         className="globe-canvas"
       >
         <GlobeScene
           markers={markers}
-          radius={radius}
-          onCountrySelect={onCountrySelect}
+          selectedMarkerId={selectedMarkerId}
           hoveredMarkerId={hoveredMarkerId}
-          searchMarkerId={searchMarkerId}
-          setHoveredMarkerId={setHoveredMarkerId}
-          onInterruptSearch={() => setSearchMarkerId(null)}
           theme={theme}
           language={language}
+          onMarkerSelect={handleMarkerSelect}
+          onMarkerHover={handleMarkerHover}
+          onMarkerHoverEnd={handleMarkerHoverEnd}
+          onSearchInterrupt={() => setSelectedMarkerId(null)}
         />
       </Canvas>
     </div>
