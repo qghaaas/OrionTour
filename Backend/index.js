@@ -17,6 +17,13 @@ const CODE_EXPIRES_MINUTES = 10;
 const RESEND_DELAY_SECONDS = 30;
 const MAX_VERIFY_ATTEMPTS = 5;
 const REGISTRATION_ERROR_MESSAGE = 'Проблема с регистрацией. Попробуйте снова.';
+const ALLOWED_PROFILE_AVATARS = [
+  '/uploads/avatars/orion-avatar-blue.png',
+  '/uploads/avatars/orion-avatar-green.png',
+  '/uploads/avatars/orion-avatar-orange.png',
+  '/uploads/avatars/orion-avatar-red.png',
+  '/uploads/avatars/orion-avatar-purple.png'
+];
 
 const pool = new Pool({
   user: process.env.DB_USER || 'postgres',
@@ -63,6 +70,81 @@ function hashCode(code) {
 
 function isValidEmail(email = '') {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+}
+const ADMIN_TOKEN_EXPIRES_MS = 1000 * 60 * 60 * 8;
+
+function createAdminToken() {
+  const payload = {
+    role: 'admin',
+    exp: Date.now() + ADMIN_TOKEN_EXPIRES_MS
+  };
+
+  const encodedPayload = Buffer
+    .from(JSON.stringify(payload))
+    .toString('base64url');
+
+  const signature = crypto
+    .createHmac('sha256', process.env.ADMIN_TOKEN_SECRET || 'dev_admin_secret')
+    .update(encodedPayload)
+    .digest('base64url');
+
+  return `${encodedPayload}.${signature}`;
+}
+
+function verifyAdminToken(token = '') {
+  try {
+    const [encodedPayload, signature] = token.split('.');
+
+    if (!encodedPayload || !signature) {
+      return false;
+    }
+
+    const expectedSignature = crypto
+      .createHmac('sha256', process.env.ADMIN_TOKEN_SECRET || 'dev_admin_secret')
+      .update(encodedPayload)
+      .digest('base64url');
+
+    const signatureBuffer = Buffer.from(signature);
+    const expectedBuffer = Buffer.from(expectedSignature);
+
+    if (
+      signatureBuffer.length !== expectedBuffer.length ||
+      !crypto.timingSafeEqual(signatureBuffer, expectedBuffer)
+    ) {
+      return false;
+    }
+
+    const payload = JSON.parse(
+      Buffer.from(encodedPayload, 'base64url').toString('utf8')
+    );
+
+    if (payload.role !== 'admin') {
+      return false;
+    }
+
+    if (!payload.exp || payload.exp < Date.now()) {
+      return false;
+    }
+
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function requireAdmin(req, res, next) {
+  const authHeader = req.headers.authorization || '';
+  const token = authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7)
+    : '';
+
+  if (!verifyAdminToken(token)) {
+    return res.status(401).json({
+      message: 'Нет доступа'
+    });
+  }
+
+  next();
 }
 
 async function deleteExpiredCodes() {
@@ -284,7 +366,7 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
       `
       INSERT INTO users (email, password_hash)
       VALUES ($1, $2)
-      RETURNING id, email, created_at
+      RETURNING id, email, full_name, avatar_url, created_at
       `,
       [row.email, row.password_hash]
     );
@@ -322,7 +404,7 @@ app.post('/api/auth/login', async (req, res) => {
 
     const userResult = await pool.query(
       `
-      SELECT id, email, password_hash, created_at
+      SELECT id, email, password_hash, full_name, avatar_url, created_at
       FROM users
       WHERE email = $1
       `,
@@ -347,6 +429,8 @@ app.post('/api/auth/login', async (req, res) => {
       user: {
         id: user.id,
         email: user.email,
+        full_name: user.full_name,
+        avatar_url: user.avatar_url,
         created_at: user.created_at
       }
     });
@@ -831,6 +915,404 @@ app.post('/api/blog-posts/:id/increment-views', async (req, res) => {
   } catch (error) {
     console.error(error);
     return res.status(500).json({ message: 'Ошибка обновления просмотров' });
+  }
+});
+app.post('/api/contact-requests', async (req, res) => {
+  try {
+    const {
+      full_name,
+      phone,
+      email = '',
+      question,
+      personal_data_agreement
+    } = req.body;
+
+    if (!full_name || !full_name.trim()) {
+      return res.status(400).json({ message: 'Введите ФИО' });
+    }
+
+    if (!phone || !phone.trim()) {
+      return res.status(400).json({ message: 'Введите телефон' });
+    }
+
+    if (!question || !question.trim()) {
+      return res.status(400).json({ message: 'Введите вопрос' });
+    }
+
+    if (personal_data_agreement !== true) {
+      return res.status(400).json({
+        message: 'Необходимо согласие на обработку персональных данных'
+      });
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+
+    if (normalizedEmail && !isValidEmail(normalizedEmail)) {
+      return res.status(400).json({ message: 'Некорректный email' });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO contact_requests (
+        full_name,
+        phone,
+        email,
+        question
+      )
+      VALUES ($1, $2, $3, $4)
+      RETURNING id, full_name, phone, email, question, created_at
+      `,
+      [
+        full_name.trim(),
+        phone.trim(),
+        normalizedEmail || null,
+        question.trim()
+      ]
+    );
+
+    return res.status(201).json({
+      message: 'Заявка успешно отправлена',
+      request: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка при отправке заявки'
+    });
+  }
+});
+
+app.post('/api/admin/login', async (req, res) => {
+  try {
+    const { login, password } = req.body;
+
+    const adminLogin = process.env.ADMIN_LOGIN || 'admin';
+    const adminPassword = process.env.ADMIN_PASSWORD || 'admin123';
+
+    if (login !== adminLogin || password !== adminPassword) {
+      return res.status(401).json({
+        message: 'Неверный логин или пароль'
+      });
+    }
+
+    const token = createAdminToken();
+
+    return res.status(200).json({
+      message: 'Вход выполнен успешно',
+      token
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка входа в админ-панель'
+    });
+  }
+});
+
+app.get('/api/admin/contact-requests', requireAdmin, async (req, res) => {
+  try {
+    const result = await pool.query(`
+      SELECT
+        id,
+        full_name,
+        phone,
+        email,
+        question,
+        created_at
+      FROM contact_requests
+      ORDER BY created_at DESC
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения обращений'
+    });
+  }
+});
+
+app.get('/api/admin/reviews', requireAdmin, async (req, res) => {
+  try {
+    const { status = 'pending' } = req.query;
+
+    let whereClause = '';
+
+    if (status === 'pending') {
+      whereClause = 'WHERE r.is_active = FALSE';
+    }
+
+    if (status === 'active') {
+      whereClause = 'WHERE r.is_active = TRUE';
+    }
+
+    const result = await pool.query(`
+      SELECT
+        r.id,
+        r.author_name,
+        r.rating,
+        r.review_text,
+        r.is_active,
+        r.created_at,
+        u.email AS user_email
+      FROM reviews r
+      LEFT JOIN users u
+        ON u.id = r.user_id
+      ${whereClause}
+      ORDER BY r.created_at DESC
+    `);
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения отзывов'
+    });
+  }
+});
+
+app.patch('/api/admin/reviews/:id/approve', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      UPDATE reviews
+      SET is_active = TRUE
+      WHERE id = $1
+      RETURNING id, author_name, rating, review_text, is_active, created_at
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Отзыв не найден'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Отзыв опубликован',
+      review: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка публикации отзыва'
+    });
+  }
+});
+
+app.delete('/api/admin/reviews/:id', requireAdmin, async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const result = await pool.query(
+      `
+      DELETE FROM reviews
+      WHERE id = $1
+      RETURNING id
+      `,
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Отзыв не найден'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Отзыв удалён'
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка удаления отзыва'
+    });
+  }
+});
+
+
+app.post('/api/reviews', async (req, res) => {
+  try {
+    const { user_id, author_name, rating, review_text } = req.body;
+
+    if (!user_id) {
+      return res.status(400).json({
+        message: 'Пользователь не определён'
+      });
+    }
+
+    if (!author_name || !author_name.trim()) {
+      return res.status(400).json({
+        message: 'Введите имя'
+      });
+    }
+
+    if (author_name.trim().length < 2) {
+      return res.status(400).json({
+        message: 'Имя должно содержать минимум 2 символа'
+      });
+    }
+
+    const numericRating = Number(rating);
+
+    if (!numericRating || numericRating < 1 || numericRating > 5) {
+      return res.status(400).json({
+        message: 'Оценка должна быть от 1 до 5'
+      });
+    }
+
+    if (!review_text || !review_text.trim()) {
+      return res.status(400).json({
+        message: 'Введите текст отзыва'
+      });
+    }
+
+    if (review_text.trim().length < 10) {
+      return res.status(400).json({
+        message: 'Отзыв должен содержать минимум 10 символов'
+      });
+    }
+
+    const userResult = await pool.query(
+      `
+      SELECT id
+      FROM users
+      WHERE id = $1
+      `,
+      [user_id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Пользователь не найден'
+      });
+    }
+
+    const result = await pool.query(
+      `
+      INSERT INTO reviews (
+        author_name,
+        rating,
+        review_text,
+        is_active,
+        user_id
+      )
+      VALUES ($1, $2, $3, FALSE, $4)
+      RETURNING id, author_name, rating, review_text, is_active, created_at
+      `,
+      [
+        author_name.trim(),
+        numericRating,
+        review_text.trim(),
+        user_id
+      ]
+    );
+
+    return res.status(201).json({
+      message: 'Отзыв отправлен на модерацию',
+      review: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка отправки отзыва'
+    });
+  }
+});
+
+app.get('/api/users/:userId/reviews', async (req, res) => {
+  try {
+    const { userId } = req.params;
+
+    const result = await pool.query(
+      `
+      SELECT
+        id,
+        author_name,
+        rating,
+        review_text,
+        is_active,
+        created_at
+      FROM reviews
+      WHERE user_id = $1
+      ORDER BY created_at DESC
+      `,
+      [userId]
+    );
+
+    return res.status(200).json(result.rows);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения отзывов пользователя'
+    });
+  }
+});
+
+
+app.patch('/api/users/:userId/profile', async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const { full_name = '', avatar_url = '' } = req.body;
+
+    const normalizedName = full_name.trim();
+    const normalizedAvatar = avatar_url.trim();
+
+    if (normalizedName && normalizedName.length < 2) {
+      return res.status(400).json({
+        message: 'Никнейм должен содержать минимум 2 символа'
+      });
+    }
+
+    if (normalizedName.length > 50) {
+      return res.status(400).json({
+        message: 'Никнейм не должен быть длиннее 50 символов'
+      });
+    }
+
+    if (
+      normalizedAvatar &&
+      !ALLOWED_PROFILE_AVATARS.includes(normalizedAvatar)
+    ) {
+      return res.status(400).json({
+        message: 'Некорректный аватар'
+      });
+    }
+
+    const result = await pool.query(
+      `
+      UPDATE users
+      SET
+        full_name = $1,
+        avatar_url = $2
+      WHERE id = $3
+      RETURNING id, email, full_name, avatar_url, created_at
+      `,
+      [
+        normalizedName || null,
+        normalizedAvatar || null,
+        userId
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Пользователь не найден'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Профиль обновлён',
+      user: result.rows[0]
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка обновления профиля'
+    });
   }
 });
 

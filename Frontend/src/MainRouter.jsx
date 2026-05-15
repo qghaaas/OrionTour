@@ -9,6 +9,8 @@ import AboutUsLink from "./Route/AboutUsLink";
 import BlogLink from './Route/BlogLink'
 import BlogPageLink from './Route/BlogPageLink'
 import Globe from "./Globe/Globe";
+import AdminPanelLink from './Route/AdminPanelLink'
+import AdminAuthLink from './Route/AdminAuthLink'
 
 
 export default function MainRouter() {
@@ -27,7 +29,8 @@ export default function MainRouter() {
                     <Route path="/Blog" element={<BlogLink />} />
                     <Route path="/blogPage/:id" element={<BlogPageLink />} />
                     <Route path="/interactive-globe" element={<Globe />} />
-
+                    <Route path="/admin/login" element={<AdminAuthLink />} />
+                    <Route path="/admin" element={<AdminPanelLink />} />
 
                 </Routes>
             </HashRouter>

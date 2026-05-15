@@ -127,3 +127,429 @@
     margin: 0;
     padding-bottom: 30px;
 }
+.account-reviews {
+    width: 100%;
+    max-width: 900px;
+    font-family: "Raleway", sans-serif;
+    color: #202020;
+}
+
+.account-reviews h2 {
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: 1%;
+    color: #001827;
+    margin-bottom: 35px;
+}
+
+.account-review-form {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #EFEFEF;
+    border-radius: 25px;
+    padding: 40px 45px 45px;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+    margin-bottom: 35px;
+}
+
+.account-review-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-review-form input,
+.account-review-form select,
+.account-review-form textarea {
+    width: 100%;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 18px 24px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-review-form textarea {
+    min-height: 165px;
+    line-height: 24px;
+    resize: vertical;
+}
+
+.account-review-form textarea::placeholder {
+    color: #6D6D6D;
+}
+
+.account-review-form input,
+.account-review-form select:focus,
+.account-review-form textarea:focus {
+    background-color: #fff;
+    border-color: #F99244;
+}
+
+.account-review-form input,
+.account-review-form select:hover,
+.account-review-form textarea:hover {
+    background-color: #F4F4F4;
+}
+
+.account-review-form .main-btn_site {
+    width: 100%;
+    max-width: 330px;
+    height: 58px;
+    flex-shrink: 0;
+    background-color: #F99244;
+    border-radius: 50px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 25px;
+    letter-spacing: 1%;
+    color: #fff;
+    margin-top: 5px;
+}
+
+.account-review-form .main-btn_site:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+.account-review-message {
+    width: 100%;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 20px 25px;
+    margin-bottom: 35px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-review-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.account-review-list h3 {
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: 1%;
+    color: #001827;
+    margin-bottom: 11px;
+}
+
+.account-review-list > p {
+    width: 100%;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 30px 35px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    color: #6D6D6D;
+}
+
+.account-review-card {
+    width: 100%;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 30px 35px;
+    font-family: "Raleway", sans-serif;
+}
+
+.account-review-card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 25px;
+    margin-bottom: 18px;
+}
+
+.account-review-card-top strong {
+    display: block;
+    width: fit-content;
+    min-width: 150px;
+    background-color: #fff;
+    text-align: center;
+    border-radius: 25px;
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+    padding: 8px 14px;
+}
+
+.account-review-card p {
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: 1%;
+    color: #202020;
+    margin-bottom: 18px;
+}
+
+.account-review-card small {
+    display: block;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 18px;
+    color: #6D6D6D;
+}
+
+.review-status {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 160px;
+    border-radius: 25px;
+    padding: 8px 14px;
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1%;
+    white-space: nowrap;
+}
+
+.review-status.active {
+    background-color: #F99244;
+    color: #fff;
+}
+
+.review-status.pending {
+    background-color: #fff;
+    color: #202020;
+}
+
+.user-avatar {
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.account-settings {
+    width: 100%;
+    max-width: 900px;
+    font-family: "Raleway", sans-serif;
+    color: #202020;
+}
+
+.account-settings h2 {
+    font-family: "Arimo", sans-serif;
+    font-weight: 700;
+    font-size: 40px;
+    letter-spacing: 1%;
+    color: #001827;
+    margin-bottom: 35px;
+}
+
+.account-settings-form {
+    width: 100%;
+    background-color: #fff;
+    border: 1px solid #EFEFEF;
+    border-radius: 25px;
+    padding: 40px 45px 45px;
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.account-settings-form label {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-settings-form input {
+    width: 100%;
+    height: 58px;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 0 24px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-settings-form input::placeholder {
+    color: #6D6D6D;
+}
+
+.account-settings-form input:hover {
+    background-color: #F4F4F4;
+}
+
+.account-settings-form input:focus {
+    background-color: #fff;
+    border-color: #F99244;
+}
+
+.account-avatar-settings {
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+}
+
+.account-avatar-settings > p {
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-avatar-list {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 18px;
+}
+
+.account-avatar-option {
+    width: 112px;
+    height: 112px;
+    background-color: #EFEFEF;
+    border: 2px solid #DDDDDD;
+    border-radius: 50%;
+    padding: 0;
+    overflow: hidden;
+    transition: border-color 0.25s ease, transform 0.25s ease;
+}
+
+.account-avatar-option img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+.account-avatar-option:hover {
+    transform: scale(1.04);
+    border-color: #F99244;
+}
+
+.account-avatar-option.active {
+    border-color: #F99244;
+}
+
+.account-settings-message {
+    width: 100%;
+    background-color: #EFEFEF;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    padding: 20px 25px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 500;
+    font-size: 20px;
+    line-height: 24px;
+    letter-spacing: 1%;
+    color: #202020;
+}
+
+.account-settings-form .main-btn_site {
+    width: 100%;
+    max-width: 250px;
+    height: 58px;
+    flex-shrink: 0;
+    background-color: #F99244;
+    border-radius: 50px;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: 25px;
+    letter-spacing: 1%;
+    color: #fff;
+}
+
+.account-settings-form .main-btn_site:disabled {
+    opacity: 0.7;
+    cursor: default;
+}
+
+@media (max-width: 1100px) {
+    .account-settings {
+        max-width: 100%;
+    }
+
+    .account-settings-form {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .account-settings h2 {
+        font-size: 32px;
+    }
+
+    .account-settings-form .main-btn_site {
+        max-width: none;
+    }
+
+    .account-avatar-option {
+        width: 96px;
+        height: 96px;
+    }
+}
+
+@media (max-width: 1100px) {
+    .account-reviews {
+        max-width: 100%;
+    }
+
+    .account-review-form,
+    .account-review-card {
+        padding: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    .account-review-card-top {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .account-review-form .main-btn_site {
+        max-width: none;
+    }
+
+    .account-reviews h2,
+    .account-review-list h3 {
+        font-size: 32px;
+    }
+}
