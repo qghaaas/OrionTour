@@ -22,12 +22,14 @@ import SunIcon from './img/SunIcon.svg';
 import MoonIcon from './img/MoonIcon.svg';
 
 import './Globe.css';
+import './GlobeCatalog.css';
 
 const API_URL = 'http://localhost:3010/api';
 
 const GLOBE_RADIUS = 4;
 const CAMERA_START_Z = 12;
 const CAMERA_END_Z = 8;
+const GLOBE_CATALOG_PAGE_SIZE = 5;
 
 const LIGHTS = {
   light: {
@@ -64,6 +66,9 @@ function normalizeDirection(row) {
     popularityLevel: row.popularity_level || null,
     popularityColor: row.popularity_color || null,
     toursCount: Number(row.tours_count ?? 0),
+    hotelsCount: Number(row.hotels_count ?? 0),
+    priceFrom: Number(row.price_from ?? 0),
+    isDomestic: Boolean(row.is_domestic),
   };
 }
 
@@ -138,6 +143,25 @@ function markerMatchesSearch(marker, query) {
   return searchableText.includes(query);
 }
 
+function getTourLink(tourId) {
+  return `#/tours/${tourId}`;
+}
+
+function formatCount(count, type = 'tours') {
+  const value = Number(count) || 0;
+  const lastDigit = value % 10;
+  const lastTwoDigits = value % 100;
+  const forms = type === 'hotels'
+    ? ['отель', 'отеля', 'отелей']
+    : ['тур', 'тура', 'туров'];
+
+  if (lastTwoDigits >= 11 && lastTwoDigits <= 14) return `${value} ${forms[2]}`;
+  if (lastDigit === 1) return `${value} ${forms[0]}`;
+  if (lastDigit >= 2 && lastDigit <= 4) return `${value} ${forms[1]}`;
+
+  return `${value} ${forms[2]}`;
+}
+
 function Earth({ radius, theme }) {
   const textures = useTexture(
     theme === 'light'
@@ -197,7 +221,7 @@ const CountryMarker = memo(function CountryMarker({
 
   return (
     <group position={position}>
-      <Html center distanceFactor={9} zIndexRange={[20, 0]}>
+      <Html center zIndexRange={[20, 0]}>
         <div
           className={`marker-pill ${isActive ? 'marker-pill--active' : ''}`}
           style={{ borderColor }}
@@ -351,7 +375,7 @@ function GlobeScene({
           marker={marker}
           radius={GLOBE_RADIUS}
           language={language}
-          isActive={selectedMarkerId === marker.id || hoveredMarkerId === marker.id}
+          isActive={hoveredMarkerId === marker.id}
           onClick={onMarkerSelect}
           onHover={onMarkerHover}
           onHoverEnd={onMarkerHoverEnd}
@@ -519,12 +543,139 @@ function PopularityLegend({ language }) {
   );
 }
 
+function GlobeTourCard({ item }) {
+  return (
+    <a className="globe-catalog-card" href={getTourLink(item.id)}>
+      <div className="globe-catalog-card__image-wrap">
+        {item.image ? (
+          <img src={item.image} alt={item.title} className="globe-catalog-card__image" />
+        ) : (
+          <div className="globe-catalog-card__image-placeholder">ORION</div>
+        )}
+      </div>
+
+      <div className="globe-catalog-card__content">
+        <div className="globe-catalog-card__meta">
+          <span>{item.location_name || item.direction_name || 'Направление'}</span>
+          {item.hotel_rating ? <span>{Number(item.hotel_rating).toFixed(1)} ★</span> : null}
+        </div>
+        <h3>{item.title}</h3>
+        <p>{item.description || 'Описание тура пока не добавлено'}</p>
+        <div className="globe-catalog-card__footer">
+          <strong>{item.price_formatted}</strong>
+          <span>{item.nights_label}</span>
+        </div>
+      </div>
+    </a>
+  );
+}
+
+function GlobeCatalogPanel({
+  selectedDirection,
+  language,
+  type,
+  onTypeChange,
+  items,
+  total,
+  hasMore,
+  loading,
+  appending,
+  error,
+  onLoadMore,
+}) {
+  const title = selectedDirection
+    ? getMarkerName(selectedDirection, language)
+    : (language === 'en' ? 'Catalog' : 'Каталог');
+  const totalLabel = formatCount(total || items.length, type);
+  const counterLabel = total > items.length && items.length > 0
+    ? `${items.length} из ${totalLabel}`
+    : totalLabel;
+
+  return (
+    <aside className="globe-catalog-panel">
+      <div className="globe-catalog-panel__head">
+        <div>
+          <span className="globe-catalog-panel__eyebrow">
+            {language === 'en' ? 'Tours and hotels' : 'Туры и отели'}
+          </span>
+          <h2>{title}</h2>
+        </div>
+
+        <span className="globe-catalog-panel__counter">
+          {loading && items.length === 0 ? '...' : counterLabel}
+        </span>
+      </div>
+
+      <div className="globe-catalog-tabs">
+        <button
+          type="button"
+          className={type === 'tours' ? 'active' : ''}
+          onClick={() => onTypeChange('tours')}
+        >
+          {language === 'en' ? 'Tours' : 'Туры'}
+        </button>
+        <button
+          type="button"
+          className={type === 'hotels' ? 'active' : ''}
+          onClick={() => onTypeChange('hotels')}
+        >
+          {language === 'en' ? 'Hotels' : 'Отели'}
+        </button>
+      </div>
+
+      {!selectedDirection ? (
+        <div className="globe-catalog-message">
+          {language === 'en'
+            ? 'Select a country marker on the globe.'
+            : 'Выберите страну на глобусе, чтобы увидеть каталог.'}
+        </div>
+      ) : null}
+
+      {error ? <div className="globe-catalog-message globe-catalog-message--error">{error}</div> : null}
+
+      {selectedDirection && !loading && !error && items.length === 0 ? (
+        <div className="globe-catalog-message">
+          {language === 'en'
+            ? 'Tour data has not been added yet.'
+            : 'Данные о турах пока не добавили'}
+        </div>
+      ) : null}
+
+      <div className="globe-catalog-list" aria-busy={loading || appending}>
+        {items.map((item) => <GlobeTourCard key={item.id} item={item} />)}
+      </div>
+
+      {hasMore ? (
+        <button
+          type="button"
+          className="globe-catalog-more"
+          onClick={onLoadMore}
+          disabled={loading || appending}
+        >
+          {appending
+            ? (language === 'en' ? 'Loading...' : 'Загрузка...')
+            : (language === 'en' ? 'Show more' : 'Показать ещё')}
+        </button>
+      ) : null}
+    </aside>
+  );
+}
+
 function Globe({ onCountrySelect, language = 'ru' }) {
   const [markers, setMarkers] = useState([]);
   const [theme, setTheme] = useState('dark');
   const [searchValue, setSearchValue] = useState('');
   const [selectedMarkerId, setSelectedMarkerId] = useState(null);
   const [hoveredMarkerId, setHoveredMarkerId] = useState(null);
+  const [selectedDirection, setSelectedDirection] = useState(null);
+  const [catalogType, setCatalogType] = useState('tours');
+  const [catalogItems, setCatalogItems] = useState([]);
+  const [catalogLoading, setCatalogLoading] = useState(false);
+  const [catalogAppending, setCatalogAppending] = useState(false);
+  const [catalogError, setCatalogError] = useState('');
+  const [catalogPage, setCatalogPage] = useState(1);
+  const [catalogTotal, setCatalogTotal] = useState(0);
+  const [catalogHasMore, setCatalogHasMore] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -557,6 +708,71 @@ function Globe({ onCountrySelect, language = 'ru' }) {
     };
   }, []);
 
+  const loadCatalogForMarker = useCallback(async (
+    marker,
+    type = catalogType,
+    page = 1,
+    append = false,
+  ) => {
+    if (!marker?.id) return;
+
+    const params = new URLSearchParams({
+      type,
+      direction_id: String(marker.id),
+      page: String(page),
+      limit: String(GLOBE_CATALOG_PAGE_SIZE),
+    });
+
+    if (append) {
+      setCatalogAppending(true);
+    } else {
+      setCatalogLoading(true);
+    }
+
+    setCatalogError('');
+
+    try {
+      const response = await fetch(`${API_URL}/catalog?${params.toString()}`);
+
+      if (!response.ok) {
+        throw new Error(`Catalog API error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const nextItems = Array.isArray(data.items) ? data.items : [];
+
+      setCatalogItems((currentItems) => (
+        append ? [...currentItems, ...nextItems] : nextItems
+      ));
+      setCatalogPage(Number(data.page) || page);
+      setCatalogTotal(Number(data.total) || nextItems.length);
+      setCatalogHasMore(Boolean(data.has_more));
+    } catch (error) {
+      console.error('Ошибка при загрузке каталога направления:', error);
+
+      if (!append) {
+        setCatalogItems([]);
+        setCatalogTotal(0);
+        setCatalogHasMore(false);
+      }
+
+      setCatalogError(language === 'en'
+        ? 'Could not load catalog.'
+        : 'Не удалось загрузить каталог.');
+    } finally {
+      setCatalogLoading(false);
+      setCatalogAppending(false);
+    }
+  }, [catalogType, language]);
+
+  const selectMarker = useCallback((marker) => {
+    setSelectedMarkerId(marker.id);
+    setHoveredMarkerId(null);
+    setSelectedDirection(marker);
+    loadCatalogForMarker(marker, catalogType, 1, false);
+    onCountrySelect?.(marker);
+  }, [catalogType, loadCatalogForMarker, onCountrySelect]);
+
   const suggestions = useMemo(() => {
     const query = searchValue.trim().toLowerCase();
 
@@ -578,27 +794,29 @@ function Globe({ onCountrySelect, language = 'ru' }) {
 
     if (!foundMarker) return;
 
-    setSelectedMarkerId(foundMarker.id);
-    setHoveredMarkerId(foundMarker.id);
-  }, [markers, searchValue, suggestions]);
+    selectMarker(foundMarker);
+  }, [markers, searchValue, selectMarker, suggestions]);
 
   const handleClearSearch = useCallback(() => {
     setSearchValue('');
     setSelectedMarkerId(null);
     setHoveredMarkerId(null);
+    setSelectedDirection(null);
+    setCatalogItems([]);
+    setCatalogError('');
+    setCatalogPage(1);
+    setCatalogTotal(0);
+    setCatalogHasMore(false);
   }, []);
 
   const handleSuggestionClick = useCallback((marker) => {
     setSearchValue(getMarkerName(marker, language));
-    setSelectedMarkerId(marker.id);
-    setHoveredMarkerId(marker.id);
-  }, [language]);
+    selectMarker(marker);
+  }, [language, selectMarker]);
 
   const handleMarkerSelect = useCallback((marker) => {
-    setSelectedMarkerId(marker.id);
-    setHoveredMarkerId(marker.id);
-    onCountrySelect?.(marker);
-  }, [onCountrySelect]);
+    selectMarker(marker);
+  }, [selectMarker]);
 
   const handleMarkerHover = useCallback((marker) => {
     setHoveredMarkerId(marker.id);
@@ -609,6 +827,25 @@ function Globe({ onCountrySelect, language = 'ru' }) {
       currentId === marker.id ? null : currentId
     ));
   }, []);
+
+  const handleCatalogTypeChange = useCallback((nextType) => {
+    setCatalogType(nextType);
+
+    if (selectedDirection) {
+      loadCatalogForMarker(selectedDirection, nextType, 1, false);
+    }
+  }, [loadCatalogForMarker, selectedDirection]);
+
+  const handleCatalogLoadMore = useCallback(() => {
+    if (!selectedDirection) return;
+
+    loadCatalogForMarker(
+      selectedDirection,
+      catalogType,
+      catalogPage + 1,
+      true,
+    );
+  }, [catalogPage, catalogType, loadCatalogForMarker, selectedDirection]);
 
   return (
     <div className={`globe-wrapper ${theme}`}>
@@ -629,6 +866,20 @@ function Globe({ onCountrySelect, language = 'ru' }) {
         onClear={handleClearSearch}
         onSearch={handleSearch}
         onSuggestionClick={handleSuggestionClick}
+      />
+
+      <GlobeCatalogPanel
+        selectedDirection={selectedDirection}
+        language={language}
+        type={catalogType}
+        onTypeChange={handleCatalogTypeChange}
+        items={catalogItems}
+        total={catalogTotal}
+        hasMore={catalogHasMore}
+        loading={catalogLoading}
+        appending={catalogAppending}
+        error={catalogError}
+        onLoadMore={handleCatalogLoadMore}
       />
 
       <PopularityLegend language={language} />

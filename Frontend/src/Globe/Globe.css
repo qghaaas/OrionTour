@@ -58,83 +58,113 @@
 }
 
 .marker-pill {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  background: rgba(0, 0, 0, 0.7);
-  border-radius: 999px;
-  border: 1px solid rgba(255, 255, 255, 0.25);
-  backdrop-filter: blur(4px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
-  max-width: 22px;
-  max-height: 22px;
-  padding: 1px;
+  justify-content: flex-start;
+  width: 28px;
+  height: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  max-width: 28px;
+  max-height: 28px;
+  padding: 2px;
   overflow: hidden;
   cursor: pointer;
   user-select: none;
+  border: 2px solid #F99244;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.72);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.16), 0 6px 18px rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
   transition:
-    max-width 0.35s ease,
-    padding-right 0.35s ease,
-    background 0.25s ease;
+    width 0.25s ease,
+    max-width 0.25s ease,
+    border-color 0.18s ease,
+    background-color 0.18s ease,
+    box-shadow 0.18s ease;
 }
 
-.marker-pill:hover,
-.marker-pill--active {
-  max-width: 180px;
+.marker-pill:hover {
+  width: auto;
+  max-width: 220px;
   padding-right: 12px;
-  background: rgba(0, 0, 0, 0.9);
+  border-color: #F99244;
+  background: rgba(0, 0, 0, 0.88);
+  box-shadow: 0 0 0 1px rgba(249, 146, 68, 0.28), 0 8px 22px rgba(0, 0, 0, 0.62);
+}
+
+.marker-pill--active {
+  width: 28px;
+  max-width: 28px;
+  padding-right: 2px;
 }
 
 .marker-flag-wrapper {
-  width: 18px;
-  height: 100%;
-  border-radius: 50%;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
+  flex: 0 0 22px;
   display: flex;
   align-items: center;
   justify-content: center;
-  flex-shrink: 0;
-  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
-  transition: border-color 0.25s ease, transform 0.25s ease;
   overflow: hidden;
-}
-
-.marker-pill:hover .marker-pill--active {
-  transform: scale(1.05);
+  border-radius: 50%;
+  background-color: #fff;
+  box-shadow: inset 0 0 0 1px rgba(0, 0, 0, 0.28);
 }
 
 .marker-flag {
-  width: 100%;  
-  aspect-ratio: 1;
+  display: block;
+  width: 22px;
+  height: 22px;
+  min-width: 22px;
+  min-height: 22px;
   border-radius: 50%;
   object-fit: cover;
+  object-position: center;
 }
 
 .marker-info {
   display: flex;
   flex-direction: column;
-  margin-left: 4px;
+  min-width: 0;
+  margin-left: 8px;
   opacity: 0;
   transform: translateX(-6px);
   transition:
-    opacity 0.25s ease 0.08s,
-    transform 0.25s ease 0.08s;
-    line-height: 10px;
+    opacity 0.2s ease 0.05s,
+    transform 0.2s ease 0.05s;
+  line-height: 1.05;
 }
 
-.marker-pill:hover .marker-info,
-.marker-pill--active .marker-info {
+.marker-pill:hover .marker-info {
   opacity: 1;
   transform: translateX(0);
 }
 
 .marker-country {
+  max-width: 160px;
+  overflow: hidden;
   color: #ffffff;
-  font-size: 11px;
+  font-family: "Arimo", sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  line-height: 1.05;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
 .marker-tours {
-  color: rgba(255, 255, 255, 0.8);
-  font-size: 10px;
+  max-width: 160px;
+  overflow: hidden;
+  margin-top: 2px;
+  color: rgba(255, 255, 255, 0.76);
+  font-family: "Raleway", sans-serif;
+  font-weight: 700;
+  font-size: 11px;
+  line-height: 1.05;
+  text-overflow: ellipsis;
   white-space: nowrap;
 }
 
@@ -142,26 +172,30 @@
   position: absolute;
   bottom: 16px;
   left: 16px;
-  z-index: 10;
+  z-index: 11;
   display: flex;
-  gap: 12px;
-  padding: 8px 12px;
-  border-radius: 999px;
-  background: rgba(0, 0, 0, 0.6);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(6px);
-  color: #ffffff;
-  font-size: 1rem;
   align-items: center;
+  gap: 12px;
+  max-width: calc(100vw - 32px);
+  padding: 8px 12px;
+  overflow-x: auto;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.62);
+  color: #ffffff;
+  font-family: "Raleway", sans-serif;
+  font-weight: 500;
+  font-size: 14px;
+  backdrop-filter: blur(6px);
 }
 
 .globe-legend-item {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
   gap: 6px;
   white-space: nowrap;
 }
-
 .globe-legend-dot {
   width: 10px;
   height: 10px;
@@ -301,20 +335,11 @@
 
 
 
-
-
-
-/* --------
-GlobeMini
--------- */
-
-/* Мини-глобус */
 .globe-mini-wrapper {
-  width: 450px;     /* размер глобуса */
+  width: 450px;    
   height: 450px;
   border-radius: 16px;
   overflow: hidden;
-  /* box-shadow: 0 20px 40px rgba(0,0,0,0.7); */
   position: relative;
   margin: 0 auto;
 }

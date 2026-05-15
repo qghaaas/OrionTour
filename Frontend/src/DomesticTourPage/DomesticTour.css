@@ -8,8 +8,8 @@
     display: grid;
     grid-template-columns: 1fr;
     gap: 120px 0;
-    z-index: 11;
     position: relative;
+    z-index: 11;
 }
 
 .domtour-page_card {

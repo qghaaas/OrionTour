@@ -8,9 +8,10 @@ import earthDayImg from './img/earthDay.jpg';
 import earthBumpImg from './img/earthBump.jpg';
 
 import './Globe.css';
+import './GlobeCatalog.css';
 
 const MINI_GLOBE_RADIUS = 1.2;
-const ROTATION_SPEED = 0.25;
+const ROTATION_SPEED = 0.18;
 
 useTexture.preload(earthDayImg);
 useTexture.preload(earthBumpImg);
@@ -25,7 +26,7 @@ function MiniGlobeFallback() {
         <sphereGeometry args={[MINI_GLOBE_RADIUS, 32, 32]} />
         <meshStandardMaterial
           color="#dbeafe"
-          roughness={0.9}
+          roughness={0.85}
           metalness={0}
         />
       </mesh>
@@ -56,7 +57,7 @@ const MiniGlobeScene = memo(function MiniGlobeScene() {
         <meshStandardMaterial
           map={earthTexture}
           bumpMap={bumpTexture}
-          bumpScale={1.04}
+          bumpScale={0.18}
           roughness={0.85}
           metalness={0}
         />
@@ -84,9 +85,7 @@ export default function GlobeMini() {
       </Canvas>
 
       <div className="globe-mini-link">
-        <Link to="/interactive-globe">
-          Открыть интерактивную карту
-        </Link>
+        <Link to="/interactive-globe">Открыть интерактивную карту</Link>
       </div>
     </div>
   );
