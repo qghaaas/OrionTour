@@ -156,3 +156,9 @@
     right: 4.5%;
 }
 
+.pop-card_text .main-btn_site {
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}

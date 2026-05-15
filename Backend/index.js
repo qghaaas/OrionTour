@@ -695,12 +695,18 @@ app.get('/api/tours/:id/details', async (req, res) => {
         t.full_description,
         t.hotel_lat,
         t.hotel_lng,
+        t.tour_type,
+        d.id AS direction_id,
+        COALESCE(d.name_ru, d.name) AS direction_name,
+        d.country_slug,
         (
-          SELECT COUNT(*)::INTEGER
-          FROM tour_images ti
-          WHERE ti.tour_id = t.id
+          SELECT COUNT(*)
+          FROM tour_images ti_count
+          WHERE ti_count.tour_id = t.id
         ) AS images_count
       FROM tours t
+      JOIN directions d
+        ON d.id = t.direction_id
       WHERE t.id = $1
         AND t.is_active = TRUE
       `,
@@ -716,8 +722,8 @@ app.get('/api/tours/:id/details', async (req, res) => {
       SELECT
         id,
         CASE
-          WHEN image_url ~* '^https?://' THEN image_url
-          WHEN image_url IS NOT NULL THEN CONCAT('http://localhost:${PORT}', image_url)
+          WHEN image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', image_url)
           ELSE ''
         END AS image_url,
         is_main
@@ -734,7 +740,121 @@ app.get('/api/tours/:id/details', async (req, res) => {
     });
   } catch (error) {
     console.error(error);
-    return res.status(500).json({ message: 'Ошибка получения данных тура' });
+    return res.status(500).json({
+      message: 'Ошибка получения данных тура'
+    });
+  }
+});
+
+app.get('/api/tours/:id/related', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const limit = Math.min(Math.max(Number(req.query.limit) || 2, 1), 6);
+
+    const currentTourResult = await pool.query(
+      `
+      SELECT
+        id,
+        title
+      FROM tours
+      WHERE id = $1
+        AND is_active = TRUE
+      `,
+      [id]
+    );
+
+    if (currentTourResult.rows.length === 0) {
+      return res.status(404).json({ message: 'Тур не найден' });
+    }
+
+    const currentTour = currentTourResult.rows[0];
+
+    const relatedResult = await pool.query(
+      `
+      SELECT
+        t.id,
+        t.title,
+        t.location_name AS location,
+        t.short_description AS description,
+        t.price,
+        t.nights,
+        t.hotel_rating,
+        CASE
+          WHEN t.title = 'Hard Rock Hotel Maldives'
+            THEN 'с прямым вылетом из Москвы на BlackJet'
+          WHEN t.title = 'Pickalbatros Luxury Suites'
+            THEN 'центр города'
+          WHEN t.title = 'Fort Arabesque The Villas'
+            THEN 'с прямым вылетом из Москвы'
+          ELSE 'с прямым вылетом из Москвы'
+        END AS flight,
+        CASE
+          WHEN t.title = 'Hard Rock Hotel Maldives'
+            THEN 'завтраки'
+          WHEN t.title = 'Pickalbatros Luxury Suites'
+            THEN 'поле для гольфа'
+          WHEN t.title = 'Fort Arabesque The Villas'
+            THEN 'всё включено'
+          ELSE 'всё включено'
+        END AS food,
+        (
+          SELECT COUNT(*)
+          FROM tour_images ti_count
+          WHERE ti_count.tour_id = t.id
+        ) AS images_count
+      FROM tours t
+      WHERE t.is_active = TRUE
+        AND t.is_popular = TRUE
+        AND t.tour_type = 'hotel'
+        AND t.title <> $1
+      ORDER BY
+        CASE t.title
+          WHEN 'Fort Arabesque The Villas' THEN 1
+          WHEN 'Hard Rock Hotel Maldives' THEN 2
+          WHEN 'Pickalbatros Luxury Suites' THEN 3
+          ELSE 4
+        END,
+        t.id ASC
+      LIMIT $2
+      `,
+      [currentTour.title, limit]
+    );
+
+    const tourIds = relatedResult.rows.map((tour) => tour.id);
+
+    if (tourIds.length === 0) {
+      return res.status(200).json([]);
+    }
+
+    const imagesResult = await pool.query(
+      `
+      SELECT
+        id,
+        tour_id,
+        CASE
+          WHEN image_url IS NOT NULL
+            THEN CONCAT('http://localhost:${PORT}', image_url)
+          ELSE ''
+        END AS image_url,
+        is_main
+      FROM tour_images
+      WHERE tour_id = ANY($1)
+      ORDER BY is_main DESC, id ASC
+      `,
+      [tourIds]
+    );
+
+    const relatedTours = relatedResult.rows.map((tour) => ({
+      ...tour,
+      images: imagesResult.rows.filter((image) => image.tour_id === tour.id)
+    }));
+
+    return res.status(200).json(relatedTours);
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка получения похожих туров'
+    });
   }
 });
 

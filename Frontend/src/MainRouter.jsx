@@ -22,7 +22,8 @@ export default function MainRouter() {
                     <Route path="/" index element={<MainPageLink />} />
                     <Route path="/Home" element={<MainPageLink />} />
                     <Route path="/DomesticTourism" element={<DomesticTourPageLink />} />
-                    <Route path="/Directions" element={<PopularDesPageLink />} />
+                    <Route path="/Directions" element={<PopularDesPageLink defaultTourId={1} />} />
+                    <Route path="/tour/:id" element={<PopularDesPageLink />} />
                     <Route path="/account" element={<AccountLink />} />
                     <Route path="/ContactInfo" element={<ContactInfoLink />} />
                     <Route path="/AboutUs" element={<AboutUsLink />} />
