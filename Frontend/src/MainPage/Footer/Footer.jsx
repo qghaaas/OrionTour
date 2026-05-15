@@ -20,18 +20,18 @@ export default function Footer({ variant = 'default', className = '' }) {
 
                     <nav className='footer-menu'>
                         <ul className="footer-item">
-                            <li><Link to="#">Главная страница</Link></li>
-                            <li><Link to="#">Направления</Link></li>
+                            <li><Link to="/">Главная страница</Link></li>
+                            <li><Link to="/Directions">Направления</Link></li>
                             <li><Link to="#">Поиск тура</Link></li>
                         </ul>
                         <ul className="footer-item">
-                            <li><Link to="#">Внутренний туризм</Link></li>
-                            <li><Link to="#">Направления</Link></li>
-                            <li><Link to="#">Блог</Link></li>
+                            <li><Link to="/DomesticTourism">Внутренний туризм</Link></li>
+                            <li><Link to="/Directions">Направления</Link></li>
+                            <li><Link to="/Blog">Блог</Link></li>
                         </ul>
                         <ul className="footer-item">
-                            <li><Link to="#">Контакты</Link></li>
-                            <li><Link to="#">О нас</Link></li>
+                            <li><Link to="/ContactInfo">Контакты</Link></li>
+                            <li><Link to="/AboutUs">О нас</Link></li>
                         </ul>
                         <ul className="footer-item footer-item_sep">
                             <li>

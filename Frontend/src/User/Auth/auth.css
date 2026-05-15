@@ -200,6 +200,3 @@
     font-family: Arimo, sans-serif !important;
 }
 
-span:not(:last-child){
-    margin-bottom: 20px;
-}

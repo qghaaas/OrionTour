@@ -834,6 +834,70 @@ app.post('/api/blog-posts/:id/increment-views', async (req, res) => {
   }
 });
 
+// Получение всех стран/направлений для глобуса
+app.get('/api/directions', async (req, res) => {
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        id,
+        name_ru,
+        name_en,
+        name,
+        country_slug,
+        globe_lat,
+        globe_lng,
+        flag_url,
+        is_popular,
+        popularity_score,
+        is_domestic
+      FROM directions
+      ORDER BY is_popular DESC, name_en ASC;
+    `);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Ошибка при получении направлений:', error);
+    res.status(500).json({ message: 'Ошибка при получении направлений' });
+  }
+});
+
+// Получение туров для конкретной страны
+app.get('/api/directions/:id/tours', async (req, res) => {
+  const countryId = Number(req.params.id);
+
+  if (!Number.isFinite(countryId)) {
+    return res.status(400).json({ message: 'Некорректный id страны' });
+  }
+
+  try {
+    const { rows } = await pool.query(`
+      SELECT
+        t.id,
+        t.title,
+        t.short_desc,
+        t.image_url,
+        t.is_hot,
+        COALESCE(MIN(o.price), 0) AS price_from,
+        COALESCE(AVG(hl.rating_avg), 0)::numeric(3,1) AS rating_avg,
+        COUNT(o.id) AS offers_count
+      FROM tour t
+      LEFT JOIN tour_offer o
+        ON o.tour_id = t.id
+       AND o.is_available = TRUE
+      LEFT JOIN hotel_listing hl
+        ON hl.hotel_id = o.hotel_id
+      WHERE t.country_id = $1
+      GROUP BY t.id
+      ORDER BY t.is_hot DESC, rating_avg DESC NULLS LAST, price_from ASC;
+    `, [countryId]);
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Ошибка при получении туров для направления:', error);
+    res.status(500).json({ message: 'Ошибка при получении туров для направления' });
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Server started on port ${PORT}`);
 });

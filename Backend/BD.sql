@@ -1,18 +1,20 @@
 SET search_path TO oriontour;
 
--- =========================
--- ОСНОВНЫЕ ТАБЛИЦЫ
--- =========================
-
 -- Таблица направлений
 CREATE TABLE directions (
     id BIGSERIAL PRIMARY KEY,
-    name VARCHAR(100) NOT NULL,
+    name_ru TEXT,
+    name_en TEXT,
+    name TEXT,
     country_slug VARCHAR(100) UNIQUE NOT NULL,
-    globe_lat NUMERIC(9,6),
+    globe_lat NUMERIC(9,6),  
     globe_lng NUMERIC(9,6),
+    flag_url TEXT,
+    is_popular BOOLEAN DEFAULT FALSE,
+    popularity_score INTEGER DEFAULT 0,
+    is_domestic BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    is_domestic BOOLEAN DEFAULT FALSE
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 -- Таблица категорий внутреннего туризма
@@ -179,6 +181,22 @@ VALUES
     ('Египет', 'egypt', 26.820553, 30.802498, FALSE),
     ('Мальдивы', 'maldives', 3.202778, 73.220680, FALSE)
 ON CONFLICT (country_slug) DO NOTHING;
+
+--БД globus
+INSERT INTO directions (name_ru, name_en, country_slug, globe_lat, globe_lng, flag_url, is_popular, popularity_score)
+VALUES
+    ('Россия', 'Russia', 'ru', 61.52401, 105.318756, 'flags/ru.png', TRUE, 100),
+    ('Франция', 'France', 'fr', 46.227638, 2.213749, 'flags/fr.png', TRUE, 90),
+    ('Германия', 'Germany', 'de', 51.165691, 10.451526, 'flags/de.png', FALSE, 70)
+ON CONFLICT (country_slug) DO UPDATE
+SET
+    name_ru = EXCLUDED.name_ru,
+    name_en = EXCLUDED.name_en,
+    globe_lat = EXCLUDED.globe_lat,
+    globe_lng = EXCLUDED.globe_lng,
+    flag_url = EXCLUDED.flag_url,
+    is_popular = EXCLUDED.is_popular,
+    popularity_score = EXCLUDED.popularity_score;
 
 -- Категории внутреннего туризма
 INSERT INTO domestic_categories (title, image_url, slug, sort_order, is_active)

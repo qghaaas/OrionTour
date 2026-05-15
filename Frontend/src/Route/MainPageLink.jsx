@@ -1,3 +1,4 @@
+
 import DomTour from "../MainPage/DomTour/DomTour"
 import Footer from "../MainPage/Footer/Footer"
 import Hero from "../MainPage/Hero/Hero"
@@ -16,5 +17,6 @@ export default function MainPageLink() {
             <Reviews />
             <Footer />
         </>
-    )
+
+    );
 }

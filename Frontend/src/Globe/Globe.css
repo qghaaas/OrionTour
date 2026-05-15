@@ -1,0 +1,364 @@
+.globe-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+}
+
+.globe-canvas {
+  width: 100%;
+  height: 100%;
+  background: #000;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+}
+
+.globe-search {
+  position: absolute;
+  top: 16px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  gap: 8px;
+}
+
+.globe-search-input {
+  min-width: 220px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  background: rgba(0, 0, 0, 0.6);
+  color: #fff;
+  outline: none;
+  font-size: 14px;
+  backdrop-filter: blur(6px);
+
+}
+
+.globe-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.globe-search-btn {
+  border-radius: 999px;
+  padding: 8px 14px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  background: linear-gradient(135deg, #ffb703, #fb8500);
+  color: #111;
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.globe-search-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.6);
+}
+
+.marker-pill {
+  display: flex;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.7);
+  max-width: 22px;
+  max-height: 22px;
+  padding: 1px;
+  overflow: hidden;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    max-width 0.35s ease,
+    padding-right 0.35s ease,
+    background 0.25s ease;
+}
+
+.marker-pill:hover,
+.marker-pill--active {
+  max-width: 180px;
+  padding-right: 12px;
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.marker-flag-wrapper {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  box-shadow: 0 0 0 1px rgba(0, 0, 0, 0.6);
+  transition: border-color 0.25s ease, transform 0.25s ease;
+
+}
+
+.marker-pill:hover .marker-pill--active {
+  transform: scale(1.05);
+}
+
+.marker-flag {
+  width: 16px;  
+  height: 16px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.marker-info {
+  display: flex;
+  flex-direction: column;
+  margin-left: 4px;
+  opacity: 0;
+  transform: translateX(-6px);
+  transition:
+    opacity 0.25s ease 0.08s,
+    transform 0.25s ease 0.08s;
+    line-height: 10px;
+}
+
+.marker-pill:hover .marker-info,
+.marker-pill--active .marker-info {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.marker-country {
+  color: #ffffff;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.marker-tours {
+  color: rgba(255, 255, 255, 0.8);
+  font-size: 10px;
+  white-space: nowrap;
+}
+
+.globe-legend {
+  position: absolute;
+  bottom: 16px;
+  left: 16px;
+  z-index: 10;
+  display: flex;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  backdrop-filter: blur(6px);
+  color: #ffffff;
+  font-size: 1rem;
+  align-items: center;
+}
+
+.globe-legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.globe-legend-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+
+.globe-legend-dot--low {
+  background: #27ae60;
+}
+
+.globe-legend-dot--medium {
+  background: #f1c40f;
+}
+
+.globe-legend-dot--high {
+  background: #e74c3c;
+}
+
+.globe-canvas,
+.marker-pill,
+.marker-flag,
+.marker-info,
+.marker-country,
+.marker-tours {
+  user-select: none;
+  -webkit-user-select: none;
+  -ms-user-select: none;
+}
+
+.globe-canvas {
+  -webkit-touch-callout: none;
+}
+
+.marker-popularity-dots {
+  display: flex;
+  gap: 3px;
+  flex-direction: row;
+  margin-left: 4px;
+  align-items: center;
+}
+
+.popularity-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  opacity: 0.9;
+  box-shadow: 0 0 4px currentColor;
+}
+
+.globe-search-suggestions {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  margin: 4px 0 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #0f172a;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 12px 25px rgba(0, 0, 0, 0.35);
+  max-height: 260px;
+  overflow-y: auto;
+  z-index: 20;
+}
+
+.globe-search-suggestion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  cursor: pointer;
+  transition: background 0.12s ease;
+}
+
+.globe-search-suggestion:hover {
+  background: rgba(148, 163, 184, 0.1);
+}
+
+.globe-search-suggestion-flag {
+  width: 20px;
+  height: 14px;
+  object-fit: cover;
+  border-radius: 2px;
+  flex-shrink: 0;
+}
+
+.globe-search-suggestion-name {
+  font-size: 14px;
+  color: #e5e7eb;
+}
+
+.globe-search-suggestion-name-en {
+  font-size: 12px;
+  color: #9ca3af;
+}
+
+.globe-search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.globe-search-icon {
+  position: absolute;
+  right: 10px;
+  width: 20px;
+  height: 20px;
+  opacity: 1;
+  pointer-events: none;
+}
+
+.globe-search-icon--clear {
+  cursor: pointer;
+  pointer-events: all;
+}
+
+.globe-theme-toggle {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  z-index: 20;
+}
+
+.theme-toggle-icon {
+  width: 30px;
+  height: 30px;
+  cursor: pointer;
+  opacity: 0.85;
+  transition: opacity 0.2s ease;
+}
+
+.theme-toggle-icon:hover {
+  opacity: 1;
+}
+
+
+
+
+
+
+/* --------
+GlobeMini
+-------- */
+
+/* Мини-глобус */
+.globe-mini-wrapper {
+  width: 450px;     /* размер глобуса */
+  height: 450px;
+  border-radius: 16px;
+  overflow: hidden;
+  /* box-shadow: 0 20px 40px rgba(0,0,0,0.7); */
+  position: relative;
+  margin: 0 auto;
+}
+
+.globe-mini-canvas {
+  width: 100%;
+  height: 100%;
+}
+
+.globe-mini-link {
+  position: absolute;
+  bottom: 10px;
+  width: 100%;
+  text-align: center;
+}
+
+.globe-mini-link a {
+  padding: 8px 16px;
+  border-radius: 20px;
+  background-color: #F99244;
+  color: #fff;
+  font-weight: 700;
+  transition: 0.3s;
+  font-family: "Raleway", sans-serif;
+  letter-spacing: 2%;
+}
+
+.globe-mini-link a:hover {
+  background-color: #e57c20;
+}
+
+/* Адаптив для разных экранов */
+@media (max-width: 1400px) {
+  .globe-mini-wrapper { width: 250px; height: 250px; }
+}
+
+@media (max-width: 1024px) {
+  .globe-mini-wrapper { width: 220px; height: 220px; }
+}
+
+@media (max-width: 768px) {
+  .globe-mini-wrapper { width: 200px; height: 200px; }
+}
+
+@media (max-width: 480px) {
+  .globe-mini-wrapper { width: 150px; height: 150px; }
+}
