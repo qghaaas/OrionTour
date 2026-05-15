@@ -6,6 +6,7 @@ import React, {
   useRef,
   useState,
 } from 'react';
+import { Link } from 'react-router-dom';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { Html, OrbitControls, Stars, useTexture } from '@react-three/drei';
 import * as THREE from 'three';
@@ -545,32 +546,43 @@ function PopularityLegend({ language }) {
 
 function GlobeTourCard({ item }) {
   return (
-    <a className="globe-catalog-card" href={getTourLink(item.id)}>
+    <Link
+      className="globe-catalog-card"
+      to={`/tour/${item.id}`}
+    >
       <div className="globe-catalog-card__image-wrap">
         {item.image ? (
-          <img src={item.image} alt={item.title} className="globe-catalog-card__image" />
+          <img
+            className="globe-catalog-card__image"
+            src={item.image}
+            alt={item.title}
+          />
         ) : (
-          <div className="globe-catalog-card__image-placeholder">ORION</div>
+          <div className="globe-catalog-card__image-placeholder">
+            ORION
+          </div>
         )}
       </div>
 
       <div className="globe-catalog-card__content">
         <div className="globe-catalog-card__meta">
-          <span>{item.location_name || item.direction_name || 'Направление'}</span>
-          {item.hotel_rating ? <span>{Number(item.hotel_rating).toFixed(1)} ★</span> : null}
+          <span>{item.location || item.direction_name}</span>
+          {item.hotel_rating ? <span>{Number(item.hotel_rating)} ★</span> : null}
         </div>
+
         <h3>{item.title}</h3>
-        <p>{item.description || 'Описание тура пока не добавлено'}</p>
+
         <div className="globe-catalog-card__footer">
-          <strong>{item.price_formatted}</strong>
-          <span>{item.nights_label}</span>
+          <strong>от {Number(item.price).toLocaleString('ru-RU')} ₽</strong>
+          <span>{item.nights} ночей</span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }
 
-function GlobeCatalogPanel({
+function GlobeCatalogModal({
+  open,
   selectedDirection,
   language,
   type,
@@ -582,82 +594,135 @@ function GlobeCatalogPanel({
   appending,
   error,
   onLoadMore,
+  onClose,
 }) {
+  useEffect(() => {
+    if (!open) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [open, onClose]);
+
+  if (!open) return null;
+
   const title = selectedDirection
     ? getMarkerName(selectedDirection, language)
     : (language === 'en' ? 'Catalog' : 'Каталог');
+
   const totalLabel = formatCount(total || items.length, type);
+
   const counterLabel = total > items.length && items.length > 0
     ? `${items.length} из ${totalLabel}`
     : totalLabel;
 
   return (
-    <aside className="globe-catalog-panel">
-      <div className="globe-catalog-panel__head">
-        <div>
-          <span className="globe-catalog-panel__eyebrow">
-            {language === 'en' ? 'Tours and hotels' : 'Туры и отели'}
-          </span>
-          <h2>{title}</h2>
+    <div
+      className="globe-catalog-modal"
+      role="dialog"
+      aria-modal="true"
+      onMouseDown={(event) => {
+        if (event.target === event.currentTarget) {
+          onClose();
+        }
+      }}
+    >
+      <div className="globe-catalog-modal__backdrop" />
+
+      <div className="globe-catalog-modal__content">
+        <div className="globe-catalog-modal__head">
+          <div>
+            <span className="globe-catalog-panel__eyebrow">
+              {language === 'en' ? 'Tours and hotels' : 'Туры и отели'}
+            </span>
+
+            <h2>{title}</h2>
+          </div>
+
+          <div className="globe-catalog-modal__head-actions">
+            <span className="globe-catalog-panel__counter">
+              {loading && items.length === 0 ? '...' : counterLabel}
+            </span>
+
+            <button
+              type="button"
+              className="globe-catalog-modal__close"
+              onClick={onClose}
+              aria-label={language === 'en' ? 'Close catalog' : 'Закрыть каталог'}
+            >
+              ×
+            </button>
+          </div>
         </div>
 
-        <span className="globe-catalog-panel__counter">
-          {loading && items.length === 0 ? '...' : counterLabel}
-        </span>
-      </div>
+        <div className="globe-catalog-tabs">
+          <button
+            type="button"
+            className={type === 'tours' ? 'active' : ''}
+            onClick={() => onTypeChange('tours')}
+          >
+            {language === 'en' ? 'Tours' : 'Туры'}
+          </button>
 
-      <div className="globe-catalog-tabs">
-        <button
-          type="button"
-          className={type === 'tours' ? 'active' : ''}
-          onClick={() => onTypeChange('tours')}
-        >
-          {language === 'en' ? 'Tours' : 'Туры'}
-        </button>
-        <button
-          type="button"
-          className={type === 'hotels' ? 'active' : ''}
-          onClick={() => onTypeChange('hotels')}
-        >
-          {language === 'en' ? 'Hotels' : 'Отели'}
-        </button>
-      </div>
-
-      {!selectedDirection ? (
-        <div className="globe-catalog-message">
-          {language === 'en'
-            ? 'Select a country marker on the globe.'
-            : 'Выберите страну на глобусе, чтобы увидеть каталог.'}
+          <button
+            type="button"
+            className={type === 'hotels' ? 'active' : ''}
+            onClick={() => onTypeChange('hotels')}
+          >
+            {language === 'en' ? 'Hotels' : 'Отели'}
+          </button>
         </div>
-      ) : null}
 
-      {error ? <div className="globe-catalog-message globe-catalog-message--error">{error}</div> : null}
+        {!selectedDirection ? (
+          <div className="globe-catalog-message">
+            {language === 'en'
+              ? 'Select a country marker on the globe.'
+              : 'Выберите страну на глобусе, чтобы увидеть каталог.'}
+          </div>
+        ) : null}
 
-      {selectedDirection && !loading && !error && items.length === 0 ? (
-        <div className="globe-catalog-message">
-          {language === 'en'
-            ? 'Tour data has not been added yet.'
-            : 'Данные о турах пока не добавили'}
+        {error ? (
+          <div className="globe-catalog-message globe-catalog-message--error">
+            {error}
+          </div>
+        ) : null}
+
+        {selectedDirection && !loading && !error && items.length === 0 ? (
+          <div className="globe-catalog-message">
+            {language === 'en'
+              ? 'Tour data has not been added yet.'
+              : 'Данные о турах пока не добавили'}
+          </div>
+        ) : null}
+
+        <div className="globe-catalog-list" aria-busy={loading || appending}>
+          {items.map((item) => (
+            <GlobeTourCard key={item.id} item={item} />
+          ))}
         </div>
-      ) : null}
 
-      <div className="globe-catalog-list" aria-busy={loading || appending}>
-        {items.map((item) => <GlobeTourCard key={item.id} item={item} />)}
+        {hasMore ? (
+          <button
+            type="button"
+            className="globe-catalog-more"
+            onClick={onLoadMore}
+            disabled={loading || appending}
+          >
+            {appending
+              ? (language === 'en' ? 'Loading...' : 'Загрузка...')
+              : (language === 'en' ? 'Show more' : 'Показать ещё')}
+          </button>
+        ) : null}
       </div>
-
-      {hasMore ? (
-        <button
-          type="button"
-          className="globe-catalog-more"
-          onClick={onLoadMore}
-          disabled={loading || appending}
-        >
-          {appending
-            ? (language === 'en' ? 'Loading...' : 'Загрузка...')
-            : (language === 'en' ? 'Show more' : 'Показать ещё')}
-        </button>
-      ) : null}
-    </aside>
+    </div>
   );
 }
 
@@ -676,6 +741,7 @@ function Globe({ onCountrySelect, language = 'ru' }) {
   const [catalogPage, setCatalogPage] = useState(1);
   const [catalogTotal, setCatalogTotal] = useState(0);
   const [catalogHasMore, setCatalogHasMore] = useState(false);
+  const [catalogModalOpen, setCatalogModalOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -769,6 +835,7 @@ function Globe({ onCountrySelect, language = 'ru' }) {
     setSelectedMarkerId(marker.id);
     setHoveredMarkerId(null);
     setSelectedDirection(marker);
+    setCatalogModalOpen(true);
     loadCatalogForMarker(marker, catalogType, 1, false);
     onCountrySelect?.(marker);
   }, [catalogType, loadCatalogForMarker, onCountrySelect]);
@@ -802,6 +869,7 @@ function Globe({ onCountrySelect, language = 'ru' }) {
     setSelectedMarkerId(null);
     setHoveredMarkerId(null);
     setSelectedDirection(null);
+    setCatalogModalOpen(false);
     setCatalogItems([]);
     setCatalogError('');
     setCatalogPage(1);
@@ -847,8 +915,16 @@ function Globe({ onCountrySelect, language = 'ru' }) {
     );
   }, [catalogPage, catalogType, loadCatalogForMarker, selectedDirection]);
 
+  const handleCatalogClose = useCallback(() => {
+    setCatalogModalOpen(false);
+  }, []);
+
   return (
     <div className={`globe-wrapper ${theme}`}>
+      <Link to="/" className="globe-home-link">
+        <span className="globe-home-link__arrow">←</span>
+        <span className="globe-home-link__text">На главную</span>
+      </Link>
       <ThemeToggle
         theme={theme}
         onToggle={() => {
@@ -857,7 +933,6 @@ function Globe({ onCountrySelect, language = 'ru' }) {
           ));
         }}
       />
-
       <SearchPanel
         value={searchValue}
         language={language}
@@ -868,7 +943,8 @@ function Globe({ onCountrySelect, language = 'ru' }) {
         onSuggestionClick={handleSuggestionClick}
       />
 
-      <GlobeCatalogPanel
+      <GlobeCatalogModal
+        open={catalogModalOpen}
         selectedDirection={selectedDirection}
         language={language}
         type={catalogType}
@@ -880,6 +956,7 @@ function Globe({ onCountrySelect, language = 'ru' }) {
         appending={catalogAppending}
         error={catalogError}
         onLoadMore={handleCatalogLoadMore}
+        onClose={handleCatalogClose}
       />
 
       <PopularityLegend language={language} />

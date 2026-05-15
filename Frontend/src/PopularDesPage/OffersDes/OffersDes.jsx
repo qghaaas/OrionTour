@@ -7,7 +7,7 @@ import GalleryModal from '../../GalleryModal/GalleryModal'
 
 
 
-export default function OffersDes() {
+export default function OffersDes({ currentTourId }) {
     const [offers, setOffers] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -16,7 +16,19 @@ export default function OffersDes() {
     const [activeImageIndex, setActiveImageIndex] = useState(0)
 
     useEffect(() => {
-        fetch('http://localhost:3010/api/offers-des')
+        let isMounted = true
+
+        setLoading(true)
+        setError('')
+        setOffers([])
+        setActiveOfferId(null)
+        setActiveImageIndex(0)
+
+        const url = currentTourId
+            ? `http://localhost:3010/api/tours/${currentTourId}/related?limit=2`
+            : 'http://localhost:3010/api/offers-des'
+
+        fetch(url)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Ошибка загрузки предложений')
@@ -25,15 +37,23 @@ export default function OffersDes() {
                 return res.json()
             })
             .then((data) => {
-                setOffers(data)
+                if (!isMounted) return
+
+                setOffers(Array.isArray(data) ? data : [])
                 setLoading(false)
             })
             .catch((err) => {
+                if (!isMounted) return
+
                 console.error('Ошибка загрузки предложений:', err)
                 setError('Не удалось загрузить предложения')
                 setLoading(false)
             })
-    }, [])
+
+        return () => {
+            isMounted = false
+        }
+    }, [currentTourId])
 
     const activeOffer = useMemo(() => {
         return offers.find((offer) => offer.id === activeOfferId) || null
@@ -81,6 +101,10 @@ export default function OffersDes() {
                 </div>
             </section>
         )
+    }
+
+    if (!offers.length) {
+        return null
     }
 
     return (

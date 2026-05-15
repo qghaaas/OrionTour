@@ -2,6 +2,7 @@ import '../../main.css'
 import './PopularDes.css'
 import arrowSwiper from '../../mainIMG/arrowSwiper.svg'
 import { useEffect, useRef, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 
@@ -76,9 +77,12 @@ export default function PopularDes() {
 
                                         <span className="pop-card_time">{card.nights}</span>
 
-                                        <button className="main-btn_site" type="button">
+                                        <Link
+                                            className="main-btn_site"
+                                            to={`/tour/${card.id}`}
+                                        >
                                             Забронировать
-                                        </button>
+                                        </Link>
                                     </div>
                                 </div>
                             </SwiperSlide>

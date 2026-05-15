@@ -265,8 +265,8 @@ VALUES
     TRUE,
     'Мальдивы, Южный Мале Атолл',
     'hotel',
-    NULL,
-    NULL
+    4.123751,
+    73.472686
 ),
 (
     (SELECT id FROM directions WHERE country_slug = 'egypt' LIMIT 1),
@@ -285,10 +285,13 @@ VALUES
     TRUE,
     'Шарм-эль-Шейх',
     'hotel',
-    NULL,
-    NULL
+    27.942643,
+    34.361339
 );
 
+-- =========================
+-- ИЗОБРАЖЕНИЯ ПОПУЛЯРНЫХ ОТЕЛЕЙ
+-- =========================
 
 INSERT INTO tour_images (tour_id, image_url, is_main)
 VALUES
@@ -474,6 +477,118 @@ VALUES
     FALSE
 );
 
+INSERT INTO tours (
+    direction_id,
+    title,
+    short_description,
+    full_description,
+    price,
+    nights,
+    hotel_rating,
+    is_hot,
+    is_active,
+    is_popular,
+    domestic_category_id,
+    tour_type,
+    location_name,
+    hotel_lat,
+    hotel_lng
+)
+VALUES
+(
+    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
+    'Комбинированный экскурсионный тур по историческим памятникам',
+    'Экскурсионный тур по Кёнигсбергскому кафедральному собору, музеям и старинным крепостным стенам, вечерняя прогулка по набережной и дегустация местной кухни.',
+    'Подробная программа включает посещение исторического центра Калининграда, обзорную экскурсию по главным достопримечательностям, прогулку по острову Канта и знакомство с культурным наследием региона.',
+    999.00,
+    2,
+    4.0,
+    FALSE,
+    TRUE,
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
+    'Экскурсионный',
+    'Калининград',
+    54.706489,
+    20.511389
+),
+(
+    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
+    'Природно-познавательный выезд на Куршскую косу',
+    'Прогулка по дюнам, визит в музей природы и наблюдение за птицами, отдых у моря и пляжные остановки.',
+    'Маршрут сочетает природные ландшафты, экологические тропы и обзорные площадки Куршской косы. Подходит для семей, компаний друзей и туристов, любящих спокойный отдых.',
+    1300.00,
+    1,
+    4.0,
+    FALSE,
+    TRUE,
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
+    'Природный',
+    'Куршская коса',
+    55.112322,
+    20.757230
+),
+(
+    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
+    'Семейный формат с программой для детей',
+    'Интерактивный музей, поездка в янтарную мастерскую, прогулки по паркам и безопасные пляжные активности для младшего и подросткового возраста.',
+    'Тур рассчитан на семьи с детьми: насыщенная, но комфортная программа, адаптированная под семейный ритм и интересы разных возрастов.',
+    700.00,
+    1,
+    3.0,
+    FALSE,
+    TRUE,
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
+    'Семейный',
+    'Калининградская область',
+    54.724052,
+    20.524689
+),
+(
+    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
+    'Активный маршрут для любителей приключений',
+    'Велопрогулки по окрестностям, каякинг у побережья, посещение фортификаций и вечерние посиделки у уютных кафе с местными деликатесами.',
+    'Тур подойдет тем, кто любит насыщенные поездки, активный отдых и необычные впечатления. Возможны пешие маршруты и расширенные выездные экскурсии.',
+    1000.00,
+    2,
+    4.0,
+    TRUE,
+    TRUE,
+    FALSE,
+    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
+    'Активный',
+    'Калининград и побережье',
+    54.752083,
+    20.423056
+);
+
+
+INSERT INTO tour_images (tour_id, image_url, is_main)
+VALUES
+(
+    (SELECT id FROM tours WHERE title = 'Комбинированный экскурсионный тур по историческим памятникам' LIMIT 1),
+    '/uploads/kldtours/comb-tour.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Природно-познавательный выезд на Куршскую косу' LIMIT 1),
+    '/uploads/kldtours/nature-tour.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Семейный формат с программой для детей' LIMIT 1),
+    '/uploads/kldtours/family-tour.png',
+    TRUE
+),
+(
+    (SELECT id FROM tours WHERE title = 'Активный маршрут для любителей приключений' LIMIT 1),
+    '/uploads/kldtours/active-tour.png',
+    TRUE
+);
+
+
 -- =========================
 -- ОТЗЫВЫ
 -- =========================
@@ -509,159 +624,9 @@ VALUES
     TRUE
 );
 
--- =========================
--- КАЛИНИНГРАДСКИЕ ТУРЫ
--- Все is_popular = FALSE, чтобы они не попадали в главный свайпер
--- =========================
 
-INSERT INTO tours (
-    direction_id,
-    title,
-    short_description,
-    full_description,
-    price,
-    nights,
-    hotel_rating,
-    is_hot,
-    is_active,
-    is_popular,
-    domestic_category_id,
-    tour_type,
-    location_name
-)
-VALUES
-(
-    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
-    'Комбинированный экскурсионный тур по историческим памятникам',
-    'Экскурсионный тур по Кёнигсбергскому кафедральному собору, музеям и старинным крепостным стенам, вечерняя прогулка по набережной и дегустация местной кухни.',
-    'Подробная программа включает посещение исторического центра Калининграда, обзорную экскурсию по главным достопримечательностям, прогулку по острову Канта и знакомство с культурным наследием региона.',
-    999.00,
-    2,
-    4.0,
-    FALSE,
-    TRUE,
-    FALSE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
-    'Экскурсионный',
-    'Калининград'
-),
-(
-    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
-    'Природно-познавательный выезд на Куршскую косу',
-    'Прогулка по дюнам, визит в музей природы и наблюдение за птицами, отдых у моря и пляжные остановки.',
-    'Маршрут сочетает природные ландшафты, экологические тропы и обзорные площадки Куршской косы. Подходит для семей, компаний друзей и туристов, любящих спокойный отдых.',
-    1300.00,
-    1,
-    4.0,
-    FALSE,
-    TRUE,
-    FALSE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
-    'Природный',
-    'Куршская коса'
-),
-(
-    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
-    'Семейный формат с программой для детей',
-    'Интерактивный музей, поездка в янтарную мастерскую, прогулки по паркам и безопасные пляжные активности для младшего и подросткового возраста.',
-    'Тур рассчитан на семьи с детьми: насыщенная, но комфортная программа, адаптированная под семейный ритм и интересы разных возрастов.',
-    700.00,
-    1,
-    3.0,
-    FALSE,
-    TRUE,
-    FALSE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
-    'Семейный',
-    'Калининградская область'
-),
-(
-    (SELECT id FROM directions WHERE country_slug = 'kaliningrad'),
-    'Активный маршрут для любителей приключений',
-    'Велопрогулки по окрестностям, каякинг у побережья, посещение фортификаций и вечерние посиделки у уютных кафе с местными деликатесами.',
-    'Тур подойдет тем, кто любит насыщенные поездки, активный отдых и необычные впечатления. Возможны пешие маршруты и расширенные выездные экскурсии.',
-    1000.00,
-    2,
-    4.0,
-    TRUE,
-    TRUE,
-    FALSE,
-    (SELECT id FROM domestic_categories WHERE slug = 'kaliningrad-tours-1'),
-    'Активный',
-    'Калининград и побережье'
-);
 
-INSERT INTO tour_images (tour_id, image_url, is_main)
-VALUES
-(
-    (SELECT id FROM tours WHERE title = 'Комбинированный экскурсионный тур по историческим памятникам' LIMIT 1),
-    '/uploads/kldtours/comb-tour.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Природно-познавательный выезд на Куршскую косу' LIMIT 1),
-    '/uploads/kldtours/nature-tour.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Семейный формат с программой для детей' LIMIT 1),
-    '/uploads/kldtours/family-tour.png',
-    TRUE
-),
-(
-    (SELECT id FROM tours WHERE title = 'Активный маршрут для любителей приключений' LIMIT 1),
-    '/uploads/kldtours/active-tour.png',
-    TRUE
-);
 
--- =========================
--- ТУРЫ ДЛЯ СПЕЦПРЕДЛОЖЕНИЙ
--- is_popular = FALSE, чтобы не попадали в главный свайпер
--- =========================
-
-INSERT INTO tours (
-    direction_id,
-    title,
-    short_description,
-    full_description,
-    price,
-    nights,
-    hotel_rating,
-    is_hot,
-    is_active,
-    is_popular,
-    tour_type,
-    location_name
-)
-VALUES
-(
-    (SELECT id FROM directions WHERE country_slug = 'maldives'),
-    'Hard Rock Hotel Maldives',
-    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock',
-    'Виллы над водой и на пляже с частными бассейнами, рестораны с мировой кухней, уникальная музыкальная атмосфера Hard Rock.',
-    477900.00,
-    9,
-    5.0,
-    TRUE,
-    TRUE,
-    FALSE,
-    'offer',
-    'Мальдивы, Южный Мале Атолл'
-),
-(
-    (SELECT id FROM directions WHERE country_slug = 'egypt'),
-    'Pickalbatros Luxury Suites',
-    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа',
-    'Отель расположен среди красивых пейзажей, создавая место, полное природной красоты полуострова Южный Синай, окруженный потрясающими садами и полем для гольфа.',
-    110200.00,
-    14,
-    5.0,
-    TRUE,
-    TRUE,
-    FALSE,
-    'offer',
-    'Шармс Бей'
-);
 
 -- =========================
 -- БЛОГ

@@ -7,6 +7,8 @@ import Hotel from './img/Hotel.svg'
 import GlobeMini from '../../Globe/GlobeMini'
 import { useCallback, useEffect, useState } from 'react'
 
+import { Link } from 'react-router-dom'
+
 const API_URL = 'http://localhost:3010/api'
 const CATALOG_PAGE_SIZE = 9
 
@@ -64,31 +66,38 @@ function buildCatalogParams({ tab, directionId, filter, page = 1, limit = CATALO
 
 function CatalogCard({ item }) {
     return (
-        <a className="hero-catalog-card" href={getTourLink(item.id)}>
+        <Link
+            className="hero-catalog-card"
+            to={`/tour/${item.id}`}
+        >
             <div className="hero-catalog-card__image-wrap">
                 {item.image ? (
-                    <img src={item.image} alt={item.title} className="hero-catalog-card__image" />
+                    <img
+                        className="hero-catalog-card__image"
+                        src={item.image}
+                        alt={item.title}
+                    />
                 ) : (
-                    <div className="hero-catalog-card__image-placeholder">ORION</div>
+                    <div className="hero-catalog-card__image-placeholder">
+                        ORION
+                    </div>
                 )}
             </div>
 
             <div className="hero-catalog-card__body">
                 <div className="hero-catalog-card__topline">
-                    <span>{item.direction_name || item.location_name || 'Направление'}</span>
-                    {item.hotel_rating ? <span>{Number(item.hotel_rating).toFixed(1)} ★</span> : null}
+                    <span>{item.location || item.direction_name}</span>
+                    {item.hotel_rating ? <span>{Number(item.hotel_rating)} ★</span> : null}
                 </div>
 
                 <h3>{item.title}</h3>
 
-                <p>{item.description || 'Описание тура пока не добавлено'}</p>
-
                 <div className="hero-catalog-card__footer">
-                    <strong>{item.price_formatted || `от ${Number(item.price || 0).toLocaleString('ru-RU')} ₽`}</strong>
-                    <span>{item.nights_label || `${item.nights || 0} ночей`}</span>
+                    <strong>от {Number(item.price).toLocaleString('ru-RU')} ₽</strong>
+                    <span>{item.nights} ночей</span>
                 </div>
             </div>
-        </a>
+        </Link>
     )
 }
 
@@ -349,7 +358,7 @@ export default function Hero() {
             <div className="container hero-container">
                 <div className="hero-left">
                     <p className="hero-top-text">
-                        Откройте мир вместе с нами<br/>
+                        Откройте мир вместе с нами<br />
                         Выберите направление на интерактивном глобусе и найдите тур за пару минут
                     </p>
 

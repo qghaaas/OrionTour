@@ -1,13 +1,17 @@
 import '../../main.css'
 import './Directions.css'
 import star from '../../mainIMG/star.svg'
+import { Link, useParams } from 'react-router-dom'
 import { useEffect, useMemo, useState } from 'react'
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps'
 import GalleryModal from '../../GalleryModal/GalleryModal'
 
 
+export default function Directions({ defaultTourId = 1 }) {
+    const { id } = useParams()
 
-export default function Directions() {
+    const tourId = id || defaultTourId
+
     const [tour, setTour] = useState(null)
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState('')
@@ -16,7 +20,13 @@ export default function Directions() {
     const [activeImageIndex, setActiveImageIndex] = useState(0)
 
     useEffect(() => {
-        fetch('http://localhost:3010/api/tours/1/details')
+        let isMounted = true
+
+        setLoading(true)
+        setError('')
+        setTour(null)
+
+        fetch(`http://localhost:3010/api/tours/${tourId}/details`)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Ошибка загрузки данных тура')
@@ -25,15 +35,23 @@ export default function Directions() {
                 return res.json()
             })
             .then((data) => {
+                if (!isMounted) return
+
                 setTour(data)
                 setLoading(false)
             })
             .catch((err) => {
-                console.error('Ошибка загрузки направления:', err)
-                setError('Не удалось загрузить данные')
+                if (!isMounted) return
+
+                console.error('Ошибка загрузки тура:', err)
+                setError('Не удалось загрузить данные тура')
                 setLoading(false)
             })
-    }, [])
+
+        return () => {
+            isMounted = false
+        }
+    }, [tourId])
 
     const galleryImages = useMemo(() => {
         if (!tour?.images?.length) return []
@@ -56,6 +74,8 @@ export default function Directions() {
     const totalPhotos = Number(tour?.images_count) || galleryImages.length
 
     const openGallery = (imageId) => {
+        if (!galleryImages.length) return
+
         const index = galleryImages.findIndex((img) => img.id === imageId)
 
         setActiveImageIndex(index >= 0 ? index : 0)
@@ -82,6 +102,10 @@ export default function Directions() {
             <section className="directions">
                 <div className="container">
                     <p>{error}</p>
+
+                    <Link className="main-btn_site directions-back-link" to="/">
+                        На главную
+                    </Link>
                 </div>
             </section>
         )
@@ -92,6 +116,10 @@ export default function Directions() {
             <section className="directions">
                 <div className="container">
                     <p>Тур не найден</p>
+
+                    <Link className="main-btn_site directions-back-link" to="/">
+                        На главную
+                    </Link>
                 </div>
             </section>
         )
@@ -105,15 +133,17 @@ export default function Directions() {
                         <div className="directions-top_title-inner">
                             <h2>{tour.title}</h2>
 
-                            <div className="directions-top_title-rev">
-                                <span>{Number(tour.hotel_rating)}</span>
-                                <img src={star} alt="star" />
-                            </div>
+                            {tour.hotel_rating ? (
+                                <div className="directions-top_title-rev">
+                                    <span>{Number(tour.hotel_rating)}</span>
+                                    <img src={star} alt="star" />
+                                </div>
+                            ) : null}
                         </div>
 
                         <div className="directions-top_title-bot">
                             <span>{tour.nights} ночей</span>
-                            <h3>{tour.location_name}</h3>
+                            <h3>{tour.location_name || tour.direction_name}</h3>
                         </div>
                     </div>
 
@@ -133,27 +163,31 @@ export default function Directions() {
                             </button>
 
                             <div className="directions-gallery-grid">
-                                {sideImages.map((img, index) => (
-                                    <button
-                                        className={`directions-gallery-small ${
-                                            index === 4 ? 'directions-gallery-more' : ''
-                                        }`}
-                                        key={img.id}
-                                        type="button"
-                                        onClick={() => openGallery(img.id)}
-                                    >
-                                        <img
-                                            src={img.image_url}
-                                            alt={`${tour.title} фото ${index + 2}`}
-                                        />
+                                {sideImages.map((img, index) => {
+                                    const isLastPreview = index === 4
 
-                                        {index === 4 && totalPhotos > 0 && (
-                                            <span className="directions-gallery-overlay">
-                                                +{totalPhotos} <br /> фото
-                                            </span>
-                                        )}
-                                    </button>
-                                ))}
+                                    return (
+                                        <button
+                                            className={`directions-gallery-small ${
+                                                isLastPreview ? 'directions-gallery-more' : ''
+                                            }`}
+                                            key={img.id}
+                                            type="button"
+                                            onClick={() => openGallery(img.id)}
+                                        >
+                                            <img
+                                                src={img.image_url}
+                                                alt={`${tour.title} фото ${index + 2}`}
+                                            />
+
+                                            {isLastPreview && totalPhotos > 0 ? (
+                                                <span className="directions-gallery-overlay">
+                                                    +{totalPhotos} <br /> фото
+                                                </span>
+                                            ) : null}
+                                        </button>
+                                    )
+                                })}
                             </div>
                         </div>
                     </div>
@@ -163,8 +197,21 @@ export default function Directions() {
                     <div className="directions-des_loc">
                         <div className="directions-description">
                             <p style={{ whiteSpace: 'pre-line' }}>
-                                {tour.full_description}
+                                {tour.full_description || tour.short_description}
                             </p>
+
+                            <div className="directions-booking-box">
+                                <div>
+                                    <span>Стоимость</span>
+                                    <strong>
+                                        от {Number(tour.price).toLocaleString('ru-RU')} ₽
+                                    </strong>
+                                </div>
+
+                                <button className="main-btn_site" type="button">
+                                    Забронировать
+                                </button>
+                            </div>
                         </div>
 
                         <div className="directions-loc">
