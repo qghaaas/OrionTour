@@ -1,71 +1,120 @@
 .account {
     width: 100%;
-    height: fit-content;
+    height: fit-content;;
 }
 
 .account-inner {
     display: flex;
-    padding: 100px 0 280px 9%;
+    align-items: flex-start;
+    gap: clamp(32px, 5vw, 80px);
+    padding: clamp(45px, 6vw, 100px) clamp(16px, 4vw, 70px) clamp(90px, 13vw, 280px);
     background-color: #F9F9F9;
-    gap: 80px;
 }
 
 .account-aside {
+    width: clamp(280px, 23.5vw, 360px);
+    flex: 0 0 clamp(280px, 23.5vw, 360px);
     background-color: #fff;
+    border-radius: 25px;
     padding: 45px 0 30px;
-    width: 23.5%;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    border-radius: 25px;
 }
 
 .account-aside_user {
     display: flex;
     flex-direction: column;
     align-items: center;
-    font-size: 20px;
-    margin-bottom: 14px;
+    padding: 0 24px;
+    margin-bottom: 20px;
+    text-align: center;
 }
 
 .user-avatar {
     width: 122px;
     aspect-ratio: 1;
-    background-color: #D9D9D9;
-    border-radius: 50%;
     margin-bottom: 20px;
+    border-radius: 50%;
+    background-color: #D9D9D9;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.user-avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
 }
 
 .account-aside_user p {
-    font-weight: 700;
-    margin-bottom: 7px;
+    max-width: 100%;
+    margin: 0 0 7px;
     color: #1F2A36;
+    font-weight: 700;
+    font-size: 20px;
+    overflow-wrap: anywhere;
 }
 
 .account-aside_user span {
-    font-weight: 500;
+    max-width: 100%;
     color: #A8A1A1;
+    font-size: 16px;
+    font-weight: 500;
+    overflow-wrap: anywhere;
 }
 
 .aside_select-list {
-    padding: 30px 0 30px 60px;
     display: flex;
     flex-direction: column;
+    gap: 30px;
+    padding: 30px 24px 30px clamp(30px, 3.2vw, 60px);
+    margin: 0;
+    list-style: none;
     border-top: 1px solid #A4A4A4;
     border-bottom: 1px solid #A4A4A4;
-}
-
-.aside_select-list>li:not(:last-child) {
-    margin-bottom: 30px;
 }
 
 .aside_select-list li {
     display: flex;
     align-items: center;
-    gap: 0 5px;
+    gap: 5px;
+}
+
+.aside_select-list img {
+    flex: 0 0 auto;
+}
+
+.aside_select-list button,
+.exit-account {
+    border: none;
+    padding: 0;
+    background: transparent;
+    color: #1F2A36;
+    font-family: "Raleway", sans-serif;
+    font-size: 20px;
+    font-weight: 500;
+    text-align: left;
+    cursor: pointer;
+    transition: color 0.2s ease;
+}
+
+.aside_select-list button:hover,
+.exit-account:hover {
+    color: #F99244;
+}
+
+.aside_select-list li.active button {
+    color: #F99244;
+}
+
+.aside_select-list li.active img {
+    filter: brightness(0) saturate(100%) invert(63%) sepia(70%) saturate(500%) hue-rotate(350deg);
 }
 
 .orders-item {
-    display: flex;
     flex-direction: column;
     align-items: flex-start !important;
 }
@@ -77,166 +126,210 @@
 }
 
 .aside_select-list-nested {
-    margin-left: 34px;
     display: flex;
     flex-direction: column;
     gap: 16px;
     max-height: 0;
+    margin: 0 0 0 34px;
+    padding: 0;
+    list-style: none;
     opacity: 0;
     overflow: hidden;
     transition: max-height 0.35s ease, opacity 0.35s ease, margin-top 0.35s ease;
 }
 
 .aside_select-list-nested.show {
-    margin-top: 16px;
     max-height: 120px;
+    margin-top: 16px;
     opacity: 1;
 }
 
 .aside_select-list-nested button {
     color: #A8A1A1 !important;
+    font-size: 18px;
 }
 
-.account-inner button {
-    color: #1F2A36;
-    font-family: "Raleway", sans-serif;
-    font-size: 20px;
-    font-weight: 500;
+.aside_select-list-nested button.active-nested {
+    color: #F99244 !important;
 }
 
 .exit-account {
-    padding-top: 21px;
-    margin: 0 auto;
     display: block;
-}
-
-.aside_select-list li.active button {
-    color: #F99244;
-}
-
-.aside_select-list li.active img {
-    filter: brightness(0) saturate(100%) invert(63%) sepia(70%) saturate(500%) hue-rotate(350deg);
+    margin: 21px auto 0;
+    text-align: center;
 }
 
 .active-content {
-    flex: 1;
+    flex: 1 1 auto;
+    min-width: 0;
 }
 
-.footer-account-footer {
+.account-empty {
+    margin: 60px auto 140px;
+    width: min(900px, calc(100% - 32px));
+    padding: 35px;
+    border-radius: 25px;
     background-color: #F9F9F9;
-    margin: 0;
-    padding-bottom: 30px;
-}
-.account-reviews {
-    width: 100%;
-    max-width: 900px;
     font-family: "Raleway", sans-serif;
+    font-size: 20px;
     color: #202020;
 }
 
-.account-reviews h2 {
+.footer-account-footer {
+    margin: 0;
+    padding-bottom: 30px;
+    background-color: #F9F9F9;
+}
+
+.account-reviews,
+.account-settings {
+    width: 100%;
+    max-width: 900px;
+    color: #202020;
+    font-family: "Raleway", sans-serif;
+}
+
+.account-reviews h2,
+.account-settings h2,
+.account-review-list h3 {
+    margin: 0 0 35px;
+    color: #001827;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: 40px;
+    font-size: clamp(30px, 3vw, 40px);
     letter-spacing: 1%;
-    color: #001827;
-    margin-bottom: 35px;
+}
+
+.account-review-list h3 {
+    margin-bottom: 11px;
+}
+
+.account-review-form,
+.account-settings-form {
+    width: 100%;
+    border: 1px solid #EFEFEF;
+    border-radius: 25px;
+    background-color: #fff;
+    padding: clamp(24px, 3vw, 45px);
+    display: flex;
+    flex-direction: column;
 }
 
 .account-review-form {
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid #EFEFEF;
-    border-radius: 25px;
-    padding: 40px 45px 45px;
-    display: flex;
-    flex-direction: column;
     gap: 25px;
     margin-bottom: 35px;
 }
 
-.account-review-form label {
+.account-settings-form {
+    gap: 30px;
+}
+
+.account-review-form label,
+.account-settings-form label {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(17px, 1.4vw, 20px);
     letter-spacing: 1%;
-    color: #202020;
 }
 
 .account-review-form input,
-.account-review-form select,
-.account-review-form textarea {
+.account-review-form textarea,
+.account-settings-form input {
     width: 100%;
-    background-color: #EFEFEF;
     border: 1px solid #DDDDDD;
     border-radius: 25px;
-    padding: 18px 24px;
+    background-color: #EFEFEF;
+    box-sizing: border-box;
+    color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 20px;
+    font-size: clamp(16px, 1.4vw, 20px);
     letter-spacing: 1%;
-    color: #202020;
+    outline: none;
+    transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.account-review-form input,
+.account-settings-form input {
+    height: 58px;
+    padding: 0 24px;
 }
 
 .account-review-form textarea {
     min-height: 165px;
-    line-height: 24px;
+    padding: 18px 24px;
+    line-height: 1.5;
     resize: vertical;
 }
 
-.account-review-form textarea::placeholder {
+.account-review-form input::placeholder,
+.account-review-form textarea::placeholder,
+.account-settings-form input::placeholder {
     color: #6D6D6D;
 }
 
-.account-review-form input,
-.account-review-form select:focus,
-.account-review-form textarea:focus {
-    background-color: #fff;
-    border-color: #F99244;
-}
-
-.account-review-form input,
-.account-review-form select:hover,
-.account-review-form textarea:hover {
+.account-review-form input:hover,
+.account-review-form textarea:hover,
+.account-settings-form input:hover {
     background-color: #F4F4F4;
 }
 
-.account-review-form .main-btn_site {
-    width: 100%;
-    max-width: 330px;
+.account-review-form input:focus,
+.account-review-form textarea:focus,
+.account-settings-form input:focus {
+    border-color: #F99244;
+    background-color: #fff;
+    box-shadow: 0 0 0 3px rgba(249, 146, 68, 0.16);
+}
+
+.account-review-form .main-btn_site,
+.account-settings-form .main-btn_site {
     height: 58px;
-    flex-shrink: 0;
-    background-color: #F99244;
     border-radius: 50px;
+    background-color: #F99244;
+    color: #fff;
     font-family: "Raleway", sans-serif;
     font-weight: 700;
-    font-size: 25px;
+    font-size: clamp(20px, 1.8vw, 25px);
     letter-spacing: 1%;
-    color: #fff;
+}
+
+.account-review-form .main-btn_site {
+    width: min(330px, 100%);
     margin-top: 5px;
 }
 
-.account-review-form .main-btn_site:disabled {
+.account-settings-form .main-btn_site {
+    width: min(250px, 100%);
+}
+
+.account-review-form .main-btn_site:disabled,
+.account-settings-form .main-btn_site:disabled {
     opacity: 0.7;
     cursor: default;
 }
 
-.account-review-message {
+.account-review-message,
+.account-settings-message {
     width: 100%;
-    background-color: #EFEFEF;
     border: 1px solid #DDDDDD;
     border-radius: 25px;
+    background-color: #EFEFEF;
     padding: 20px 25px;
-    margin-bottom: 35px;
+    color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: clamp(16px, 1.4vw, 20px);
+    line-height: 1.5;
     letter-spacing: 1%;
-    color: #202020;
+}
+
+.account-review-message {
+    margin-bottom: 35px;
 }
 
 .account-review-list {
@@ -246,34 +339,25 @@
     gap: 24px;
 }
 
-.account-review-list h3 {
-    font-family: "Arimo", sans-serif;
-    font-weight: 700;
-    font-size: 40px;
-    letter-spacing: 1%;
-    color: #001827;
-    margin-bottom: 11px;
-}
-
 .account-review-list > p {
     width: 100%;
-    background-color: #EFEFEF;
     border: 1px solid #DDDDDD;
     border-radius: 25px;
+    background-color: #EFEFEF;
     padding: 30px 35px;
+    color: #6D6D6D;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
-    color: #6D6D6D;
+    font-size: clamp(16px, 1.4vw, 20px);
+    line-height: 1.5;
 }
 
 .account-review-card {
     width: 100%;
-    background-color: #EFEFEF;
     border: 1px solid #DDDDDD;
     border-radius: 25px;
-    padding: 30px 35px;
+    background-color: #EFEFEF;
+    padding: clamp(24px, 2.4vw, 35px);
     font-family: "Raleway", sans-serif;
 }
 
@@ -285,37 +369,26 @@
     margin-bottom: 18px;
 }
 
-.account-review-card-top strong {
-    display: block;
-    width: fit-content;
-    min-width: 150px;
-    background-color: #fff;
-    text-align: center;
-    border-radius: 25px;
-    font-family: "Arimo", sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1%;
-    color: #202020;
-    padding: 8px 14px;
+.account-review-author {
+    font-weight: 700 !important;
 }
 
 .account-review-card p {
+    margin: 0 0 18px;
+    color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
+    font-size: clamp(16px, 1.4vw, 20px);
+    line-height: 1.5;
     letter-spacing: 1%;
-    color: #202020;
-    margin-bottom: 18px;
 }
 
 .account-review-card small {
     display: block;
+    color: #6D6D6D;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 18px;
-    color: #6D6D6D;
+    font-size: clamp(14px, 1.2vw, 18px);
 }
 
 .review-status {
@@ -327,7 +400,7 @@
     padding: 8px 14px;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(16px, 1.4vw, 20px);
     letter-spacing: 1%;
     white-space: nowrap;
 }
@@ -342,83 +415,68 @@
     color: #202020;
 }
 
-.user-avatar {
-    overflow: hidden;
+.account-rating-stars {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.account-rating-star {
+    width: 34px;
+    height: 34px;
+    border: none;
+    padding: 0;
+    margin: 0;
+    background: transparent;
     display: flex;
     align-items: center;
     justify-content: center;
+    cursor: default;
 }
 
-.user-avatar img {
+.account-rating-star img {
     width: 100%;
     height: 100%;
-    object-fit: cover;
     display: block;
+    object-fit: contain;
+    filter: grayscale(100%) brightness(0.7) !important;
+    opacity: 0.55;
+    transition: filter 0.2s ease, opacity 0.2s ease, transform 0.2s ease;
 }
 
-.account-settings {
-    width: 100%;
-    max-width: 900px;
-    font-family: "Raleway", sans-serif;
-    color: #202020;
+.account-rating-star.active img {
+    filter: brightness(0) saturate(100%) invert(69%) sepia(70%) saturate(1048%) hue-rotate(335deg) brightness(101%) contrast(96%) !important;
+    opacity: 1;
 }
 
-.account-settings h2 {
-    font-family: "Arimo", sans-serif;
-    font-weight: 700;
-    font-size: 40px;
-    letter-spacing: 1%;
-    color: #001827;
-    margin-bottom: 35px;
+.account-rating-stars-interactive .account-rating-star {
+    cursor: pointer;
 }
 
-.account-settings-form {
-    width: 100%;
-    background-color: #fff;
-    border: 1px solid #EFEFEF;
-    border-radius: 25px;
-    padding: 40px 45px 45px;
+.account-rating-stars-interactive .account-rating-star:hover img,
+.account-rating-stars-interactive .account-rating-star:focus-visible img {
+    transform: scale(1.12);
+}
+
+.account-rating-stars-interactive .account-rating-star:focus-visible {
+    border-radius: 50%;
+    outline: 2px solid #F99244;
+    outline-offset: 4px;
+}
+
+.account-review-card-rating {
     display: flex;
-    flex-direction: column;
-    gap: 30px;
+    align-items: center;
 }
 
-.account-settings-form label {
-    display: flex;
-    flex-direction: column;
-    gap: 14px;
-    font-family: "Raleway", sans-serif;
-    font-weight: 700;
-    font-size: 20px;
-    letter-spacing: 1%;
-    color: #202020;
+.account-review-card-rating .account-rating-stars {
+    margin-top: 0;
 }
 
-.account-settings-form input {
-    width: 100%;
-    height: 58px;
-    background-color: #EFEFEF;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    padding: 0 24px;
-    font-family: "Raleway", sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    letter-spacing: 1%;
-    color: #202020;
-}
-
-.account-settings-form input::placeholder {
-    color: #6D6D6D;
-}
-
-.account-settings-form input:hover {
-    background-color: #F4F4F4;
-}
-
-.account-settings-form input:focus {
-    background-color: #fff;
-    border-color: #F99244;
+.account-review-card-rating .account-rating-star {
+    width: 24px;
+    height: 24px;
 }
 
 .account-avatar-settings {
@@ -428,11 +486,12 @@
 }
 
 .account-avatar-settings > p {
+    margin: 0;
+    color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(17px, 1.4vw, 20px);
     letter-spacing: 1%;
-    color: #202020;
 }
 
 .account-avatar-list {
@@ -443,13 +502,14 @@
 }
 
 .account-avatar-option {
-    width: 112px;
-    height: 112px;
-    background-color: #EFEFEF;
+    width: clamp(86px, 8vw, 112px);
+    height: clamp(86px, 8vw, 112px);
     border: 2px solid #DDDDDD;
     border-radius: 50%;
     padding: 0;
+    background-color: #EFEFEF;
     overflow: hidden;
+    cursor: pointer;
     transition: border-color 0.25s ease, transform 0.25s ease;
 }
 
@@ -461,95 +521,268 @@
 }
 
 .account-avatar-option:hover {
-    transform: scale(1.04);
     border-color: #F99244;
+    transform: scale(1.04);
 }
 
 .account-avatar-option.active {
     border-color: #F99244;
 }
 
-.account-settings-message {
-    width: 100%;
-    background-color: #EFEFEF;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    padding: 20px 25px;
-    font-family: "Raleway", sans-serif;
-    font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
-    letter-spacing: 1%;
-    color: #202020;
-}
+@media (max-width: 1180px) {
+    .account-inner {
+        gap: 32px;
+        padding-inline: 24px;
+    }
 
-.account-settings-form .main-btn_site {
-    width: 100%;
-    max-width: 250px;
-    height: 58px;
-    flex-shrink: 0;
-    background-color: #F99244;
-    border-radius: 50px;
-    font-family: "Raleway", sans-serif;
-    font-weight: 700;
-    font-size: 25px;
-    letter-spacing: 1%;
-    color: #fff;
-}
+    .account-aside {
+        width: 280px;
+        flex-basis: 280px;
+    }
 
-.account-settings-form .main-btn_site:disabled {
-    opacity: 0.7;
-    cursor: default;
-}
+    .aside_select-list {
+        padding-left: 30px;
+    }
 
-@media (max-width: 1100px) {
+    .aside_select-list button,
+    .exit-account {
+        font-size: 18px;
+    }
+
+    .account-reviews,
     .account-settings {
         max-width: 100%;
     }
+}
 
-    .account-settings-form {
-        padding: 30px;
+@media (max-width: 980px) {
+    .account-inner {
+        flex-direction: column;
+        padding: 40px 20px 110px;
+    }
+
+    .account-aside {
+        width: 100%;
+        flex: none;
+        padding: 28px 0;
+    }
+
+    .account-aside_user {
+        margin-bottom: 18px;
+    }
+
+    .user-avatar {
+        width: 96px;
+    }
+
+    .aside_select-list {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 16px;
+        padding: 24px;
+    }
+
+    .aside_select-list li {
+        min-height: 54px;
+        padding: 12px 14px;
+        border-radius: 18px;
+        background-color: #F6F6F6;
+    }
+
+    .orders-item {
+        grid-column: 1 / -1;
+    }
+
+    .aside-item-main {
+        min-height: 30px;
+    }
+
+    .aside_select-list-nested {
+        width: 100%;
+        margin-left: 34px;
+    }
+
+    .aside_select-list-nested.show {
+        margin-top: 12px;
+    }
+
+    .exit-account {
+        margin-top: 18px;
+    }
+
+    .active-content {
+        width: 100%;
     }
 }
 
 @media (max-width: 768px) {
-    .account-settings h2 {
-        font-size: 32px;
+    .account-inner {
+        padding: 32px 16px 90px;
     }
 
-    .account-settings-form .main-btn_site {
-        max-width: none;
+    .account-aside {
+        border-radius: 22px;
     }
 
-    .account-avatar-option {
-        width: 96px;
-        height: 96px;
+    .aside_select-list {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        padding: 20px;
     }
-}
 
-@media (max-width: 1100px) {
-    .account-reviews {
-        max-width: 100%;
+    .aside_select-list li {
+        width: 100%;
+    }
+
+    .aside_select-list button,
+    .exit-account {
+        font-size: 17px;
     }
 
     .account-review-form,
-    .account-review-card {
-        padding: 30px;
+    .account-settings-form,
+    .account-review-card,
+    .account-review-list > p {
+        border-radius: 22px;
+        padding: 24px;
     }
-}
 
-@media (max-width: 768px) {
     .account-review-card-top {
-        align-items: flex-start;
         flex-direction: column;
+        align-items: flex-start;
+        gap: 14px;
     }
 
-    .account-review-form .main-btn_site {
+    .review-status {
+        min-width: 0;
+    }
+
+    .account-review-form .main-btn_site,
+    .account-settings-form .main-btn_site {
+        width: 100%;
         max-width: none;
     }
 
-    .account-reviews h2,
-    .account-review-list h3 {
-        font-size: 32px;
+    .account-avatar-list {
+        gap: 14px;
+    }
+}
+
+@media (max-width: 520px) {
+    .account-inner {
+        padding: 26px 12px 75px;
+    }
+
+    .account-aside {
+        border-radius: 18px;
+    }
+
+    .account-aside_user p {
+        font-size: 18px;
+    }
+
+    .account-aside_user span {
+        font-size: 14px;
+    }
+
+    .user-avatar {
+        width: 82px;
+        margin-bottom: 14px;
+    }
+
+    .aside_select-list {
+        padding: 16px;
+    }
+
+    .aside_select-list li {
+        min-height: 50px;
+        padding: 10px 12px;
+        border-radius: 15px;
+    }
+
+    .aside_select-list img {
+        width: 22px;
+        height: 22px;
+    }
+
+    .aside_select-list button,
+    .exit-account {
+        font-size: 16px;
+    }
+
+    .aside_select-list-nested {
+        margin-left: 27px;
+        gap: 12px;
+    }
+
+    .aside_select-list-nested button {
+        font-size: 15px;
+    }
+
+    .account-review-form,
+    .account-settings-form,
+    .account-review-card,
+    .account-review-list > p,
+    .account-review-message,
+    .account-settings-message {
+        border-radius: 18px;
+        padding: 18px;
+    }
+
+    .account-review-form input,
+    .account-settings-form input {
+        height: 50px;
+        padding: 0 18px;
+        border-radius: 20px;
+    }
+
+    .account-review-form textarea {
+        min-height: 135px;
+        padding: 16px 18px;
+        border-radius: 20px;
+    }
+
+    .account-rating-star {
+        width: 30px;
+        height: 30px;
+    }
+
+    .account-review-card-rating .account-rating-star {
+        width: 22px;
+        height: 22px;
+    }
+
+    .account-avatar-option {
+        width: 74px;
+        height: 74px;
+    }
+}
+
+@media (max-width: 380px) {
+    .account-inner {
+        padding-inline: 10px;
+    }
+
+    .account-review-form,
+    .account-settings-form,
+    .account-review-card,
+    .account-review-list > p,
+    .account-review-message,
+    .account-settings-message {
+        padding: 16px;
+    }
+
+    .account-rating-stars {
+        gap: 4px;
+    }
+
+    .account-rating-star {
+        width: 28px;
+        height: 28px;
+    }
+
+    .account-review-card-rating .account-rating-star {
+        width: 20px;
+        height: 20px;
     }
 }

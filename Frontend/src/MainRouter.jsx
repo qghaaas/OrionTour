@@ -1,25 +1,39 @@
-import { Route, Routes } from "react-router-dom";
-import { HashRouter } from "react-router-dom";
-import MainPageLink from "./Route/MainPageLink";
-import DomesticTourPageLink from './Route/DomesticTourPageLink'
-import PopularDesPageLink from "./Route/PopularDesPageLink";
-import AccountLink from "./Route/AccountLink";
-import ContactInfoLink from "./Route/ContactInfoLink";
-import AboutUsLink from "./Route/AboutUsLink";
-import BlogLink from './Route/BlogLink'
-import BlogPageLink from './Route/BlogPageLink'
-import Globe from "./Globe/Globe";
-import AdminPanelLink from './Route/AdminPanelLink'
-import AdminAuthLink from './Route/AdminAuthLink'
+import { Route, Routes, HashRouter } from 'react-router-dom'
+import { lazy, Suspense } from 'react'
+const MainPageLink = lazy(() => import('./Route/MainPageLink'))
+const DomesticTourPageLink = lazy(() => import('./Route/DomesticTourPageLink'))
+const PopularDesPageLink = lazy(() => import('./Route/PopularDesPageLink'))
+const AccountLink = lazy(() => import('./Route/AccountLink'))
+const ContactInfoLink = lazy(() => import('./Route/ContactInfoLink'))
+const AboutUsLink = lazy(() => import('./Route/AboutUsLink'))
+const BlogLink = lazy(() => import('./Route/BlogLink'))
+const BlogPageLink = lazy(() => import('./Route/BlogPageLink'))
+const Globe = lazy(() => import('./Globe/Globe'))
+const AdminPanelLink = lazy(() => import('./Route/AdminPanelLink'))
+const AdminAuthLink = lazy(() => import('./Route/AdminAuthLink'))
+import './main.css'
 
+
+
+function PageLoader() {
+    return (
+        <div className="page-loader">
+            <span>Загрузка страницы</span>
+            <span className="page-loader-dots">
+                <span></span>
+                <span></span>
+                <span></span>
+            </span>
+        </div>
+    )
+}
 
 export default function MainRouter() {
     return (
-        <>
-            <HashRouter>
+        <HashRouter>
+            <Suspense fallback={<PageLoader />}>
                 <Routes>
-
-                    <Route path="/" index element={<MainPageLink />} />
+                    <Route path="/" element={<MainPageLink />} />
                     <Route path="/Home" element={<MainPageLink />} />
                     <Route path="/DomesticTourism" element={<DomesticTourPageLink />} />
                     <Route path="/Directions" element={<PopularDesPageLink />} />
@@ -31,9 +45,8 @@ export default function MainRouter() {
                     <Route path="/interactive-globe" element={<Globe />} />
                     <Route path="/admin/login" element={<AdminAuthLink />} />
                     <Route path="/admin" element={<AdminPanelLink />} />
-
                 </Routes>
-            </HashRouter>
-        </>
+            </Suspense>
+        </HashRouter>
     )
 }

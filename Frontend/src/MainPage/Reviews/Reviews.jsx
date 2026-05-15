@@ -8,11 +8,19 @@ import { Navigation } from 'swiper/modules'
 import 'swiper/css'
 import 'swiper/css/navigation'
 
-
-
 export default function Reviews() {
     const [reviews, setReviews] = useState([])
+
+    const sectionRef = useRef(null)
     const swiperRef = useRef(null)
+    const prevRef = useRef(null)
+    const nextRef = useRef(null)
+
+    const getStartIndex = () => {
+        if (typeof window === 'undefined') return 0
+
+        return window.innerWidth > 768 && reviews.length > 2 ? 1 : 0
+    }
 
     useEffect(() => {
         fetch('http://localhost:3010/api/reviews')
@@ -22,21 +30,49 @@ export default function Reviews() {
     }, [])
 
     useEffect(() => {
-        if (!reviews.length || !swiperRef.current) return
+        if (!reviews.length) return
 
-        requestAnimationFrame(() => {
-            swiperRef.current.update()
+        const updateSwiper = () => {
+            const swiper = swiperRef.current
 
-            if (reviews.length > 1) {
-                swiperRef.current.slideToLoop(0, 0, false)
+            if (!swiper || swiper.destroyed) return
+
+            const startIndex = getStartIndex()
+
+            swiper.update()
+            swiper.slideTo(startIndex, 0, false)
+        }
+
+        const frameId = requestAnimationFrame(updateSwiper)
+
+        const observer = new IntersectionObserver(
+            ([entry]) => {
+                if (entry.isIntersecting) {
+                    requestAnimationFrame(updateSwiper)
+                }
+            },
+            {
+                threshold: 0.25,
             }
-        })
-    }, [reviews])
+        )
+
+        if (sectionRef.current) {
+            observer.observe(sectionRef.current)
+        }
+
+        window.addEventListener('resize', updateSwiper)
+
+        return () => {
+            cancelAnimationFrame(frameId)
+            observer.disconnect()
+            window.removeEventListener('resize', updateSwiper)
+        }
+    }, [reviews.length])
 
     if (!reviews.length) return null
 
     return (
-        <section className="reviews">
+        <section className="reviews" ref={sectionRef}>
             <div className="container">
                 <div className="reviews-inner">
                     <h2>Отзывы наших клиентов</h2>
@@ -47,12 +83,37 @@ export default function Reviews() {
                         onSwiper={(swiper) => {
                             swiperRef.current = swiper
                         }}
-                        navigation={{
-                            prevEl: '.reviews-btn-prev',
-                            nextEl: '.reviews-btn-next',
+                        onInit={(swiper) => {
+                            swiperRef.current = swiper
+
+                            requestAnimationFrame(() => {
+                                if (!swiper || swiper.destroyed) return
+
+                                if (prevRef.current && nextRef.current) {
+                                    swiper.params.navigation.prevEl = prevRef.current
+                                    swiper.params.navigation.nextEl = nextRef.current
+
+                                    swiper.navigation.destroy()
+                                    swiper.navigation.init()
+                                    swiper.navigation.update()
+                                }
+
+                                swiper.update()
+                                swiper.slideTo(getStartIndex(), 0, false)
+                            })
                         }}
-                        loop={reviews.length > 2}
+                        navigation={{
+                            prevEl: prevRef.current,
+                            nextEl: nextRef.current,
+                        }}
+                        observer={true}
+                        observeParents={true}
+                        resizeObserver={true}
+                        watchOverflow={true}
+                        loop={false}
+                        rewind={reviews.length > 2}
                         speed={600}
+                        initialSlide={getStartIndex()}
                         breakpoints={{
                             0: {
                                 slidesPerView: 1,
@@ -97,11 +158,11 @@ export default function Reviews() {
 
                     {reviews.length > 1 && (
                         <div className="reviews-nav">
-                            <button className="reviews-btn reviews-btn-prev" type="button">
+                            <button ref={prevRef} className="reviews-btn reviews-btn-prev" type="button">
                                 <img src={arrowSwiper} alt="Назад" />
                             </button>
 
-                            <button className="reviews-btn reviews-btn-next" type="button">
+                            <button ref={nextRef} className="reviews-btn reviews-btn-next" type="button">
                                 <img src={arrowSwiper} alt="Вперёд" />
                             </button>
                         </div>

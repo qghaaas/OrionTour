@@ -21,6 +21,7 @@
     margin-bottom: clamp(18px, 3vw, 30px);
 }
 
+
 .reviews-slide {
     width: clamp(300px, 54vw, 760px) !important;
     height: auto !important;

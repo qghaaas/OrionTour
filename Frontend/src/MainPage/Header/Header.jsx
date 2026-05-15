@@ -2,28 +2,69 @@ import '../../main.css'
 import './Header.css'
 import logo from '../../mainIMG/logo.svg'
 import { Link } from 'react-router-dom'
-import { useEffect, useState } from "react"
+import { useEffect, useState } from 'react'
 import AuthModal from '../../User/Auth/AuthModal'
 
+const API_URL = 'http://localhost:3010'
 
+function getAvatarSrc(avatarUrl) {
+    if (!avatarUrl) return ''
+
+    if (avatarUrl.startsWith('http')) {
+        return avatarUrl
+    }
+
+    return `${API_URL}${avatarUrl}`
+}
+
+function getUserInitial(user) {
+    const name = user?.full_name?.trim()
+    const email = user?.email?.trim()
+
+    if (name) {
+        return name[0].toUpperCase()
+    }
+
+    if (email) {
+        return email[0].toUpperCase()
+    }
+
+    return 'U'
+}
 
 export default function Header() {
     const [isAuthOpen, setIsAuthOpen] = useState(false)
-    const [isAuth, setIsAuth] = useState(false)
+    const [user, setUser] = useState(null)
     const [isMenuOpen, setIsMenuOpen] = useState(false)
+
+    const isAuth = Boolean(user)
 
     useEffect(() => {
         const checkAuth = () => {
-            const savedUser = localStorage.getItem("user")
-            setIsAuth(!!savedUser)
+            const savedUser = localStorage.getItem('user')
+
+            if (!savedUser) {
+                setUser(null)
+                return
+            }
+
+            try {
+                setUser(JSON.parse(savedUser))
+            } catch (error) {
+                console.error('Ошибка чтения пользователя из localStorage:', error)
+                localStorage.removeItem('user')
+                setUser(null)
+            }
         }
 
         checkAuth()
 
-        window.addEventListener("authChanged", checkAuth)
+        window.addEventListener('authChanged', checkAuth)
+        window.addEventListener('storage', checkAuth)
 
         return () => {
-            window.removeEventListener("authChanged", checkAuth)
+            window.removeEventListener('authChanged', checkAuth)
+            window.removeEventListener('storage', checkAuth)
         }
     }, [])
 
@@ -35,25 +76,25 @@ export default function Header() {
         }
 
         const handleEscape = (event) => {
-            if (event.key === "Escape") {
+            if (event.key === 'Escape') {
                 setIsMenuOpen(false)
             }
         }
 
-        window.addEventListener("resize", handleResize)
-        window.addEventListener("keydown", handleEscape)
+        window.addEventListener('resize', handleResize)
+        window.addEventListener('keydown', handleEscape)
 
         return () => {
-            window.removeEventListener("resize", handleResize)
-            window.removeEventListener("keydown", handleEscape)
+            window.removeEventListener('resize', handleResize)
+            window.removeEventListener('keydown', handleEscape)
         }
     }, [])
 
     useEffect(() => {
-        document.body.style.overflow = isMenuOpen ? "hidden" : ""
+        document.body.style.overflow = isMenuOpen ? 'hidden' : ''
 
         return () => {
-            document.body.style.overflow = ""
+            document.body.style.overflow = ''
         }
     }, [isMenuOpen])
 
@@ -66,6 +107,10 @@ export default function Header() {
         setIsAuthOpen(true)
     }
 
+    const userName = user?.full_name?.trim() || 'Новый пользователь'
+    const userEmail = user?.email || 'email не указан'
+    const avatarSrc = getAvatarSrc(user?.avatar_url)
+
     return (
         <>
             <header className="site-header">
@@ -77,7 +122,7 @@ export default function Header() {
 
                         <nav
                             id="header-nav"
-                            className={`header-nav ${isMenuOpen ? "is-open" : ""}`}
+                            className={`header-nav ${isMenuOpen ? 'is-open' : ''}`}
                         >
                             <ul className="header-menu">
                                 <li><Link to="/Directions" onClick={closeMenu}>Направления</Link></li>
@@ -92,14 +137,39 @@ export default function Header() {
 
                         <div className="header-auth">
                             {isAuth ? (
-                                <Link className="login-link main-btn_site" to="/account">
-                                    Личный кабинет
-                                </Link>
+                                <div className="header-profile">
+                                    <Link
+                                        className="header-profile-avatar"
+                                        to="/account"
+                                        onClick={closeMenu}
+                                        aria-label="Открыть личный кабинет"
+                                    >
+                                        {avatarSrc ? (
+                                            <img src={avatarSrc} alt="Аватар пользователя" />
+                                        ) : (
+                                            <span>{getUserInitial(user)}</span>
+                                        )}
+                                    </Link>
+
+                                    <div className="header-profile-tooltip">
+                                        <p className="header-profile-service">
+                                            Аккаунт Орион Тур
+                                        </p>
+
+                                        <p className="header-profile-name">
+                                            {userName}
+                                        </p>
+
+                                        <p className="header-profile-email">
+                                            {userEmail}
+                                        </p>
+                                    </div>
+                                </div>
                             ) : (
                                 <button
                                     className="login-link main-btn_site"
                                     type="button"
-                                    onClick={() => setIsAuthOpen(true)}
+                                    onClick={openAuth}
                                 >
                                     Войти
                                 </button>
@@ -107,12 +177,12 @@ export default function Header() {
                         </div>
 
                         <button
-                            className={`burger-btn ${isMenuOpen ? "is-active" : ""}`}
+                            className={`burger-btn ${isMenuOpen ? 'is-active' : ''}`}
                             type="button"
-                            aria-label={isMenuOpen ? "Закрыть меню" : "Открыть меню"}
+                            aria-label={isMenuOpen ? 'Закрыть меню' : 'Открыть меню'}
                             aria-expanded={isMenuOpen}
                             aria-controls="header-nav"
-                            onClick={() => setIsMenuOpen(prev => !prev)}
+                            onClick={() => setIsMenuOpen((prev) => !prev)}
                         >
                             <span></span>
                             <span></span>

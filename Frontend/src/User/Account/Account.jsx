@@ -4,11 +4,11 @@ import order from './img/order.svg';
 import favorites from './img/favorites.svg';
 import star from './img/star.svg';
 import wrench from './img/wrench.svg';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import OrdersContent from './Components/OrdersContent/OrdersContent';
 import FavoritesContent from './Components/FavoritesContent';
 
-
+const API_URL = 'http://localhost:3010';
 
 const AVATAR_OPTIONS = [
     {
@@ -33,23 +33,86 @@ const AVATAR_OPTIONS = [
     }
 ];
 
-const API_URL = 'http://localhost:3010';
+function getStoredUser() {
+    try {
+        return JSON.parse(localStorage.getItem('user'));
+    } catch {
+        localStorage.removeItem('user');
+        return null;
+    }
+}
 
 function getAvatarSrc(avatarUrl) {
     if (!avatarUrl) return '';
 
-    if (avatarUrl.startsWith('http')) {
-        return avatarUrl;
+    return avatarUrl.startsWith('http')
+        ? avatarUrl
+        : `${API_URL}${avatarUrl}`;
+}
+
+async function fetchJson(url, options = {}, fallbackMessage = 'Ошибка запроса') {
+    const response = await fetch(url, options);
+    const data = await response.json().catch(() => ({}));
+
+    if (!response.ok) {
+        throw new Error(data.message || fallbackMessage);
     }
 
-    return `${API_URL}${avatarUrl}`;
+    return data;
+}
+
+function RatingStars({ value, onChange }) {
+    const [hoveredRating, setHoveredRating] = useState(0);
+
+    const isInteractive = typeof onChange === 'function';
+    const currentRating = Number(hoveredRating || value) || 0;
+
+    return (
+        <div
+            className={
+                isInteractive
+                    ? 'account-rating-stars account-rating-stars-interactive'
+                    : 'account-rating-stars'
+            }
+            onMouseLeave={isInteractive ? () => setHoveredRating(0) : undefined}
+        >
+            {[1, 2, 3, 4, 5].map((starValue) => {
+                const isActive = starValue <= currentRating;
+
+                if (!isInteractive) {
+                    return (
+                        <span
+                            key={starValue}
+                            className={`account-rating-star ${isActive ? 'active' : ''}`}
+                        >
+                            <img src={star} alt="" />
+                        </span>
+                    );
+                }
+
+                return (
+                    <button
+                        key={starValue}
+                        type="button"
+                        className={`account-rating-star ${isActive ? 'active' : ''}`}
+                        onMouseEnter={() => setHoveredRating(starValue)}
+                        onFocus={() => setHoveredRating(starValue)}
+                        onClick={() => onChange(starValue)}
+                        aria-label={`Поставить оценку ${starValue} из 5`}
+                    >
+                        <img src={star} alt="" />
+                    </button>
+                );
+            })}
+        </div>
+    );
 }
 
 export default function Account() {
     const [active, setActive] = useState('orders');
     const [ordersTab, setOrdersTab] = useState('active');
 
-    const user = JSON.parse(localStorage.getItem('user'));
+    const [user, setUser] = useState(getStoredUser);
 
     const [profileName, setProfileName] = useState(user?.full_name || '');
     const [profileAvatar, setProfileAvatar] = useState(user?.avatar_url || '');
@@ -67,25 +130,18 @@ export default function Account() {
     const [isReviewsLoading, setIsReviewsLoading] = useState(false);
     const [isReviewSubmitting, setIsReviewSubmitting] = useState(false);
 
-    const handleLogout = () => {
-        localStorage.removeItem('user');
-        window.dispatchEvent(new Event('authChanged'));
-        window.location.href = '/';
-    };
-
-    const loadReviews = async () => {
+    const loadReviews = useCallback(async () => {
         if (!user?.id) return;
 
         try {
             setIsReviewsLoading(true);
             setReviewMessage('');
 
-            const response = await fetch(`${API_URL}/api/users/${user.id}/reviews`);
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Ошибка загрузки отзывов');
-            }
+            const data = await fetchJson(
+                `${API_URL}/api/users/${user.id}/reviews`,
+                {},
+                'Ошибка загрузки отзывов'
+            );
 
             setReviews(data);
         } catch (error) {
@@ -93,7 +149,7 @@ export default function Account() {
         } finally {
             setIsReviewsLoading(false);
         }
-    };
+    }, [user?.id]);
 
     useEffect(() => {
         if (active === 'reviews') {
@@ -105,63 +161,62 @@ export default function Account() {
             setSelectedAvatar(profileAvatar);
             setSettingsMessage('');
         }
-    }, [active, user?.id]);
+    }, [active, loadReviews, profileName, profileAvatar]);
+
+    const handleLogout = () => {
+        localStorage.removeItem('user');
+        window.dispatchEvent(new Event('authChanged'));
+        window.location.href = '/';
+    };
+
+    const validateReview = () => {
+        const name = authorName.trim();
+        const text = reviewText.trim();
+
+        if (!user?.id) return 'Необходимо войти в аккаунт';
+        if (!name) return 'Введите имя';
+        if (name.length < 2) return 'Имя должно содержать минимум 2 символа';
+        if (!text) return 'Введите текст отзыва';
+        if (text.length < 10) return 'Отзыв должен содержать минимум 10 символов';
+
+        return '';
+    };
 
     const handleReviewSubmit = async (event) => {
         event.preventDefault();
-        setReviewMessage('');
 
-        if (!user?.id) {
-            setReviewMessage('Необходимо войти в аккаунт');
-            return;
-        }
+        const validationMessage = validateReview();
 
-        if (!authorName.trim()) {
-            setReviewMessage('Введите имя');
-            return;
-        }
-
-        if (authorName.trim().length < 2) {
-            setReviewMessage('Имя должно содержать минимум 2 символа');
-            return;
-        }
-
-        if (!reviewText.trim()) {
-            setReviewMessage('Введите текст отзыва');
-            return;
-        }
-
-        if (reviewText.trim().length < 10) {
-            setReviewMessage('Отзыв должен содержать минимум 10 символов');
+        if (validationMessage) {
+            setReviewMessage(validationMessage);
             return;
         }
 
         try {
             setIsReviewSubmitting(true);
+            setReviewMessage('');
 
-            const response = await fetch(`${API_URL}/api/reviews`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+            await fetchJson(
+                `${API_URL}/api/reviews`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        user_id: user.id,
+                        author_name: authorName.trim(),
+                        rating,
+                        review_text: reviewText.trim()
+                    })
                 },
-                body: JSON.stringify({
-                    user_id: user.id,
-                    author_name: authorName.trim(),
-                    rating,
-                    review_text: reviewText.trim()
-                })
-            });
+                'Ошибка отправки отзыва'
+            );
 
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Ошибка отправки отзыва');
-            }
-
-            setReviewMessage('Отзыв отправлен на модерацию');
             setAuthorName('');
-            setReviewText('');
             setRating(5);
+            setReviewText('');
+            setReviewMessage('Отзыв отправлен на модерацию');
 
             await loadReviews();
         } catch (error) {
@@ -173,40 +228,41 @@ export default function Account() {
 
     const handleProfileSubmit = async (event) => {
         event.preventDefault();
-        setSettingsMessage('');
+
+        const trimmedName = settingsName.trim();
 
         if (!user?.id) {
             setSettingsMessage('Необходимо войти в аккаунт');
             return;
         }
 
-        if (settingsName.trim() && settingsName.trim().length < 2) {
+        if (trimmedName && trimmedName.length < 2) {
             setSettingsMessage('Никнейм должен содержать минимум 2 символа');
             return;
         }
 
         try {
             setIsSettingsSubmitting(true);
+            setSettingsMessage('');
 
-            const response = await fetch(`${API_URL}/api/users/${user.id}/profile`, {
-                method: 'PATCH',
-                headers: {
-                    'Content-Type': 'application/json'
+            const data = await fetchJson(
+                `${API_URL}/api/users/${user.id}/profile`,
+                {
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        full_name: trimmedName,
+                        avatar_url: selectedAvatar
+                    })
                 },
-                body: JSON.stringify({
-                    full_name: settingsName.trim(),
-                    avatar_url: selectedAvatar
-                })
-            });
-
-            const data = await response.json();
-
-            if (!response.ok) {
-                throw new Error(data.message || 'Ошибка сохранения профиля');
-            }
+                'Ошибка сохранения профиля'
+            );
 
             localStorage.setItem('user', JSON.stringify(data.user));
 
+            setUser(data.user);
             setProfileName(data.user.full_name || '');
             setProfileAvatar(data.user.avatar_url || '');
             setSettingsMessage('Профиль сохранён');
@@ -219,184 +275,187 @@ export default function Account() {
         }
     };
 
-    const renderReviewsContent = () => {
-        return (
-            <div className="account-reviews">
-                <h2>Мои отзывы</h2>
+    const openOrdersTab = (tab) => {
+        setActive('orders');
+        setOrdersTab(tab);
+    };
 
-                <form className="account-review-form" onSubmit={handleReviewSubmit}>
-                    <label>
-                        Ваше имя
-                        <input
-                            type="text"
-                            value={authorName}
-                            onChange={(event) => setAuthorName(event.target.value)}
-                            placeholder="Введите имя"
-                        />
-                    </label>
+    const renderReviewsContent = () => (
+        <div className="account-reviews">
+            <h2>Мои отзывы</h2>
 
-                    <label>
-                        Оценка
-                        <select
-                            value={rating}
-                            onChange={(event) => setRating(Number(event.target.value))}
-                        >
-                            <option value={5}>5 звёзд</option>
-                            <option value={4}>4 звезды</option>
-                            <option value={3}>3 звезды</option>
-                            <option value={2}>2 звезды</option>
-                            <option value={1}>1 звезда</option>
-                        </select>
-                    </label>
+            <form className="account-review-form" onSubmit={handleReviewSubmit}>
+                <label>
+                    Ваше имя
+                    <input
+                        type="text"
+                        value={authorName}
+                        onChange={(event) => setAuthorName(event.target.value)}
+                        placeholder="Введите имя"
+                    />
+                </label>
 
-                    <label>
-                        Текст отзыва
-                        <textarea
-                            value={reviewText}
-                            onChange={(event) => setReviewText(event.target.value)}
-                            placeholder="Расскажите о вашем опыте"
-                            rows={5}
-                        />
-                    </label>
+                <label>
+                    Оценка
+                    <RatingStars value={rating} onChange={setRating} />
+                </label>
 
-                    <button
-                        type="submit"
-                        className="main-btn_site"
-                        disabled={isReviewSubmitting}
-                    >
-                        {isReviewSubmitting ? 'Отправка...' : 'Отправить отзыв'}
-                    </button>
-                </form>
+                <label>
+                    Текст отзыва
+                    <textarea
+                        value={reviewText}
+                        onChange={(event) => setReviewText(event.target.value)}
+                        placeholder="Расскажите о вашем опыте"
+                        rows={5}
+                    />
+                </label>
 
-                {reviewMessage && (
-                    <p className="account-review-message">
-                        {reviewMessage}
+                <button
+                    type="submit"
+                    className="main-btn_site"
+                    disabled={isReviewSubmitting}
+                >
+                    {isReviewSubmitting ? 'Отправка...' : 'Отправить отзыв'}
+                </button>
+            </form>
+
+            {reviewMessage && (
+                <p className="account-review-message">
+                    {reviewMessage}
+                </p>
+            )}
+
+            <div className="account-review-list">
+                <h3>История отзывов</h3>
+
+                {isReviewsLoading && (
+                    <p>Загрузка...</p>
+                )}
+
+                {!isReviewsLoading && reviews.length === 0 && (
+                    <p>Вы ещё не оставляли отзывы.</p>
+                )}
+
+                {!isReviewsLoading && reviews.map((review) => (
+                    <div className="account-review-card" key={review.id}>
+                        <div className="account-review-card-top">
+                            <div className="account-review-card-rating">
+                                <RatingStars value={Number(review.rating)} />
+                            </div>
+
+                            <span
+                                className={
+                                    review.is_active
+                                        ? 'review-status active'
+                                        : 'review-status pending'
+                                }
+                            >
+                                {review.is_active ? 'Опубликован' : 'На модерации'}
+                            </span>
+                        </div>
+
+                        <p className="account-review-author">
+                            {review.author_name}
+                        </p>
+
+                        <p>{review.review_text}</p>
+
+                        <small>
+                            {new Date(review.created_at).toLocaleString('ru-RU')}
+                        </small>
+                    </div>
+                ))}
+            </div>
+        </div>
+    );
+
+    const renderSettingsContent = () => (
+        <div className="account-settings">
+            <h2>Настройки профиля</h2>
+
+            <form className="account-settings-form" onSubmit={handleProfileSubmit}>
+                <label>
+                    Никнейм
+                    <input
+                        type="text"
+                        value={settingsName}
+                        onChange={(event) => setSettingsName(event.target.value)}
+                        placeholder="Введите никнейм"
+                        maxLength={50}
+                    />
+                </label>
+
+                <div className="account-avatar-settings">
+                    <p>Выберите аватар</p>
+
+                    <div className="account-avatar-list">
+                        {AVATAR_OPTIONS.map((avatar) => (
+                            <button
+                                type="button"
+                                key={avatar.value}
+                                className={
+                                    selectedAvatar === avatar.value
+                                        ? 'account-avatar-option active'
+                                        : 'account-avatar-option'
+                                }
+                                onClick={() => setSelectedAvatar(avatar.value)}
+                            >
+                                <img
+                                    src={getAvatarSrc(avatar.value)}
+                                    alt={avatar.label}
+                                />
+                            </button>
+                        ))}
+                    </div>
+                </div>
+
+                {settingsMessage && (
+                    <p className="account-settings-message">
+                        {settingsMessage}
                     </p>
                 )}
 
-                <div className="account-review-list">
-                    <h3>История отзывов</h3>
-
-                    {isReviewsLoading && (
-                        <p>Загрузка...</p>
-                    )}
-
-                    {!isReviewsLoading && reviews.length === 0 && (
-                        <p>Вы ещё не оставляли отзывы.</p>
-                    )}
-
-                    {!isReviewsLoading && reviews.map((review) => (
-                        <div className="account-review-card" key={review.id}>
-                            <div className="account-review-card-top">
-                                <strong>
-                                    Оценка: {review.rating}/5
-                                </strong>
-
-                                <span
-                                    className={
-                                        review.is_active
-                                            ? 'review-status active'
-                                            : 'review-status pending'
-                                    }
-                                >
-                                    {review.is_active ? 'Опубликован' : 'На модерации'}
-                                </span>
-                            </div>
-
-                            <p className="account-review-author">
-                                {review.author_name}
-                            </p>
-
-                            <p>{review.review_text}</p>
-
-                            <small>
-                                {new Date(review.created_at).toLocaleString('ru-RU')}
-                            </small>
-                        </div>
-                    ))}
-                </div>
-            </div>
-        );
-    };
-
-    const renderSettingsContent = () => {
-        return (
-            <div className="account-settings">
-                <h2>Настройки профиля</h2>
-
-                <form className="account-settings-form" onSubmit={handleProfileSubmit}>
-                    <label>
-                        Никнейм
-                        <input
-                            type="text"
-                            value={settingsName}
-                            onChange={(event) => setSettingsName(event.target.value)}
-                            placeholder="Введите никнейм"
-                            maxLength={50}
-                        />
-                    </label>
-
-                    <div className="account-avatar-settings">
-                        <p>Выберите аватар</p>
-
-                        <div className="account-avatar-list">
-                            {AVATAR_OPTIONS.map((avatar) => (
-                                <button
-                                    type="button"
-                                    key={avatar.value}
-                                    className={
-                                        selectedAvatar === avatar.value
-                                            ? 'account-avatar-option active'
-                                            : 'account-avatar-option'
-                                    }
-                                    onClick={() => setSelectedAvatar(avatar.value)}
-                                >
-                                    <img
-                                        src={getAvatarSrc(avatar.value)}
-                                        alt={avatar.label}
-                                    />
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-
-                    {settingsMessage && (
-                        <p className="account-settings-message">
-                            {settingsMessage}
-                        </p>
-                    )}
-
-                    <button
-                        type="submit"
-                        className="main-btn_site"
-                        disabled={isSettingsSubmitting}
-                    >
-                        {isSettingsSubmitting ? 'Сохранение...' : 'Сохранить'}
-                    </button>
-                </form>
-            </div>
-        );
-    };
+                <button
+                    type="submit"
+                    className="main-btn_site"
+                    disabled={isSettingsSubmitting}
+                >
+                    {isSettingsSubmitting ? 'Сохранение...' : 'Сохранить'}
+                </button>
+            </form>
+        </div>
+    );
 
     const renderContent = () => {
-        if (active === 'orders') {
-            return <OrdersContent ordersTab={ordersTab} />;
-        }
+        switch (active) {
+            case 'orders':
+                return <OrdersContent ordersTab={ordersTab} />;
 
-        if (active === 'favorites') {
-            return <FavoritesContent />;
-        }
+            case 'favorites':
+                return <FavoritesContent />;
 
-        if (active === 'reviews') {
-            return renderReviewsContent();
-        }
+            case 'reviews':
+                return renderReviewsContent();
 
-        if (active === 'settings') {
-            return renderSettingsContent();
-        }
+            case 'settings':
+                return renderSettingsContent();
 
-        return <OrdersContent ordersTab={ordersTab} />;
+            default:
+                return <OrdersContent ordersTab={ordersTab} />;
+        }
     };
+
+    if (!user) {
+        return (
+            <section className="account">
+                <h1 className="name-title_page">Личный кабинет</h1>
+
+                <div className="account-empty">
+                    <p>Необходимо войти в аккаунт.</p>
+                </div>
+            </section>
+        );
+    }
 
     return (
         <section className="account">
@@ -415,7 +474,7 @@ export default function Account() {
                         </div>
 
                         <p>{profileName || 'Новый пользователь'}</p>
-                        <span>{user?.email || 'email не указан'}</span>
+                        <span>{user.email || 'email не указан'}</span>
                     </div>
 
                     <ul className="aside_select-list">
@@ -425,10 +484,7 @@ export default function Account() {
 
                                 <button
                                     type="button"
-                                    onClick={() => {
-                                        setActive('orders');
-                                        setOrdersTab('active');
-                                    }}
+                                    onClick={() => openOrdersTab('active')}
                                 >
                                     Заказы
                                 </button>
@@ -439,10 +495,7 @@ export default function Account() {
                                     <button
                                         type="button"
                                         className={ordersTab === 'active' ? 'active-nested' : ''}
-                                        onClick={() => {
-                                            setActive('orders');
-                                            setOrdersTab('active');
-                                        }}
+                                        onClick={() => openOrdersTab('active')}
                                     >
                                         Активные
                                     </button>
@@ -452,10 +505,7 @@ export default function Account() {
                                     <button
                                         type="button"
                                         className={ordersTab === 'inactive' ? 'active-nested' : ''}
-                                        onClick={() => {
-                                            setActive('orders');
-                                            setOrdersTab('inactive');
-                                        }}
+                                        onClick={() => openOrdersTab('inactive')}
                                     >
                                         Неактивные
                                     </button>
