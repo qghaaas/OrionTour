@@ -131,10 +131,15 @@ export default function VerifyCodeForm({
         return;
       }
 
+      if (!data.user || !data.token) {
+        setError("Сервер не вернул данные авторизации. Попробуйте войти позже.");
+        return;
+      }
+
       setSuccess(data.message || "Регистрация завершена.");
 
       setTimeout(() => {
-        onSuccess?.();
+        onSuccess?.(data);
       }, 700);
     } catch {
       setError(NETWORK_ERROR_MESSAGE);

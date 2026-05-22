@@ -136,6 +136,7 @@ textarea::placeholder {
 }
 
 .contact-form_button {
+    width: 300px;
     font-family: "Arimo", sans-serif;
     padding: 18px;
 }

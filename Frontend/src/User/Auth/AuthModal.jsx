@@ -45,9 +45,21 @@ export default function AuthModal({ isOpen, onClose }) {
     onClose();
   };
 
-  const handleLoginSuccess = (user) => {
-    localStorage.setItem("user", JSON.stringify(user));
+  const saveAuthData = (authData) => {
+    if (!authData?.user || !authData?.token) return;
+
+    localStorage.setItem("user", JSON.stringify(authData.user));
+    localStorage.setItem("authToken", authData.token);
     window.dispatchEvent(new Event("authChanged"));
+  };
+
+  const handleLoginSuccess = (authData) => {
+    saveAuthData(authData);
+    setStep("success");
+  };
+
+  const handleRegistrationSuccess = (authData) => {
+    saveAuthData(authData);
     setStep("success");
   };
 
@@ -86,7 +98,7 @@ export default function AuthModal({ isOpen, onClose }) {
               email={registrationData.email}
               password={registrationData.password}
               onBack={() => setStep("register")}
-              onSuccess={() => setStep("success")}
+              onSuccess={handleRegistrationSuccess}
             />
           )}
 

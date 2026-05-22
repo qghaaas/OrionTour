@@ -33,11 +33,34 @@ const AVATAR_OPTIONS = [
     }
 ];
 
+function clearStoredAuth() {
+    localStorage.removeItem('user');
+    localStorage.removeItem('authToken');
+}
+
+function getStoredAuthToken() {
+    return localStorage.getItem('authToken') || '';
+}
+
 function getStoredUser() {
+    const token = getStoredAuthToken();
+
+    if (!token) {
+        clearStoredAuth();
+        return null;
+    }
+
     try {
-        return JSON.parse(localStorage.getItem('user'));
+        const user = JSON.parse(localStorage.getItem('user'));
+
+        if (!user?.id) {
+            clearStoredAuth();
+            return null;
+        }
+
+        return user;
     } catch {
-        localStorage.removeItem('user');
+        clearStoredAuth();
         return null;
     }
 }
@@ -51,10 +74,27 @@ function getAvatarSrc(avatarUrl) {
 }
 
 async function fetchJson(url, options = {}, fallbackMessage = 'Ошибка запроса') {
-    const response = await fetch(url, options);
+    const token = getStoredAuthToken();
+
+    if (!token) {
+        throw new Error('Необходимо войти в аккаунт');
+    }
+
+    const response = await fetch(url, {
+        ...options,
+        headers: {
+            ...(options.headers || {}),
+            Authorization: `Bearer ${token}`
+        }
+    });
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok) {
+        if (response.status === 401 || response.status === 403) {
+            clearStoredAuth();
+            window.dispatchEvent(new Event('authChanged'));
+        }
+
         throw new Error(data.message || fallbackMessage);
     }
 
@@ -164,7 +204,7 @@ export default function Account() {
     }, [active, loadReviews, profileName, profileAvatar]);
 
     const handleLogout = () => {
-        localStorage.removeItem('user');
+        clearStoredAuth();
         window.dispatchEvent(new Event('authChanged'));
         window.location.href = '/';
     };
@@ -204,7 +244,6 @@ export default function Account() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        user_id: user.id,
                         author_name: authorName.trim(),
                         rating,
                         review_text: reviewText.trim()

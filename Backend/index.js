@@ -4,6 +4,7 @@ const { Pool } = require('pg');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcrypt');
 const crypto = require('crypto');
+const jwt = require('jsonwebtoken');
 const path = require('path');
 require('dotenv').config();
 
@@ -17,6 +18,8 @@ const CODE_EXPIRES_MINUTES = 10;
 const RESEND_DELAY_SECONDS = 30;
 const MAX_VERIFY_ATTEMPTS = 5;
 const REGISTRATION_ERROR_MESSAGE = 'Проблема с регистрацией. Попробуйте снова.';
+const USER_TOKEN_EXPIRES_SECONDS = Number(process.env.JWT_EXPIRES_SECONDS) || 60 * 60 * 24 * 7;
+const JWT_SECRET = process.env.JWT_SECRET || process.env.ADMIN_TOKEN_SECRET || 'dev_jwt_secret_change_me';
 const ALLOWED_PROFILE_AVATARS = [
   '/uploads/avatars/orion-avatar-blue.png',
   '/uploads/avatars/orion-avatar-green.png',
@@ -71,6 +74,88 @@ function hashCode(code) {
 function isValidEmail(email = '') {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
 }
+
+function createJwtToken(payload, expiresInSeconds = USER_TOKEN_EXPIRES_SECONDS) {
+  return jwt.sign(payload, JWT_SECRET, {
+    algorithm: 'HS256',
+    expiresIn: expiresInSeconds
+  });
+}
+
+function verifyJwtToken(token = '') {
+  try {
+    return jwt.verify(token, JWT_SECRET, {
+      algorithms: ['HS256']
+    });
+  } catch {
+    return null;
+  }
+}
+
+function getPublicUser(user) {
+  return {
+    id: user.id,
+    email: user.email,
+    full_name: user.full_name,
+    avatar_url: user.avatar_url,
+    created_at: user.created_at
+  };
+}
+
+function createUserToken(user) {
+  return createJwtToken({
+    sub: String(user.id),
+    email: user.email,
+    role: 'user'
+  });
+}
+
+function createAuthResponse(user, message) {
+  return {
+    message,
+    token: createUserToken(user),
+    token_type: 'Bearer',
+    expires_in: USER_TOKEN_EXPIRES_SECONDS,
+    user: getPublicUser(user)
+  };
+}
+
+function getBearerToken(req) {
+  const authHeader = req.headers.authorization || '';
+
+  return authHeader.startsWith('Bearer ')
+    ? authHeader.slice(7).trim()
+    : '';
+}
+
+function requireUser(req, res, next) {
+  const token = getBearerToken(req);
+  const payload = verifyJwtToken(token);
+
+  if (!payload || payload.role !== 'user' || !payload.sub) {
+    return res.status(401).json({
+      message: 'Необходимо войти в аккаунт'
+    });
+  }
+
+  req.authUser = {
+    id: String(payload.sub),
+    email: payload.email || ''
+  };
+
+  return next();
+}
+
+function requireUserOwner(req, res, next) {
+  if (String(req.params.userId) !== req.authUser.id) {
+    return res.status(403).json({
+      message: 'Нет доступа к данным другого пользователя'
+    });
+  }
+
+  return next();
+}
+
 const ADMIN_TOKEN_EXPIRES_MS = 1000 * 60 * 60 * 8;
 
 function createAdminToken() {
@@ -378,10 +463,9 @@ app.post('/api/auth/register/verify-code', async (req, res) => {
 
     await client.query('COMMIT');
 
-    return res.status(201).json({
-      message: 'Регистрация успешно завершена',
-      user: newUser.rows[0]
-    });
+    return res.status(201).json(
+      createAuthResponse(newUser.rows[0], 'Регистрация успешно завершена')
+    );
   } catch (error) {
     await client.query('ROLLBACK').catch(() => { });
     console.error(error);
@@ -424,20 +508,41 @@ app.post('/api/auth/login', async (req, res) => {
       return res.status(400).json({ message: 'Неверный пароль' });
     }
 
-    return res.status(200).json({
-      message: 'Вход выполнен успешно',
-      user: {
-        id: user.id,
-        email: user.email,
-        full_name: user.full_name,
-        avatar_url: user.avatar_url,
-        created_at: user.created_at
-      }
-    });
+    return res.status(200).json(
+      createAuthResponse(user, 'Вход выполнен успешно')
+    );
   } catch (error) {
     console.error(error);
     return res.status(500).json({
       message: 'Ошибка сервера при входе'
+    });
+  }
+});
+
+app.get('/api/auth/me', requireUser, async (req, res) => {
+  try {
+    const userResult = await pool.query(
+      `
+      SELECT id, email, full_name, avatar_url, created_at
+      FROM users
+      WHERE id = $1
+      `,
+      [req.authUser.id]
+    );
+
+    if (userResult.rows.length === 0) {
+      return res.status(401).json({
+        message: 'Пользователь больше не существует'
+      });
+    }
+
+    return res.status(200).json({
+      user: getPublicUser(userResult.rows[0])
+    });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({
+      message: 'Ошибка проверки авторизации'
     });
   }
 });
@@ -1278,15 +1383,10 @@ app.delete('/api/admin/reviews/:id', requireAdmin, async (req, res) => {
 });
 
 
-app.post('/api/reviews', async (req, res) => {
+app.post('/api/reviews', requireUser, async (req, res) => {
   try {
-    const { user_id, author_name, rating, review_text } = req.body;
-
-    if (!user_id) {
-      return res.status(400).json({
-        message: 'Пользователь не определён'
-      });
-    }
+    const { author_name, rating, review_text } = req.body;
+    const userId = req.authUser.id;
 
     if (!author_name || !author_name.trim()) {
       return res.status(400).json({
@@ -1326,7 +1426,7 @@ app.post('/api/reviews', async (req, res) => {
       FROM users
       WHERE id = $1
       `,
-      [user_id]
+      [userId]
     );
 
     if (userResult.rows.length === 0) {
@@ -1351,7 +1451,7 @@ app.post('/api/reviews', async (req, res) => {
         author_name.trim(),
         numericRating,
         review_text.trim(),
-        user_id
+        userId
       ]
     );
 
@@ -1367,7 +1467,7 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
-app.get('/api/users/:userId/reviews', async (req, res) => {
+app.get('/api/users/:userId/reviews', requireUser, requireUserOwner, async (req, res) => {
   try {
     const { userId } = req.params;
 
@@ -1397,7 +1497,7 @@ app.get('/api/users/:userId/reviews', async (req, res) => {
 });
 
 
-app.patch('/api/users/:userId/profile', async (req, res) => {
+app.patch('/api/users/:userId/profile', requireUser, requireUserOwner, async (req, res) => {
   try {
     const { userId } = req.params;
     const { full_name = '', avatar_url = '' } = req.body;

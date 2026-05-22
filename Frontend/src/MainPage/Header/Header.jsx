@@ -42,8 +42,11 @@ export default function Header() {
     useEffect(() => {
         const checkAuth = () => {
             const savedUser = localStorage.getItem('user')
+            const savedToken = localStorage.getItem('authToken')
 
-            if (!savedUser) {
+            if (!savedUser || !savedToken) {
+                localStorage.removeItem('user')
+                localStorage.removeItem('authToken')
                 setUser(null)
                 return
             }
@@ -53,6 +56,7 @@ export default function Header() {
             } catch (error) {
                 console.error('Ошибка чтения пользователя из localStorage:', error)
                 localStorage.removeItem('user')
+                localStorage.removeItem('authToken')
                 setUser(null)
             }
         }

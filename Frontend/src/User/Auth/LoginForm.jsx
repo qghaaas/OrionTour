@@ -84,18 +84,15 @@ export default function LoginForm({ onOpenRegistration, onSuccess }) {
         return;
       }
 
-      if (!data.user) {
-        setError("Сервер не вернул данные пользователя. Попробуйте войти позже.");
+      if (!data.user || !data.token) {
+        setError("Сервер не вернул данные авторизации. Попробуйте войти позже.");
         return;
       }
-
-      localStorage.setItem("user", JSON.stringify(data.user));
-      window.dispatchEvent(new Event("authChanged"));
 
       setEmail("");
       setPassword("");
 
-      onSuccess?.(data.user);
+      onSuccess?.(data);
     } catch {
       setError(NETWORK_ERROR_MESSAGE);
     } finally {
