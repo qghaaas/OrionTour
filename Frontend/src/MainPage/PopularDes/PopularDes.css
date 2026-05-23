@@ -1,28 +1,48 @@
 .popdes {
     width: 100%;
     height: fit-content;
-    padding-top: 199px;
-    margin-bottom: 165px;
+    padding-top: clamp(80px, 10.4vw, 199px);
+    margin-bottom: clamp(80px, 8.6vw, 165px);
+    position: relative;
+}
+
+.popdes-inner {
     position: relative;
 }
 
 .popdes-inner h2 {
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: 40px;
-    letter-spacing: 1%;
+    font-size: clamp(30px, 2.1vw, 40px);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
     color: #001827;
     padding-left: 7%;
-    margin-bottom: 71px;
+    margin-bottom: clamp(40px, 3.7vw, 71px);
+}
+
+.pop-swiper {
+    width: 89%;
+    overflow: hidden;
+}
+
+.pop-swiper .swiper-wrapper {
+    align-items: stretch;
+}
+
+.pop-swiper .swiper-slide {
+    display: flex;
+    justify-content: center;
+    height: auto;
 }
 
 .pop-card {
     width: 100%;
-    min-height: 620px;
+    min-height: 625px;
     height: 100%;
     display: flex;
     flex-direction: column;
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
     padding: 14px 14px 19px;
     border-radius: 25px;
     box-sizing: border-box;
@@ -33,6 +53,7 @@
     position: relative;
     border-radius: 15px;
     width: 100%;
+    overflow: hidden;
 }
 
 .pop-card_top img {
@@ -40,20 +61,22 @@
     display: block;
     border-radius: 15px;
     object-fit: cover;
-    height: clamp(220px, 29.8vh, 320px);
+    height: clamp(220px, 14.4vw, 275px);
 }
 
 .pop-card_top span {
     position: absolute;
     background-color: rgba(255, 255, 255, 0.9);
     font-family: "Arimo", sans-serif;
-    font-size: 20px;
-    letter-spacing: 1%;
+    font-size: clamp(17px, 1.05vw, 20px);
+    line-height: 1;
+    letter-spacing: 0.01em;
     padding: 8px 10px;
     border-radius: 25px;
-    bottom: 0;
-    right: 0;
-    margin: 0 21px 13px 0;
+    bottom: 13px;
+    right: 21px;
+    margin: 0;
+    white-space: nowrap;
 }
 
 .pop-card_text {
@@ -61,7 +84,6 @@
     font-family: "Raleway", sans-serif;
     width: 100%;
     box-sizing: border-box;
-
     display: flex;
     flex-direction: column;
     flex: 1;
@@ -73,22 +95,25 @@
 
 .pop-card_title h3 {
     font-weight: 700;
-    font-size: 28px;
-    letter-spacing: 1%;
+    font-size: clamp(24px, 1.45vw, 28px);
+    line-height: 1.15;
+    letter-spacing: 0.01em;
     margin-bottom: 5px;
 }
 
 .pop-card_title span {
     font-weight: 500;
-    font-size: 20px;
-    letter-spacing: 1%;
-    color: #6D6D6D;
+    font-size: clamp(18px, 1.05vw, 20px);
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    color: #6d6d6d;
     margin-bottom: 15px;
 }
 
 .pop-card_title p {
     font-weight: 500;
-    letter-spacing: 1%;
+    font-size: 16px;
+    letter-spacing: 0.01em;
     line-height: 24px;
     display: -webkit-box;
     -webkit-line-clamp: 4;
@@ -103,62 +128,248 @@
 .pop-card_time {
     width: fit-content;
     min-width: 33%;
-    background-color: #DDDDDD;
+    background-color: #dddddd;
     text-align: center;
     border-radius: 25px;
     font-weight: 700;
     font-family: "Arimo", sans-serif;
-    font-size: 20px;
-    letter-spacing: 1%;
+    font-size: clamp(17px, 1.05vw, 20px);
+    line-height: 1;
+    letter-spacing: 0.01em;
     padding: 8px 12px;
     margin-bottom: 15px;
-
     margin-top: auto;
 }
 
-.pop-card button {
+.pop-card_text .main-btn_site {
     width: 100%;
-    height: 58px;
-     flex-shrink: 0;
+    height: 50px;
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.popdes-btn {
+    position: absolute;
+    top: 60%;
+    transform: translateY(-60%);
+    z-index: 10;
+    width: clamp(52px, 3.65vw, 70px);
+    height: clamp(52px, 3.65vw, 70px);
+    padding: 0;
+    border: none;
+    background: transparent;
+    cursor: pointer;
+}
+
+.popdes-btn img {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.popdes-prev {
+    left: 1%;
+}
+
+.popdes-next {
+    right: 1%;
 }
 
 .popdes-next img {
     transform: rotate(180deg);
 }
 
-.pop-swiper {
-    width: 88.4%;
-    overflow: hidden;
+@media (max-width: 1439px) {
+    .pop-swiper {
+        width: calc(100% - 130px);
+    }
+
+    .pop-card {
+        min-height: 600px;
+    }
+
+    .popdes-prev {
+        left: 0;
+    }
+
+    .popdes-next {
+        right: 0;
+    }
 }
 
-.pop-swiper .swiper-wrapper {
-    align-items: stretch;
+@media (max-width: 1199px) {
+    .pop-swiper {
+        width: calc(100% - 110px);
+    }
+
+    .pop-card {
+        min-height: 585px;
+    }
+
+    .pop-card_top img {
+        height: 245px;
+    }
+
+    .pop-card_title h3 {
+        font-size: 25px;
+    }
 }
 
-.pop-swiper .swiper-slide {
-    display: flex;
-    justify-content: center;
-    height: auto;
+@media (max-width: 991px) {
+    .popdes .container {
+        width: min(100% - 30px, 1530px);
+    }
+
+    .popdes-inner h2 {
+        padding-left: 0;
+        text-align: center;
+    }
+
+    .pop-card {
+        min-height: 565px;
+    }
+
+    .pop-card_top img {
+        height: 230px;
+    }
+
+    .pop-card_title h3 {
+        font-size: 24px;
+    }
+
+    .pop-card_title span {
+        font-size: 18px;
+    }
+
+    
 }
 
-.popdes-btn {
-    position: absolute;
-    top: 60%;
-    transform: translateY(-50%);
-    z-index: 10;
+@media (max-width: 767px) {
+    .popdes {
+        padding-top: 70px;
+        margin-bottom: 90px;
+    }
+
+    .pop-swiper {
+        width: 100%;
+        padding-bottom: 80px;
+    }
+
+    .pop-card {
+        max-width: 405px;
+        min-height: 590px;
+        margin: 0 auto;
+    }
+
+    .pop-card_top img {
+        height: 245px;
+    }
+
+    .popdes-btn {
+        width: 58px;
+        height: 58px;
+    }
+
+    .popdes-prev {
+        left: calc(20% - 72px);
+    }
+
+    .popdes-next {
+        right: calc(20% - 72px);
+    }
 }
 
-.popdes-prev {
-    left: 4.5%;
+@media (max-width: 480px) {
+    .popdes {
+        padding-top: 55px;
+        margin-bottom: 70px;
+    }
+
+    .popdes .container {
+        width: min(100% - 20px, 1530px);
+    }
+
+    .popdes-inner h2 {
+        font-size: 28px;
+        margin-bottom: 32px;
+    }
+
+    .pop-card {
+        max-width: 100%;
+        min-height: 560px;
+        padding: 12px 12px 17px;
+        border-radius: 22px;
+    }
+
+    .pop-card_top {
+        margin-bottom: 18px;
+    }
+
+    .pop-card_top img {
+        height: 220px;
+    }
+
+    .pop-card_top span {
+        right: 14px;
+        bottom: 12px;
+        font-size: 16px;
+    }
+
+    .pop-card_text {
+        padding: 0 8px;
+    }
+
+    .pop-card_title h3 {
+        font-size: 23px;
+    }
+
+    .pop-card_title span {
+        font-size: 17px;
+    }
+
+    .pop-card_title p {
+        font-size: 15px;
+        line-height: 22px;
+        -webkit-line-clamp: 4;
+    }
+
+    .pop-card_time {
+        font-size: 17px;
+        min-width: 105px;
+    }
 }
 
-.popdes-next {
-    right: 4.5%;
-}
+@media (max-width: 375px) {
+    .popdes-inner h2 {
+        font-size: 25px;
+    }
 
-.pop-card_text .main-btn_site {
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    .pop-card {
+        min-height: 540px;
+    }
+
+    .pop-card_top img {
+        height: 195px;
+    }
+
+    .pop-card_title h3 {
+        font-size: 21px;
+    }
+
+    .pop-card_title span {
+        font-size: 16px;
+    }
+
+    .pop-card_title p {
+        font-size: 14px;
+        line-height: 21px;
+    }
+
+    .pop-card_text .main-btn_site {
+        height: 48px;
+        min-height: 48px;
+    }
 }

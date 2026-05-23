@@ -1,16 +1,18 @@
 .about-us {
     width: 100%;
-    height: fit-content;
-}
-
-.about-us {
     font-family: "Arimo", sans-serif;
     font-size: 20px;
+    color: #202020;
 }
 
 .about-us_inner {
-    padding: 64px 0;
     width: 50%;
+    padding: 64px 0;
+}
+
+.about-us_inner p {
+    line-height: 1.35;
+    overflow-wrap: break-word;
 }
 
 .about-us_inner p:not(:last-child) {
@@ -20,7 +22,7 @@
 .details {
     margin: 0 auto;
     padding: 42px 9% 11%;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
 }
 
 .details h2 {
@@ -31,15 +33,89 @@
 
 .details-inner {
     display: flex;
-    gap: 0 138px;
+    gap: 80px 138px;
+}
+
+.details-list {
+    max-width: 520px;
 }
 
 .details-list li:not(:last-child) {
     margin-bottom: 28px;
 }
 
+.details-list p {
+    line-height: 1.35;
+    overflow-wrap: break-word;
+}
+
 .footer-aboutus-footer {
     margin: 0;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
     padding-bottom: 2%;
+}
+
+@media (max-width: 1200px) {
+    .about-us_inner {
+        width: 65%;
+    }
+
+    .details-inner {
+        gap: 60px;
+    }
+}
+
+@media (max-width: 900px) {
+    .about-us_inner {
+        width: 80%;
+        padding: 50px 0;
+    }
+
+    .details {
+        padding: 40px 7% 90px;
+    }
+
+    .details-inner {
+        flex-direction: column;
+        gap: 28px;
+    }
+
+    .details h2 {
+        font-size: 32px;
+        margin-bottom: 32px;
+    }
+}
+
+@media (max-width: 600px) {
+    .about-us {
+        font-size: 17px;
+    }
+
+    .about-us_inner {
+        width: 100%;
+        padding: 40px 0;
+    }
+
+    .details {
+        padding: 34px 6% 70px;
+    }
+
+    .details h2 {
+        font-size: 28px;
+        margin-bottom: 28px;
+    }
+
+    .details-list li:not(:last-child) {
+        margin-bottom: 22px;
+    }
+}
+
+@media (max-width: 380px) {
+    .about-us {
+        font-size: 16px;
+    }
+
+    .details h2 {
+        font-size: 26px;
+    }
 }

@@ -339,9 +339,7 @@
 }
 
 @media (max-width: 900px) {
-    .tour-filter .filter-item {
-        grid-template-columns: 1fr;
-    }
+  
 
     .tour-filter .filter-item input,
     .tour-filter .filter-item select.hero-filter-select,

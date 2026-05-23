@@ -6,7 +6,7 @@ import './AboutUs.css'
 export default function AboutUs() {
     return (
         <>
-            <secion className="about-us">
+           <section className="about-us">
                 <h1 className="name-title_page">О нас</h1>
                 <div className="container">
                     <div className='about-us_inner'>
@@ -42,7 +42,7 @@ export default function AboutUs() {
                         </ul>
                     </div>
                 </div>
-            </secion>
+            </section>
         </>
     )
 }

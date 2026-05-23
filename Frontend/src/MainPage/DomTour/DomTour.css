@@ -1,70 +1,88 @@
 .domtour {
     width: 100%;
-    height: fit-content;
-    margin-bottom: 103px;
+    margin-bottom: clamp(60px, 6vw, 103px);
 }
 
 .domtour-inner {
+    width: 85%;
     padding-left: 8%;
-    width: 82%;
 }
 
 .domtour-title {
-    margin-bottom: 35px;
+    margin-bottom: clamp(28px, 2vw, 35px);
     font-family: "Arimo", sans-serif;
     color: #202020;
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .domtour-title h2 {
     font-weight: 700;
-    font-size: 40px;
-    margin-bottom: 36px;
+    font-size: clamp(32px, 2.1vw, 40px);
+    line-height: 1.15;
+    margin-bottom: clamp(20px, 1.9vw, 36px);
 }
 
 .domtour-title p {
-    font-size: 20px;
+    max-width: 980px;
+    font-size: clamp(17px, 1.05vw, 20px);
+    line-height: 1.25;
 }
 
 .domtour-grid {
     display: grid;
-    grid-template-columns: 2.11fr 1fr 1fr 1fr 1fr;
-    grid-template-rows: 111px 180px 130px 114px;
-    gap: 26px;
+    grid-template-columns: minmax(300px, 2.11fr) repeat(4, minmax(0, 1fr));
+    grid-template-rows: repeat(4, clamp(95px, 6vw, 111px));
+    gap: clamp(18px, 1.35vw, 26px);
 }
 
 .domtour-item {
     position: relative;
+    display: block;
     overflow: hidden;
     border-radius: 25px;
-    transition: 1s;
+    text-decoration: none;
+    transition: transform 0.4s ease;
 }
 
 .domtour-item:hover {
-    scale: calc(1.1);
+    transform: scale(1.03);
 }
 
 .domtour-item img {
     width: 100%;
     height: 100%;
+    display: block;
+    object-fit: cover;
 }
 
 .domtour-item p {
     position: absolute;
-    left: 36px;
-    bottom: 30px;
+    left: clamp(22px, 1.9vw, 36px);
+    right: clamp(22px, 1.9vw, 36px);
+    bottom: clamp(22px, 1.6vw, 30px);
     z-index: 2;
+
     color: #fff;
     font-family: "Raleway", sans-serif;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(17px, 1.05vw, 20px);
+    line-height: 1.2;
+
+    white-space: normal;
+    overflow-wrap: break-word;
 }
 
 .domtour-item::after {
-    content: '';
+    content: "";
     position: absolute;
     inset: 0;
-    background: linear-gradient(0deg, rgba(0, 0, 0, 0.45) 21.12%, rgba(0, 0, 0, 0) 39.88%);
+    z-index: 1;
+    background: linear-gradient(
+        0deg,
+        rgba(0, 0, 0, 0.5) 0%,
+        rgba(0, 0, 0, 0.35) 25%,
+        rgba(0, 0, 0, 0) 55%
+    );
 }
 
 .domtour-empty {
@@ -75,18 +93,123 @@
 }
 
 .domcards1 {
-    grid-area: 1 / 1 / 5 / 2;
+    grid-area: 1 / 1 / 6 / 2;
 }
 
 .domcards2 {
-    grid-area: 1 / 2 / 3 / 4;
+    grid-area: 1 / 2 / 4 / 4;
 }
 
 .domcards3 {
-    grid-area: 1 / 4 / 3 / 6;
+    grid-area: 1 / 4 / 4 / 6;
 }
 
 .domcards4 {
-    grid-area: 3 / 2 / 5 / 6;
+    grid-area: 4 / 2 / 6 / 6;
 }
 
+@media (max-width: 1200px) {
+    .domtour-inner {
+        width: 100%;
+        padding-left: 0;
+    }
+
+    .domtour-grid {
+        grid-template-columns: 1.35fr 1fr 1fr 1fr;
+        grid-template-rows: repeat(4, clamp(85px, 8vw, 105px));
+        gap: 20px;
+    }
+
+    .domcards1 {
+        grid-area: 1 / 1 / 5 / 2;
+    }
+
+    .domcards2 {
+        grid-area: 1 / 2 / 3 / 4;
+    }
+
+    .domcards3 {
+        grid-area: 1 / 4 / 3 / 5;
+    }
+
+    .domcards4 {
+        grid-area: 3 / 2 / 5 / 5;
+    }
+}
+
+@media (max-width: 992px) {
+    .domtour-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: 360px 230px 260px;
+    }
+
+    .domcards1 {
+        grid-area: 1 / 1 / 2 / 3;
+    }
+
+    .domcards2 {
+        grid-area: 2 / 1 / 3 / 2;
+    }
+
+    .domcards3 {
+        grid-area: 2 / 2 / 3 / 3;
+    }
+
+    .domcards4 {
+        grid-area: 3 / 1 / 4 / 3;
+    }
+}
+
+@media (max-width: 768px) {
+    .domtour-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: none;
+        gap: 18px;
+    }
+
+    .domcards1,
+    .domcards2,
+    .domcards3,
+    .domcards4 {
+        grid-area: auto;
+    }
+
+    .domtour-item {
+        height: 260px;
+    }
+
+    .domcards1 {
+        height: 360px;
+    }
+
+    .domtour-title p {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 480px) {
+    .domtour-title h2 {
+        font-size: 28px;
+    }
+
+    .domtour-title p {
+        font-size: 16px;
+        line-height: 1.35;
+    }
+
+    .domtour-item {
+        height: 220px;
+        border-radius: 20px;
+    }
+
+    .domcards1 {
+        height: 300px;
+    }
+
+    .domtour-item p {
+        left: 18px;
+        right: 18px;
+        bottom: 18px;
+        font-size: 16px;
+    }
+}

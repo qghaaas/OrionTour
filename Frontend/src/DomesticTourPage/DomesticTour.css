@@ -1,133 +1,225 @@
 .domtour-page {
     width: 100%;
-    height: fit-content;
 }
 
 .domtour-page_inner {
-    padding-top: 130px;
+    padding-top: clamp(60px, 6.8vw, 130px);
     display: grid;
     grid-template-columns: 1fr;
-    gap: 120px 0;
+    gap: clamp(60px, 6.2vw, 120px);
     position: relative;
     z-index: 11;
 }
 
 .domtour-page_card {
     display: flex;
-    gap: 0 60px;
+    align-items: flex-start;
+    gap: clamp(30px, 3.1vw, 60px);
+}
+
+.domtour-page_card img {
+    width: clamp(300px, 22vw, 374px);
+    height: clamp(260px, 19vw, 330px);
+    flex-shrink: 0;
+    object-fit: cover;
+    display: block;
 }
 
 .domtour-page_card-content {
     width: 100%;
     max-width: 810px;
+    min-height: clamp(260px, 19vw, 330px);
     display: flex;
     flex-direction: column;
-
 }
 
-.domtour-page_card h2,
-span {
+.domtour-page_card-content h2,
+.domtour-page_card-content span {
     font-weight: 700;
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
     color: #202020;
 }
 
 .domtour-page_card-content h2 {
     font-family: "Arimo", sans-serif;
-    font-size: clamp(25px, 2.08vw, 40px);
-    line-height: 47px;
+    font-size: clamp(26px, 2.08vw, 40px);
+    line-height: 1.18;
+    margin-bottom: 8px;
 }
 
 .domtour-page_card-content span {
-    font-family: Arial, sans-serif;
-    font-size: clamp(18px, 1.82vw, 35px);
-    line-height: 61px;
-    margin-bottom: 18px;
     display: block;
+    font-family: Arial, sans-serif;
+    font-size: clamp(22px, 1.82vw, 35px);
+    line-height: 1.2;
+    margin-bottom: 18px;
 }
 
 .domtour-page_card-content p {
     max-width: 628px;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    font-size: 20px;
-    line-height: 24px;
-    letter-spacing: 1%;
-    margin-bottom: 18px;
+    font-size: clamp(16px, 1.04vw, 20px);
+    line-height: 1.25;
+    letter-spacing: 0.01em;
+    margin-bottom: 22px;
 }
 
 .domtour-page_card-content button {
-    letter-spacing: 0%;
-    line-height: 1;
-    padding: 0 30px;
     width: 144px;
     height: 65px;
+    padding: 0 30px;
+    line-height: 1;
+    letter-spacing: 0;
 }
-
-.footer-domestic-tour {
-    margin-bottom: 0;
-    background-color: #F9F9F9;
-    padding: 240px 0 40px;
-    margin-top: -50px;
-}
-
 
 .main-btn_site-DomestictTour {
     margin-top: auto;
 }
 
-
+.footer-domestic-tour {
+    margin-bottom: 0;
+    background-color: #f9f9f9;
+    padding: clamp(130px, 12.5vw, 240px) 0 40px;
+    margin-top: -50px;
+}
 
 @media (max-width: 1024px) {
-
-    .domtour-page_card-content h2,
-    .domtour-page_card-content span {
-        line-height: 1.1;
-    }
-
-    .domtour-page_card-content span {
-        padding: 10px 0;
-        margin-bottom: 10px;
-    }
-
     .domtour-page_card {
-        gap: 0 40px;
+        gap: 35px;
     }
 
-    .domtour-page_inner {
-        gap: 80px 0;
-        padding-top: 80px;
+    .domtour-page_card img {
+        width: 320px;
+        height: 285px;
     }
 
-    .footer-domestic-tour {
-        padding: 160px 0 30px;
-
+    .domtour-page_card-content {
+        min-height: 285px;
     }
 }
 
+@media (max-width: 850px) {
+    .domtour-page_card {
+        gap: 24px;
+    }
+
+    .domtour-page_card img {
+        width: 280px;
+        height: 250px;
+    }
+
+    .domtour-page_card-content {
+        min-height: 250px;
+    }
+
+    .domtour-page_card-content h2 {
+        font-size: 26px;
+    }
+
+    .domtour-page_card-content span {
+        font-size: 22px;
+        margin-bottom: 12px;
+    }
+
+    .domtour-page_card-content p {
+        font-size: 16px;
+        line-height: 1.3;
+        margin-bottom: 18px;
+    }
+
+    .domtour-page_card-content button {
+        width: 130px;
+        height: 56px;
+    }
+}
 
 @media (max-width: 767px) {
-
     .domtour-page_inner {
         grid-template-columns: repeat(2, 1fr);
-        justify-content: space-between;
-        gap: 20px;
+        gap: 35px 20px;
         padding-top: 60px;
+    }
+
+    .domtour-page_card {
+        flex-direction: column;
+        gap: 14px;
     }
 
     .domtour-page_card img {
         width: 100%;
         height: auto;
-        margin-bottom: 10px;
+        aspect-ratio: 1 / 0.88;
     }
 
-    .domtour-page_card {
-        flex-direction: column;
-        width: 90%;
+    .domtour-page_card-content {
+        min-height: auto;
+    }
+
+    .domtour-page_card-content h2 {
+        font-size: 21px;
+        line-height: 1.15;
+    }
+
+    .domtour-page_card-content span {
+        font-size: 19px;
+        margin-bottom: 10px;
     }
 
     .domtour-page_card-content p {
         font-size: 15px;
+        line-height: 1.3;
+        margin-bottom: 16px;
+
+        display: -webkit-box;
+        -webkit-line-clamp: 4;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
     }
 
+    .domtour-page_card-content button {
+        width: 120px;
+        height: 50px;
+        padding: 0 20px;
+        margin-top: 0;
+    }
+}
+
+@media (max-width: 560px) {
+    .domtour-page_inner {
+        grid-template-columns: 1fr;
+        gap: 45px;
+    }
+
+    .domtour-page_card {
+        max-width: 420px;
+        margin: 0 auto;
+    }
+
+    .domtour-page_card img {
+        aspect-ratio: 1 / 0.8;
+    }
+
+    .domtour-page_card-content p {
+        -webkit-line-clamp: 5;
+    }
+}
+
+@media (max-width: 380px) {
+    .domtour-page_card-content h2 {
+        font-size: 20px;
+    }
+
+    .domtour-page_card-content span {
+        font-size: 18px;
+    }
+
+    .domtour-page_card-content p {
+        font-size: 14px;
+    }
+
+    .domtour-page_card-content button {
+        width: 110px;
+        height: 48px;
+    }
 }

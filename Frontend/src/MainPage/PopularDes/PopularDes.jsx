@@ -43,19 +43,26 @@ export default function PopularDes() {
                         onSwiper={(swiper) => {
                             swiperRef.current = swiper
                         }}
-                        loop={cards.length === 3}
-                        watchOverflow={false}
+                        loop={cards.length > 3}
+                        watchOverflow={true}
                         spaceBetween={71}
                         slidesPerView={3}
                         breakpoints={{
                             0: {
                                 slidesPerView: 1,
+                                spaceBetween: 20,
                             },
                             768: {
                                 slidesPerView: 2,
+                                spaceBetween: 30,
                             },
                             1200: {
                                 slidesPerView: 3,
+                                spaceBetween: 45,
+                            },
+                            1440: {
+                                slidesPerView: 3,
+                                spaceBetween: 71,
                             },
                         }}
                         className="pop-swiper"
