@@ -468,7 +468,13 @@ export default function Account() {
     const renderContent = () => {
         switch (active) {
             case 'orders':
-                return <OrdersContent ordersTab={ordersTab} />;
+                return (
+                    <OrdersContent
+                        ordersTab={ordersTab}
+                        onChangeTab={setOrdersTab}
+                        user={user}
+                    />
+                );
 
             case 'favorites':
                 return <FavoritesContent />;
@@ -480,7 +486,13 @@ export default function Account() {
                 return renderSettingsContent();
 
             default:
-                return <OrdersContent ordersTab={ordersTab} />;
+                return (
+                    <OrdersContent
+                        ordersTab={ordersTab}
+                        onChangeTab={setOrdersTab}
+                        user={user}
+                    />
+                );
         }
     };
 

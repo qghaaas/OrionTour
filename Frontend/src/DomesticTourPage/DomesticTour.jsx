@@ -1,8 +1,7 @@
 import '../main.css'
 import './DomesticTour.css'
 import { useEffect, useState } from 'react'
-
-
+import { Link } from 'react-router-dom'
 
 export default function DomesticTour() {
     const [domtourcard, setDomtourcard] = useState([])
@@ -15,6 +14,7 @@ export default function DomesticTour() {
                 if (!res.ok) {
                     throw new Error('Ошибка загрузки туров')
                 }
+
                 return res.json()
             })
             .then((data) => {
@@ -32,6 +32,7 @@ export default function DomesticTour() {
         return (
             <section className="domtour-page">
                 <h1 className="name-title_page">Туры в Калининград</h1>
+
                 <div className="container">
                     <p>Загрузка туров...</p>
                 </div>
@@ -43,6 +44,7 @@ export default function DomesticTour() {
         return (
             <section className="domtour-page">
                 <h1 className="name-title_page">Туры в Калининград</h1>
+
                 <div className="container">
                     <p>{error}</p>
                 </div>
@@ -53,6 +55,7 @@ export default function DomesticTour() {
     return (
         <section className="domtour-page">
             <h1 className="name-title_page">Туры в Калининград</h1>
+
             <div className="container">
                 <div className="domtour-page_inner">
                     {domtourcard.map((card) => (
@@ -66,14 +69,19 @@ export default function DomesticTour() {
 
                             <div className="domtour-page_card-content">
                                 <h2>{card.title}</h2>
+
                                 <span>
                                     от {Number(card.price).toLocaleString('ru-RU')} ₽
                                 </span>
+
                                 <p>{card.description}</p>
 
-                                <button className="main-btn_site main-btn_site-DomestictTour" type="button">
-                                    Купить
-                                </button>
+                                <Link
+                                    className="main-btn_site main-btn_site-DomestictTour"
+                                    to={`/tour/${card.id}`}
+                                >
+                                    Забронировать
+                                </Link>
                             </div>
                         </div>
                     ))}

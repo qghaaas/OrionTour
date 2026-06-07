@@ -6,6 +6,48 @@ import { useEffect, useMemo, useState } from 'react'
 import { YMaps, Map, Placemark } from '@pbe/react-yandex-maps'
 import GalleryModal from '../../GalleryModal/GalleryModal'
 
+const API_URL = 'http://localhost:3010'
+
+function clearStoredAuth() {
+    localStorage.removeItem('user')
+    localStorage.removeItem('authToken')
+}
+
+function getStoredAuth() {
+    const token = localStorage.getItem('authToken') || ''
+
+    if (!token) {
+        return { token: '', user: null }
+    }
+
+    try {
+        const user = JSON.parse(localStorage.getItem('user') || 'null')
+
+        if (!user?.id) {
+            clearStoredAuth()
+            return { token: '', user: null }
+        }
+
+        return { token, user }
+    } catch {
+        clearStoredAuth()
+        return { token: '', user: null }
+    }
+}
+
+function getBookingErrorMessage(status, serverMessage) {
+    if (serverMessage) return serverMessage
+
+    if (status === 401 || status === 403) {
+        return 'Войдите в аккаунт, чтобы забронировать тур.'
+    }
+
+    if (status === 409) {
+        return 'Этот тур уже есть в активных заказах.'
+    }
+
+    return 'Не удалось создать заявку. Попробуйте ещё раз.'
+}
 
 export default function Directions({ defaultTourId = 1 }) {
     const { id } = useParams()
@@ -19,14 +61,18 @@ export default function Directions({ defaultTourId = 1 }) {
     const [isGalleryOpen, setIsGalleryOpen] = useState(false)
     const [activeImageIndex, setActiveImageIndex] = useState(0)
 
+    const [isBooking, setIsBooking] = useState(false)
+    const [bookingResult, setBookingResult] = useState(null)
+
     useEffect(() => {
         let isMounted = true
 
         setLoading(true)
         setError('')
         setTour(null)
+        setBookingResult(null)
 
-        fetch(`http://localhost:3010/api/tours/${tourId}/details`)
+        fetch(`${API_URL}/api/tours/${tourId}/details`)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Ошибка загрузки данных тура')
@@ -85,6 +131,66 @@ export default function Directions({ defaultTourId = 1 }) {
     const closeGallery = () => {
         setIsGalleryOpen(false)
         setActiveImageIndex(0)
+    }
+
+    const handleBookTour = async () => {
+        const { token, user } = getStoredAuth()
+
+        if (!token || !user?.id) {
+            setBookingResult({
+                type: 'warning',
+                message: 'Чтобы тур попал в активные заказы, сначала войдите в аккаунт.'
+            })
+            return
+        }
+
+        try {
+            setIsBooking(true)
+            setBookingResult(null)
+
+            const response = await fetch(`${API_URL}/api/users/${user.id}/orders`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${token}`
+                },
+                body: JSON.stringify({
+                    tour_id: Number(tourId),
+                    people_count: 1,
+                    room_type: 'Стандарт'
+                })
+            })
+
+            const data = await response.json().catch(() => ({}))
+
+            if (!response.ok) {
+                if (response.status === 401 || response.status === 403) {
+                    clearStoredAuth()
+                    window.dispatchEvent(new Event('authChanged'))
+                }
+
+                setBookingResult({
+                    type: response.status === 409 ? 'info' : 'error',
+                    message: getBookingErrorMessage(response.status, data.message),
+                    order: data.order || null
+                })
+                return
+            }
+
+            setBookingResult({
+                type: 'success',
+                message: `Заявка создана. Заказ №${data.order?.id || ''} уже появился в активных заказах.`,
+                order: data.order || null
+            })
+        } catch (err) {
+            console.error('Ошибка бронирования тура:', err)
+            setBookingResult({
+                type: 'error',
+                message: 'Не удалось подключиться к серверу. Проверьте, запущен ли backend.'
+            })
+        } finally {
+            setIsBooking(false)
+        }
     }
 
     if (loading) {
@@ -206,12 +312,36 @@ export default function Directions({ defaultTourId = 1 }) {
                                     <strong>
                                         от {Number(tour.price).toLocaleString('ru-RU')} ₽
                                     </strong>
+                                    <p className="directions-booking-note">
+                                        Нажмите «Забронировать» — заявка появится в активных заказах, а менеджер увидит её и свяжется с вами.
+                                    </p>
                                 </div>
 
-                                <button className="main-btn_site" type="button">
-                                    Забронировать
+                                <button
+                                    className="main-btn_site"
+                                    type="button"
+                                    onClick={handleBookTour}
+                                    disabled={isBooking}
+                                >
+                                    {isBooking ? 'Создаём заявку...' : 'Забронировать'}
                                 </button>
                             </div>
+
+                            {bookingResult && (
+                                <div className={`directions-booking-message ${bookingResult.type}`}>
+                                    <p>{bookingResult.message}</p>
+
+                                    <div className="directions-booking-actions">
+                                        {bookingResult.type === 'warning' ? (
+                                            <span>Войдите через кнопку «Войти» в шапке сайта.</span>
+                                        ) : (
+                                            <Link to="/account">
+                                                Открыть активные заказы
+                                            </Link>
+                                        )}
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="directions-loc">
@@ -254,7 +384,6 @@ export default function Directions({ defaultTourId = 1 }) {
                 title={tour.title}
                 images={galleryImages}
                 activeIndex={activeImageIndex}
-                onChangeIndex={setActiveImageIndex}
                 onClose={closeGallery}
             />
         </section>

@@ -1,33 +1,17 @@
 import OrderCard from './OrderCard';
-import orderImg from '../../img/order.png'
 
-export default function ActiveOrders() {
-
-    const activeOrders = [
-        {
-            id: 1,
-            title: "Hard Rock Hotel Maldives",
-            country: "Мальдивы, Южный Мале Атолл",
-            dateFrom: "01.01.2026",
-            dateTo: "10.01.2026",
-            people: "1 взрослый человек",
-            room: "Однокомнатная вилла",
-            food: "Завтраки оплачены",
-            price: "477 900",
-            image: orderImg
-        }
-    ];
-
+export default function ActiveOrders({ orders = [], onCancel, processingOrderId = null }) {
     return (
         <div className="orders-list">
-
-            {activeOrders.map(order => (
+            {orders.map((order) => (
                 <OrderCard
                     key={order.id}
                     order={order}
+                    type="active"
+                    onCancel={onCancel}
+                    isActionDisabled={Number(processingOrderId) === Number(order.id)}
                 />
             ))}
-
         </div>
     );
 }

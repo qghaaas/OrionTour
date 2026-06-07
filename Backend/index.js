@@ -1383,6 +1383,128 @@ app.delete('/api/admin/reviews/:id', requireAdmin, async (req, res) => {
 });
 
 
+app.get('/api/admin/orders', requireAdmin, async (req, res) => {
+  try {
+    const requestedStatus = normalizeOrderStatus(req.query.status || 'active');
+    const statusFilter = ['active', 'inactive', 'all', ...ORDER_ALLOWED_STATUSES].includes(requestedStatus)
+      ? requestedStatus
+      : 'active';
+
+    const whereParts = [];
+    const params = [];
+
+    if (statusFilter === 'active') {
+      params.push(ORDER_ACTIVE_STATUSES);
+      whereParts.push(`LOWER(o.status) = ANY($${params.length}::text[])`);
+    } else if (statusFilter === 'inactive') {
+      params.push(ORDER_ACTIVE_STATUSES);
+      whereParts.push(`LOWER(o.status) <> ALL($${params.length}::text[])`);
+    } else if (statusFilter !== 'all') {
+      params.push(statusFilter);
+      whereParts.push(`LOWER(o.status) = $${params.length}`);
+    }
+
+    const whereClause = whereParts.length
+      ? `WHERE ${whereParts.join(' AND ')}`
+      : '';
+
+    const result = await pool.query(
+      `
+      SELECT
+        ${getOrderSelectFields()},
+        u.email AS user_email,
+        u.full_name AS user_full_name
+      FROM orders o
+      JOIN users u
+        ON u.id = o.user_id
+      JOIN tours t
+        ON t.id = o.tour_id
+      JOIN directions d
+        ON d.id = t.direction_id
+      ${whereClause}
+      ORDER BY
+        CASE LOWER(o.status)
+          WHEN 'new' THEN 0
+          WHEN 'pending' THEN 1
+          WHEN 'confirmed' THEN 2
+          WHEN 'paid' THEN 3
+          WHEN 'active' THEN 4
+          ELSE 5
+        END ASC,
+        o.created_at DESC,
+        o.id DESC
+      `,
+      params
+    );
+
+    return res.status(200).json({
+      orders: mapOrderRows(result.rows)
+    });
+  } catch (error) {
+    console.error('Ошибка получения заказов для админа:', error);
+    return res.status(500).json({
+      message: 'Ошибка получения заказов'
+    });
+  }
+});
+
+app.patch('/api/admin/orders/:orderId/status', requireAdmin, async (req, res) => {
+  try {
+    const { orderId } = req.params;
+    const requestedStatus = normalizeOrderStatus(req.body?.status || '');
+    const managerComment = sanitizeOrderText(req.body?.manager_comment || '', 700);
+
+    if (!ORDER_ALLOWED_STATUSES.includes(requestedStatus)) {
+      return res.status(400).json({
+        message: 'Некорректный статус заказа'
+      });
+    }
+
+    const result = await pool.query(
+      `
+      WITH updated_order AS (
+        UPDATE orders
+        SET
+          status = $1,
+          manager_comment = $2,
+          status_updated_at = NOW()
+        WHERE id = $3
+        RETURNING *
+      )
+      SELECT
+        ${getOrderSelectFields()},
+        u.email AS user_email,
+        u.full_name AS user_full_name
+      FROM updated_order o
+      JOIN users u
+        ON u.id = o.user_id
+      JOIN tours t
+        ON t.id = o.tour_id
+      JOIN directions d
+        ON d.id = t.direction_id
+      `,
+      [requestedStatus, managerComment, orderId]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Заказ не найден'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Статус заказа обновлён',
+      order: mapOrderRows(result.rows)[0]
+    });
+  } catch (error) {
+    console.error('Ошибка обновления заказа админом:', error);
+    return res.status(500).json({
+      message: 'Ошибка обновления заказа'
+    });
+  }
+});
+
+
 app.post('/api/reviews', requireUser, async (req, res) => {
   try {
     const { author_name, rating, review_text } = req.body;
@@ -1620,6 +1742,358 @@ function mapCatalogRows(rows) {
     image: buildPublicUrl(tour.image || ''),
   }));
 }
+
+
+const ORDER_ACTIVE_STATUSES = ['active', 'new', 'pending', 'confirmed', 'paid'];
+const ORDER_ALLOWED_STATUSES = [
+  'active',
+  'new',
+  'pending',
+  'confirmed',
+  'paid',
+  'completed',
+  'cancelled',
+  'expired',
+  'archived'
+];
+
+function normalizeOrderStatus(status = '') {
+  return String(status || '').trim().toLowerCase();
+}
+
+function sanitizeOrderText(value = '', maxLength = 500) {
+  const normalizedValue = String(value || '').trim();
+
+  if (!normalizedValue) return null;
+
+  return normalizedValue.slice(0, maxLength);
+}
+
+function getOrderSelectFields() {
+  return `
+    o.id,
+    o.user_id,
+    o.tour_id,
+    o.start_date,
+    o.end_date,
+    o.people_count,
+    o.room_type,
+    o.total_price,
+    o.status,
+    o.created_at,
+    o.contact_phone,
+    o.user_comment,
+    o.manager_comment,
+    o.status_updated_at,
+    t.title,
+    t.price,
+    t.nights,
+    t.location_name,
+    COALESCE(t.location_name, d.name_ru, d.name, d.name_en) AS country,
+    COALESCE((
+      SELECT ti.image_url
+      FROM tour_images ti
+      WHERE ti.tour_id = t.id
+        AND ti.is_main = TRUE
+      ORDER BY ti.id ASC
+      LIMIT 1
+    ), (
+      SELECT ti.image_url
+      FROM tour_images ti
+      WHERE ti.tour_id = t.id
+      ORDER BY ti.id ASC
+      LIMIT 1
+    ), '') AS image
+  `;
+}
+
+function mapOrderRows(rows) {
+  return rows.map((order) => ({
+    ...order,
+    image: buildPublicUrl(order.image || ''),
+    price: Number(order.price) || 0,
+    total_price: Number(order.total_price) || 0,
+    people_count: Number(order.people_count) || 0,
+    tour_id: Number(order.tour_id) || null,
+    user_id: Number(order.user_id) || null
+  }));
+}
+
+async function getOrderCounts(userId) {
+  const { rows } = await pool.query(
+    `
+    SELECT
+      COUNT(*) FILTER (
+        WHERE LOWER(status) = ANY($2::text[])
+      )::int AS active,
+      COUNT(*) FILTER (
+        WHERE LOWER(status) <> ALL($2::text[])
+      )::int AS inactive
+    FROM orders
+    WHERE user_id = $1
+    `,
+    [userId, ORDER_ACTIVE_STATUSES]
+  );
+
+  return {
+    active: Number(rows[0]?.active) || 0,
+    inactive: Number(rows[0]?.inactive) || 0
+  };
+}
+
+app.get('/api/users/:userId/orders', requireUser, requireUserOwner, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const requestedStatus = String(req.query.status || 'active').toLowerCase();
+    const statusFilter = ['active', 'inactive', 'all'].includes(requestedStatus)
+      ? requestedStatus
+      : 'active';
+
+    const whereParts = ['o.user_id = $1'];
+    const params = [userId];
+
+    if (statusFilter === 'active') {
+      params.push(ORDER_ACTIVE_STATUSES);
+      whereParts.push(`LOWER(o.status) = ANY($${params.length}::text[])`);
+    }
+
+    if (statusFilter === 'inactive') {
+      params.push(ORDER_ACTIVE_STATUSES);
+      whereParts.push(`LOWER(o.status) <> ALL($${params.length}::text[])`);
+    }
+
+    const orderBy = statusFilter === 'inactive'
+      ? 'o.end_date DESC NULLS LAST, o.created_at DESC, o.id DESC'
+      : `
+        CASE WHEN o.start_date >= CURRENT_DATE THEN 0 ELSE 1 END ASC,
+        o.start_date ASC,
+        o.created_at DESC,
+        o.id DESC
+      `;
+
+    const [ordersResult, counts] = await Promise.all([
+      pool.query(
+        `
+        SELECT
+          ${getOrderSelectFields()}
+        FROM orders o
+        JOIN tours t
+          ON t.id = o.tour_id
+        JOIN directions d
+          ON d.id = t.direction_id
+        WHERE ${whereParts.join('\n          AND ')}
+        ORDER BY ${orderBy}
+        `,
+        params
+      ),
+      getOrderCounts(userId)
+    ]);
+
+    return res.status(200).json({
+      orders: mapOrderRows(ordersResult.rows),
+      counts
+    });
+  } catch (error) {
+    console.error('Ошибка получения заказов пользователя:', error);
+    return res.status(500).json({
+      message: 'Ошибка получения заказов пользователя'
+    });
+  }
+});
+
+app.post('/api/users/:userId/orders', requireUser, requireUserOwner, async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const {
+      tour_id,
+      start_date,
+      people_count = 1,
+      room_type = 'Стандарт',
+      contact_phone = '',
+      user_comment = ''
+    } = req.body || {};
+
+    const tourId = Number(tour_id);
+    const peopleCount = Number(people_count);
+
+    if (!Number.isInteger(tourId) || tourId <= 0) {
+      return res.status(400).json({
+        message: 'Тур не выбран'
+      });
+    }
+
+    if (!Number.isInteger(peopleCount) || peopleCount < 1 || peopleCount > 20) {
+      return res.status(400).json({
+        message: 'Количество туристов должно быть от 1 до 20'
+      });
+    }
+
+    let normalizedStartDate = null;
+
+    if (start_date) {
+      const parsedDate = new Date(start_date);
+
+      if (Number.isNaN(parsedDate.getTime())) {
+        return res.status(400).json({
+          message: 'Некорректная дата поездки'
+        });
+      }
+
+      normalizedStartDate = start_date;
+    }
+
+    const existingOrder = await pool.query(
+      `
+      SELECT
+        ${getOrderSelectFields()}
+      FROM orders o
+      JOIN tours t
+        ON t.id = o.tour_id
+      JOIN directions d
+        ON d.id = t.direction_id
+      WHERE o.user_id = $1
+        AND o.tour_id = $2
+        AND LOWER(o.status) = ANY($3::text[])
+      ORDER BY o.created_at DESC, o.id DESC
+      LIMIT 1
+      `,
+      [userId, tourId, ORDER_ACTIVE_STATUSES]
+    );
+
+    if (existingOrder.rows.length > 0) {
+      return res.status(409).json({
+        message: 'Этот тур уже находится в активных заказах',
+        order: mapOrderRows(existingOrder.rows)[0]
+      });
+    }
+
+    const result = await pool.query(
+      `
+      WITH inserted_order AS (
+        INSERT INTO orders (
+          user_id,
+          tour_id,
+          start_date,
+          end_date,
+          people_count,
+          room_type,
+          total_price,
+          status,
+          contact_phone,
+          user_comment,
+          manager_comment,
+          status_updated_at
+        )
+        SELECT
+          $1,
+          t.id,
+          $2::date,
+          CASE
+            WHEN $2::date IS NULL THEN NULL
+            ELSE ($2::date + (GREATEST(t.nights, 1) * INTERVAL '1 day'))::date
+          END,
+          $3::int,
+          NULLIF($4, ''),
+          (t.price * $3::int),
+          'new',
+          $5,
+          $6,
+          'Новая заявка. Менеджер скоро проверит доступность тура и свяжется с клиентом.',
+          NOW()
+        FROM tours t
+        WHERE t.id = $7
+          AND t.is_active = TRUE
+        RETURNING *
+      )
+      SELECT
+        ${getOrderSelectFields()}
+      FROM inserted_order o
+      JOIN tours t
+        ON t.id = o.tour_id
+      JOIN directions d
+        ON d.id = t.direction_id
+      `,
+      [
+        userId,
+        normalizedStartDate,
+        peopleCount,
+        sanitizeOrderText(room_type, 120) || 'Стандарт',
+        sanitizeOrderText(contact_phone, 50),
+        sanitizeOrderText(user_comment, 500),
+        tourId
+      ]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Тур не найден или недоступен для бронирования'
+      });
+    }
+
+    return res.status(201).json({
+      message: 'Заявка на бронирование создана',
+      order: mapOrderRows(result.rows)[0]
+    });
+  } catch (error) {
+    console.error('Ошибка создания заказа:', error);
+    return res.status(500).json({
+      message: 'Ошибка создания заказа'
+    });
+  }
+});
+
+app.patch('/api/users/:userId/orders/:orderId/status', requireUser, requireUserOwner, async (req, res) => {
+  try {
+    const { userId, orderId } = req.params;
+    const requestedStatus = String(req.body?.status || '').trim().toLowerCase();
+
+    if (requestedStatus !== 'cancelled') {
+      return res.status(400).json({
+        message: 'Пользователь может только отменить активный заказ'
+      });
+    }
+
+    const result = await pool.query(
+      `
+      WITH updated_order AS (
+        UPDATE orders
+        SET
+          status = 'cancelled',
+          manager_comment = COALESCE(manager_comment, 'Заказ отменён пользователем.'),
+          status_updated_at = NOW()
+        WHERE id = $1
+          AND user_id = $2
+          AND LOWER(status) = ANY($3::text[])
+        RETURNING *
+      )
+      SELECT
+        ${getOrderSelectFields()}
+      FROM updated_order o
+      JOIN tours t
+        ON t.id = o.tour_id
+      JOIN directions d
+        ON d.id = t.direction_id
+      `,
+      [orderId, userId, ORDER_ACTIVE_STATUSES]
+    );
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({
+        message: 'Активный заказ не найден или уже не может быть отменён'
+      });
+    }
+
+    return res.status(200).json({
+      message: 'Заказ отменён',
+      order: mapOrderRows(result.rows)[0]
+    });
+  } catch (error) {
+    console.error('Ошибка изменения статуса заказа:', error);
+    return res.status(500).json({
+      message: 'Ошибка изменения статуса заказа'
+    });
+  }
+});
 
 function addCatalogTypeWhere(whereParts, params, type) {
   if (normalizeCatalogType(type) !== 'hotels') return;

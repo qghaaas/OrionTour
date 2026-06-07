@@ -399,3 +399,213 @@
         padding: 25px;
     }
 }
+.admin-section-subtitle {
+    margin-top: 8px;
+    font-weight: 500;
+    font-size: 18px;
+    line-height: 1.45;
+    color: #6D6D6D;
+}
+
+.admin-order-list {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+}
+
+.admin-order-card {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    border-radius: 25px;
+    background-color: #EFEFEF;
+    padding: 28px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.45fr);
+    gap: 28px;
+}
+
+.admin-order-main {
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    gap: 24px;
+}
+
+.admin-order-image {
+    min-height: 190px;
+    overflow: hidden;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #1F2A36, #3E5065);
+    color: #FFFFFF;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-align: center;
+}
+
+.admin-order-image img {
+    width: 100%;
+    height: 100%;
+    min-height: 190px;
+    object-fit: cover;
+    display: block;
+}
+
+.admin-order-info h3 {
+    margin: 14px 0 8px;
+    color: #001827;
+    font-family: "Arimo", sans-serif;
+    font-size: 30px;
+    font-weight: 700;
+    line-height: 1.15;
+}
+
+.admin-order-topline {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+}
+
+.admin-order-number,
+.admin-order-status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 36px;
+    border-radius: 50px;
+    padding: 0 14px;
+    font-family: "Arimo", sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+}
+
+.admin-order-number {
+    background-color: #FFFFFF;
+    color: #F99244;
+}
+
+.admin-order-status {
+    background-color: #F99244;
+    color: #FFFFFF;
+}
+
+.admin-order-status-confirmed,
+.admin-order-status-paid {
+    background-color: #2F7D32;
+}
+
+.admin-order-status-completed {
+    background-color: #1F2A36;
+}
+
+.admin-order-status-cancelled,
+.admin-order-status-expired,
+.admin-order-status-archived {
+    background-color: #6D6D6D;
+}
+
+.admin-order-user {
+    margin: 0 0 18px;
+    color: #6D6D6D;
+    font-weight: 600;
+    font-size: 18px;
+    line-height: 1.35;
+}
+
+.admin-order-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.admin-order-grid span,
+.admin-order-comment {
+    border-radius: 16px;
+    background-color: #FFFFFF;
+    padding: 13px 15px;
+    color: #6D6D6D;
+    font-size: 16px;
+    font-weight: 600;
+    line-height: 1.35;
+}
+
+.admin-order-grid strong {
+    color: #202020;
+}
+
+.admin-order-comment {
+    margin-top: 14px;
+    color: #202020;
+}
+
+.admin-order-controls {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.admin-order-controls label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    color: #6D6D6D;
+    font-size: 16px;
+    font-weight: 700;
+}
+
+.admin-order-controls select,
+.admin-order-controls textarea {
+    width: 100%;
+    border: 1px solid #DDDDDD;
+    border-radius: 18px;
+    background-color: #FFFFFF;
+    padding: 14px 16px;
+    color: #202020;
+    font-family: "Raleway", sans-serif;
+    font-size: 17px;
+    font-weight: 500;
+    resize: vertical;
+}
+
+.admin-order-controls button {
+    width: 100%;
+    min-height: 54px;
+    border-radius: 50px;
+    background-color: #F99244;
+    color: #FFFFFF;
+    font-family: "Raleway", sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+}
+
+.admin-order-controls button:disabled {
+    opacity: 0.65;
+    cursor: default;
+}
+
+@media (max-width: 1180px) {
+    .admin-order-card,
+    .admin-order-main {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-order-image {
+        min-height: 240px;
+    }
+}
+
+@media (max-width: 650px) {
+    .admin-order-card {
+        padding: 20px;
+        border-radius: 20px;
+    }
+
+    .admin-order-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-order-info h3 {
+        font-size: 25px;
+    }
+}

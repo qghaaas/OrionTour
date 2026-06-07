@@ -141,17 +141,21 @@ CREATE TABLE favorite_tours (
     PRIMARY KEY (user_id, tour_id)
 );
 
--- Таблица заказов пользователя
+-- Таблица заказов пользователя / заявок на бронирование
 CREATE TABLE orders (
     id BIGSERIAL PRIMARY KEY,
     user_id BIGINT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
     tour_id BIGINT NOT NULL REFERENCES tours(id) ON DELETE CASCADE,
-    start_date DATE NOT NULL,
-    end_date DATE NOT NULL,
-    people_count INTEGER NOT NULL,
+    start_date DATE,
+    end_date DATE,
+    people_count INTEGER NOT NULL DEFAULT 1 CHECK (people_count > 0),
     room_type VARCHAR(255),
-    total_price NUMERIC(12,2) NOT NULL,
-    status VARCHAR(50) NOT NULL DEFAULT 'active',
+    total_price NUMERIC(12,2) NOT NULL DEFAULT 0,
+    status VARCHAR(50) NOT NULL DEFAULT 'new',
+    contact_phone VARCHAR(50),
+    user_comment TEXT,
+    manager_comment TEXT,
+    status_updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -167,6 +171,10 @@ CREATE TABLE registration_codes (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE INDEX idx_orders_user_status ON orders(user_id, status);
+CREATE INDEX idx_orders_user_dates ON orders(user_id, start_date, end_date);
+CREATE INDEX idx_orders_status_created_at ON orders(status, created_at DESC);
+CREATE INDEX idx_orders_tour_user_status ON orders(tour_id, user_id, status);
 CREATE INDEX idx_registration_codes_email ON registration_codes(email);
 CREATE INDEX idx_registration_codes_expires_at ON registration_codes(expires_at);
 
