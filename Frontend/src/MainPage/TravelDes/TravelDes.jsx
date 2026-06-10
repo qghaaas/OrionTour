@@ -62,7 +62,7 @@ export default function TravelDes() {
                                 value={requestText}
                                 onChange={(e) => setRequestText(e.target.value)}
                             />
-                            {message && <p>{message}</p>}
+                            {message && <p className="travdes-message">{message}</p>}
                         </div>
                     </div>
                 </div>

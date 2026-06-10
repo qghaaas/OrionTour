@@ -1,9 +1,10 @@
 import '../../../../main.css';
 import './Orders.css';
-
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import ActiveOrders from './ActiveOrders';
 import InactiveOrders from './InactiveOrders';
+import { Link } from 'react-router-dom';
+
 
 const API_URL = 'http://localhost:3010';
 
@@ -196,9 +197,9 @@ export default function OrdersContent({ ordersTab, onChangeTab, user }) {
                     <span>✈</span>
                     <h2>{emptyState.title}</h2>
                     <p>{emptyState.text}</p>
-                    <a className="main-btn_site" href={`#${emptyState.link}`}>
+                    <Link className="main-btn_site" to={emptyState.link}>
                         {emptyState.action}
-                    </a>
+                    </Link>
                 </div>
             )}
         </div>

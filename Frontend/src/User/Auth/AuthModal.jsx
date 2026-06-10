@@ -71,40 +71,38 @@ export default function AuthModal({ isOpen, onClose }) {
   if (!isOpen) return null;
 
   return (
-    <section className="auth-section">
-      <div className="container" onClick={handleClose}>
+     <section className="auth-section" onClick={handleClose}>
         <div className="auth-inner" onClick={(e) => e.stopPropagation()}>
-          <button className="closeBtn" type="button" onClick={handleClose}>
-            <img src={closeBtn} alt="Закрыть" />
-          </button>
+            <button className="closeBtn" type="button" onClick={handleClose}>
+                <img src={closeBtn} alt="Закрыть" />
+            </button>
 
-          {step === "login" && (
-            <LoginForm
-              onOpenRegistration={() => setStep("register")}
-              onForgotPassword={handleForgotPassword}
-              onSuccess={handleLoginSuccess}
-            />
-          )}
+            {step === "login" && (
+                <LoginForm
+                    onOpenRegistration={() => setStep("register")}
+                    onForgotPassword={handleForgotPassword}
+                    onSuccess={handleLoginSuccess}
+                />
+            )}
 
-          {step === "register" && (
-            <RegistrationForm
-              onOpenLogin={() => setStep("login")}
-              onCodeSent={handleCodeSent}
-            />
-          )}
+            {step === "register" && (
+                <RegistrationForm
+                    onOpenLogin={() => setStep("login")}
+                    onCodeSent={handleCodeSent}
+                />
+            )}
 
-          {step === "verify" && (
-            <VerifyCodeForm
-              email={registrationData.email}
-              password={registrationData.password}
-              onBack={() => setStep("register")}
-              onSuccess={handleRegistrationSuccess}
-            />
-          )}
+            {step === "verify" && (
+                <VerifyCodeForm
+                    email={registrationData.email}
+                    password={registrationData.password}
+                    onBack={() => setStep("register")}
+                    onSuccess={handleRegistrationSuccess}
+                />
+            )}
 
-          {step === "success" && <SuccessMessage onClose={handleClose} />}
+            {step === "success" && <SuccessMessage onClose={handleClose} />}
         </div>
-      </div>
     </section>
   );
 }

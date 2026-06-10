@@ -1,6 +1,6 @@
 .site-header {
   width: 100%;
-  padding-top: clamp(18px, 4vw, 56px);
+  padding-top: clamp(12px, 3vw, 56px);
   margin-bottom: clamp(32px, 7vw, 120px);
   font-family: "Raleway", sans-serif;
   color: #fff;
@@ -12,8 +12,8 @@
   width: 100%;
   display: flex;
   align-items: center;
-  gap: clamp(10px, 1.4vw, 24px);
   justify-content: space-between;
+  gap: clamp(8px, 1.4vw, 24px);
 }
 
 .logo-link {
@@ -26,7 +26,7 @@
 
 .logo-link img {
   display: block;
-  width: clamp(92px, 10vw, 170px);
+  width: clamp(88px, 10vw, 170px);
   height: auto;
 }
 
@@ -37,9 +37,32 @@
   display: flex;
   align-items: center;
   padding-inline: clamp(14px, 1.66vw, 32px);
-  background: rgba(37, 53, 71, 0.74);
+  position: relative;
+  overflow: hidden;
   border-radius: 36px;
-  backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.36);
+  border: 1px solid rgba(249, 146, 68, 0.38);
+  backdrop-filter: blur(32px) saturate(200%);
+  -webkit-backdrop-filter: blur(32px) saturate(200%);
+  box-shadow:
+    0 14px 36px rgba(45, 60, 80, 0.12),
+    0 0 24px rgba(249, 146, 68, 0.10),
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1px rgba(249, 146, 68, 0.12);
+}
+
+.header-nav::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(249, 146, 68, 0.10),
+    rgba(255, 255, 255, 0.18)
+  );
+  pointer-events: none;
 }
 
 .header-menu {
@@ -47,10 +70,12 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px clamp(14px, 1.65vw, 32px);
+  gap: clamp(14px, 1.45vw, 28px);
   padding: clamp(14px, 1.25vw, 20px) 0;
   margin: 0;
   list-style: none;
+  position: relative;
+  z-index: 1;
 }
 
 .header-menu li {
@@ -60,9 +85,9 @@
 
 .header-menu a,
 .header-menu button {
-  color: #fff;
+  color: #26394c;
   font-family: inherit;
-  font-size: clamp(15px, 1.28vw, 25px);
+  font-size: clamp(15px, 1.15vw, 22px);
   line-height: 1.1;
   text-decoration: none;
   white-space: nowrap;
@@ -71,7 +96,8 @@
 
 .header-menu a:hover,
 .header-menu button:hover {
-  color: #F99244;
+  color: #f99244;
+  transform: translateY(-1px);
 }
 
 .header-auth {
@@ -83,19 +109,17 @@
 }
 
 .login-link {
-  min-width: clamp(118px, 10vw, 170px);
-  min-height: clamp(54px, 4.5vw, 65px);
-  padding: 10px clamp(16px, 1.4vw, 28px);
+  min-width: clamp(78px, 9vw, 170px);
+  min-height: clamp(40px, 4.5vw, 65px);
+  padding: 8px clamp(14px, 1.4vw, 28px);
   display: flex;
   align-items: center;
   justify-content: center;
   border: none;
-  font-family: inherit;
-  font-size: clamp(15px, 1.28vw, 25px);
+  font-size: clamp(14px, 1.15vw, 22px);
   line-height: 1.1;
   white-space: nowrap;
   cursor: pointer;
-  max-width: 120px;
 }
 
 .header-profile {
@@ -106,8 +130,8 @@
 }
 
 .header-profile-avatar {
-  width: clamp(48px, 4.5vw, 65px);
-  height: clamp(48px, 4.5vw, 65px);
+  width: clamp(40px, 4.5vw, 65px);
+  height: clamp(40px, 4.5vw, 65px);
   border-radius: 50%;
   overflow: hidden;
   border: 2px solid rgba(255, 255, 255, 0.75);
@@ -122,7 +146,7 @@
 }
 
 .header-profile-avatar:hover {
-  border-color: #F99244;
+  border-color: #f99244;
   transform: scale(1.04);
   box-shadow: 0 10px 28px rgba(0, 0, 0, 0.24);
 }
@@ -137,7 +161,7 @@
 .header-profile-avatar span {
   font-family: "Raleway", sans-serif;
   font-weight: 700;
-  font-size: clamp(17px, 1.35vw, 24px);
+  font-size: clamp(16px, 1.35vw, 24px);
   line-height: 1;
   color: #fff;
 }
@@ -147,8 +171,8 @@
   top: calc(100% + 12px);
   right: 0;
   z-index: 3000;
-  min-width: 238px;
-  max-width: 290px;
+  width: min(290px, calc(100vw - 28px));
+  min-width: 215px;
   padding: 11px 14px 12px;
   border-radius: 7px;
   background: rgba(68, 68, 68, 0.96);
@@ -184,19 +208,19 @@
 }
 
 .header-profile-service {
+  margin-bottom: 4px;
   font-size: 13px;
   font-weight: 700;
-  color: #fff;
   line-height: 1.25;
-  margin-bottom: 4px;
+  color: #fff;
 }
 
 .header-profile-name {
+  margin-bottom: 2px;
   font-size: 14px;
   font-weight: 700;
-  color: #f2f2f2;
   line-height: 1.25;
-  margin-bottom: 2px;
+  color: #f2f2f2;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -205,8 +229,8 @@
 .header-profile-email {
   font-size: 13px;
   font-weight: 400;
-  color: #d8d8d8;
   line-height: 1.25;
+  color: #d8d8d8;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -214,42 +238,79 @@
 
 .burger-btn {
   display: none;
-  width: 48px;
-  height: 48px;
-  flex: 0 0 48px;
-  border: none;
+  width: clamp(40px, 6vw, 48px);
+  height: clamp(40px, 6vw, 48px);
+  flex: 0 0 clamp(40px, 6vw, 48px);
+  border: 1px solid rgba(249, 146, 68, 0.38);
   border-radius: 50%;
-  background: rgba(37, 53, 71, 0.86);
+  background: rgba(255, 255, 255, 0.36);
+  backdrop-filter: blur(24px) saturate(190%);
+  -webkit-backdrop-filter: blur(24px) saturate(190%);
+  box-shadow:
+    0 10px 26px rgba(45, 60, 80, 0.14),
+    0 0 18px rgba(249, 146, 68, 0.12),
+    inset 0 1px 1px rgba(255, 255, 255, 0.85),
+    inset 0 -1px 1px rgba(249, 146, 68, 0.12);
   cursor: pointer;
   position: relative;
   z-index: 120;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.burger-btn::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.65),
+    rgba(249, 146, 68, 0.10),
+    rgba(255, 255, 255, 0.18)
+  );
+  pointer-events: none;
+}
+
+.burger-btn:hover {
+  transform: translateY(-1px);
+  box-shadow:
+    0 12px 30px rgba(45, 60, 80, 0.16),
+    0 0 22px rgba(249, 146, 68, 0.18),
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),
+    inset 0 -1px 1px rgba(249, 146, 68, 0.16);
 }
 
 .burger-btn span {
   position: absolute;
-  left: 13px;
-  width: 22px;
+  left: 50%;
+  width: 46%;
   height: 2px;
   border-radius: 999px;
-  background: #fff;
-  transition: transform 0.25s ease, opacity 0.25s ease, top 0.25s ease;
+  background: #26394c;
+  transform: translateX(-50%);
+  z-index: 1;
+  transition:
+    transform 0.25s ease,
+    opacity 0.25s ease,
+    top 0.25s ease,
+    background 0.25s ease;
 }
 
 .burger-btn span:nth-child(1) {
-  top: 16px;
+  top: 34%;
 }
 
 .burger-btn span:nth-child(2) {
-  top: 23px;
+  top: 50%;
 }
 
 .burger-btn span:nth-child(3) {
-  top: 30px;
+  top: 66%;
 }
 
 .burger-btn.is-active span:nth-child(1) {
-  top: 23px;
-  transform: rotate(45deg);
+  top: 50%;
+  transform: translateX(-50%) rotate(45deg);
 }
 
 .burger-btn.is-active span:nth-child(2) {
@@ -257,36 +318,20 @@
 }
 
 .burger-btn.is-active span:nth-child(3) {
-  top: 23px;
-  transform: rotate(-45deg);
+  top: 50%;
+  transform: translateX(-50%) rotate(-45deg);
 }
 
-@media (max-width: 1440px) {
-  .header-menu {
-    gap: 10px 22px;
-  }
-
-  .header-menu a,
-  .header-menu button,
-  .login-link {
-    font-size: clamp(15px, 1.15vw, 20px);
-  }
+.burger-btn.is-active span {
+  background: #f99244;
 }
 
 @media (max-width: 1180px) {
   .site-header {
-    padding-top: clamp(14px, 3vw, 32px);
-    margin-bottom: clamp(36px, 7vw, 96px);
-  }
-
-  .header-inner {
-    justify-content: space-between;
+    margin-bottom: clamp(32px, 7vw, 96px);
   }
 
   .header-auth {
-    display: flex;
-    position: relative;
-    z-index: 120;
     margin-left: auto;
   }
 
@@ -300,15 +345,39 @@
     width: 100%;
     height: 100dvh;
     min-height: 100dvh;
-    padding: 96px clamp(18px, 5vw, 48px) 32px;
+    padding: clamp(84px, 12vw, 96px) clamp(14px, 5vw, 48px) 32px;
     border-radius: 0;
-    background: rgba(18, 29, 43, 0.96);
-    backdrop-filter: blur(18px);
+    border: none;
+    background:
+      linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.72),
+        rgba(255, 255, 255, 0.46)
+      ),
+      rgba(249, 146, 68, 0.06);
+    backdrop-filter: blur(32px) saturate(200%);
+    -webkit-backdrop-filter: blur(32px) saturate(200%);
+    box-shadow:
+      inset 0 1px 1px rgba(255, 255, 255, 0.85),
+      inset 0 -1px 1px rgba(249, 146, 68, 0.10);
     opacity: 0;
     pointer-events: none;
     transform: translateY(-12px);
     transition: opacity 0.25s ease, transform 0.25s ease;
     overflow-y: auto;
+    z-index: 100;
+  }
+
+  .header-nav::before {
+    border-radius: 0;
+    background:
+      linear-gradient(
+        135deg,
+        rgba(255, 255, 255, 0.58),
+        rgba(249, 146, 68, 0.08),
+        rgba(255, 255, 255, 0.24)
+      );
+    z-index: 0;
   }
 
   .header-nav.is-open {
@@ -322,8 +391,7 @@
     flex-direction: column;
     justify-content: center;
     align-items: stretch;
-    flex-wrap: nowrap;
-    gap: 12px;
+    gap: clamp(10px, 2vw, 12px);
     padding: 0;
   }
 
@@ -334,45 +402,27 @@
   .header-menu a,
   .header-menu button {
     width: 100%;
-    min-height: 54px;
-    padding: 14px 18px;
+    min-height: clamp(50px, 7vw, 54px);
+    padding: 12px clamp(14px, 4vw, 18px);
     display: flex;
     align-items: center;
     justify-content: center;
-    border-radius: 18px;
-    background: rgba(255, 255, 255, 0.06);
-    font-size: clamp(18px, 4vw, 26px);
+    border-radius: clamp(16px, 3vw, 18px);
+    background: rgba(255, 255, 255, 0.08);
+    color: #26394c;
+    font-size: clamp(16px, 4vw, 26px);
+    font-weight: 500;
     text-align: center;
+    white-space: normal;
+    transition:
+      color 0.2s ease,
+      background 0.2s ease,
+      transform 0.2s ease;
   }
 
   .header-menu a:hover,
   .header-menu button:hover {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .login-link {
-    min-width: 120px;
-    min-height: 52px;
-    padding: 10px 22px;
-    font-size: 18px;
-  }
-
-  .header-profile-avatar {
-    width: 52px;
-    height: 52px;
-  }
-
-  .header-profile-tooltip {
-    right: -8px;
-  }
-
-  .header-profile-tooltip::before {
-    right: 26px;
-  }
-
-  .mobile-auth-item {
-    display: flex;
-    margin-top: 10px;
+    background: rgba(255, 255, 255, 0.16);
   }
 }
 
@@ -381,107 +431,22 @@
     margin-bottom: 32px;
   }
 
-  .header-inner {
-    gap: 10px;
-  }
-
-  .logo-link img {
-    width: clamp(88px, 28vw, 132px);
-  }
-
-  .login-link {
-    min-width: 96px;
-    min-height: 46px;
-    padding: 8px 18px;
-    font-size: 16px;
-  }
-
-  .header-profile-avatar {
-    width: 46px;
-    height: 46px;
+  .header-menu {
+    justify-content: flex-start;
+    padding-top: 32px;
   }
 
   .header-profile-tooltip {
-    min-width: 225px;
     right: -12px;
   }
 
   .header-profile-tooltip::before {
     right: 28px;
   }
-
-  .burger-btn {
-    width: 44px;
-    height: 44px;
-    flex-basis: 44px;
-  }
-
-  .burger-btn span {
-    left: 12px;
-    width: 20px;
-  }
-
-  .burger-btn span:nth-child(1) {
-    top: 14px;
-  }
-
-  .burger-btn span:nth-child(2) {
-    top: 21px;
-  }
-
-  .burger-btn span:nth-child(3) {
-    top: 28px;
-  }
-
-  .burger-btn.is-active span:nth-child(1),
-  .burger-btn.is-active span:nth-child(3) {
-    top: 21px;
-  }
-
-  .header-nav {
-    padding-top: 84px;
-  }
-
-  .header-menu {
-    justify-content: flex-start;
-    padding-top: 32px;
-  }
-
-  .header-menu a,
-  .header-menu button {
-    min-height: 52px;
-    font-size: 18px;
-  }
 }
 
 @media (max-width: 480px) {
-  .site-header {
-    padding-top: 12px;
-  }
-
-  .header-nav {
-    padding-inline: 14px;
-  }
-
-  .header-menu {
-    gap: 10px;
-  }
-
-  .login-link {
-    min-width: 78px;
-    min-height: 40px;
-    padding: 7px 14px;
-    font-size: 14px;
-  }
-
-  .header-profile-avatar {
-    width: 40px;
-    height: 40px;
-  }
-
   .header-profile-tooltip {
-    min-width: 215px;
-    max-width: 215px;
     right: -48px;
     padding: 10px 12px;
   }
@@ -490,62 +455,9 @@
     right: 60px;
   }
 
-  .header-profile-service {
-    font-size: 12px;
-  }
-
+  .header-profile-service,
   .header-profile-name,
   .header-profile-email {
     font-size: 12px;
-  }
-
-  .header-menu a,
-  .header-menu button {
-    min-height: 50px;
-    padding: 12px 14px;
-    border-radius: 16px;
-    font-size: 16px;
-  }
-
-  .mobile-auth-item .login-link {
-    min-height: 52px;
-    font-size: 16px;
-  }
-}
-
-@media (max-width: 360px) {
-  .logo-link img {
-    width: 82px;
-  }
-
-  .burger-btn {
-    width: 40px;
-    height: 40px;
-    flex-basis: 40px;
-  }
-
-  .burger-btn span {
-    left: 11px;
-    width: 18px;
-  }
-
-  .login-link {
-    min-width: 68px;
-    min-height: 38px;
-    padding: 6px 10px;
-    font-size: 13px;
-  }
-
-  .header-profile-avatar {
-    width: 38px;
-    height: 38px;
-  }
-
-  .header-profile-tooltip {
-    right: -52px;
-  }
-
-  .header-profile-tooltip::before {
-    right: 62px;
   }
 }

@@ -1,43 +1,42 @@
 .offersdes {
     width: 100%;
-    height: fit-content;
-    margin-bottom: 235px;
     padding-top: 55px;
+    margin-bottom: clamp(100px, 12vw, 235px);
 }
 
 .offersdes-inner {
     display: flex;
     flex-direction: column;
-    gap: 150px 0;
+    gap: clamp(70px, 7.8vw, 150px);
 }
 
 .offersdes-card {
     display: flex;
-    gap: 0 30px;
     align-items: stretch;
+    gap: clamp(24px, 1.6vw, 30px);
 }
 
 .offersdes-gallery {
-    width: min(600px, 100%);
+    width: min(600px, 55%);
     flex-shrink: 0;
 }
 
 .offersdes-gallery_main,
 .offersdes-gallery_thumb {
-    border: none;
+    display: block;
+    width: 100%;
     padding: 0;
     margin: 0;
+    border: none;
     background: transparent;
-    display: block;
     font: inherit;
     cursor: pointer;
 }
 
 .offersdes-gallery_main {
     position: relative;
-    width: 100%;
-    height: 360px;
-    margin-bottom: 19px;
+    height: clamp(300px, 18.75vw, 360px);
+    margin-bottom: clamp(12px, 1vw, 19px);
     overflow: hidden;
     border-radius: 18px;
 }
@@ -46,7 +45,8 @@
     cursor: default;
 }
 
-.offersdes-gallery_main img {
+.offersdes-gallery_main img,
+.offersdes-gallery_thumb img {
     width: 100%;
     height: 100%;
     display: block;
@@ -61,23 +61,14 @@
 .offersdes-gallery_preview {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 14px;
-    align-items: center;
+    gap: clamp(10px, 0.75vw, 14px);
 }
 
 .offersdes-gallery_thumb {
     position: relative;
+    height: clamp(82px, 6.25vw, 120px);
     overflow: hidden;
-    height: 120px;
     border-radius: 15px;
-}
-
-.offersdes-gallery_thumb img {
-    width: 100%;
-    height: 100%;
-    display: block;
-    object-fit: cover;
-    transition: transform 0.35s ease;
 }
 
 .offersdes-gallery_thumb:hover img {
@@ -111,7 +102,7 @@
     text-align: center;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: 22px;
+    font-size: clamp(15px, 1.15vw, 22px);
     line-height: 1.15;
     color: #fff;
     pointer-events: none;
@@ -119,27 +110,26 @@
 
 .offersdes-price {
     position: absolute;
+    left: clamp(14px, 1vw, 20px);
+    top: clamp(14px, 1vw, 20px);
     z-index: 3;
+    padding: 0 10px;
+    border-radius: 15px;
     background-color: #fff;
     font-family: "Arimo", sans-serif;
-    font-size: 20px;
-    letter-spacing: 1%;
+    font-size: clamp(16px, 1.05vw, 20px);
     line-height: 1.5;
     color: #000;
-    left: 20px;
-    top: 20px;
-    border-radius: 15px;
-    padding: 0 10px;
     font-weight: 400;
 }
 
 .offersdes-card_text {
+    max-width: 364px;
     display: flex;
     flex-direction: column;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
-    letter-spacing: 1%;
-    max-width: 364px;
+    letter-spacing: 0.01em;
 }
 
 .offersdes-card_title {
@@ -148,31 +138,37 @@
 }
 
 .offersdes-card_title h2 {
-    font-weight: 700;
-    font-size: 29px;
     margin: 0;
+    font-weight: 700;
+    font-size: clamp(24px, 1.5vw, 29px);
 }
 
 .offersdes-card_title h3 {
-    color: #A4A4A4;
     margin: 0;
+    color: #a4a4a4;
     font-weight: 500;
 }
 
 .offersdes-card_text p {
-    font-size: 1rem;
-    line-height: 24px;
-    margin-bottom: 32px;
+    margin: 0 0 clamp(24px, 1.65vw, 32px);
+    font-size: clamp(15px, 0.85vw, 16px);
+    line-height: 1.5;
 }
 
 .offersdes-card_subtitle {
-    margin-bottom: auto;
+    margin: 0 0 auto;
+    padding: 0;
+    list-style: none;
 }
 
 .offersdes-card_subtitle li {
     display: flex;
     align-items: center;
-    gap: 0 9px;
+    gap: 9px;
+}
+
+.offersdes-card_subtitle li:not(:last-child) {
+    margin-bottom: 8px;
 }
 
 .offersdes-card_subtitle span {
@@ -180,24 +176,16 @@
     font-weight: 500;
 }
 
-.offersdes-card_subtitle li:not(:last-child) {
-    margin-bottom: 8px;
-}
-
 .offersdes-card_text a {
-    padding: 0 26px;
     width: 284px;
     height: 52px;
+    padding: 0 26px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-@media (max-width: 1100px) {
-    .offersdes-card {
-        gap: 0 24px;
-    }
-
+@media (max-width: 1180px) {
     .offersdes-gallery {
         width: 55%;
     }
@@ -208,18 +196,15 @@
     }
 }
 
-@media (max-width: 900px) {
+@media (max-width: 768px) {
     .offersdes {
-        margin-bottom: 140px;
-    }
-
-    .offersdes-inner {
-        gap: 90px 0;
+        padding-top: 40px;
+        margin-bottom: 100px;
     }
 
     .offersdes-card {
         flex-direction: column;
-        gap: 30px 0;
+        gap: 30px;
     }
 
     .offersdes-gallery {
@@ -227,7 +212,13 @@
     }
 
     .offersdes-gallery_main {
-        height: 380px;
+        height: 300px;
+        border-radius: 15px;
+    }
+
+    .offersdes-gallery_thumb {
+        height: 82px;
+        border-radius: 12px;
     }
 
     .offersdes-card_text {
@@ -239,71 +230,17 @@
     }
 }
 
-@media (max-width: 700px) {
-    .offersdes {
-        padding-top: 40px;
-        margin-bottom: 100px;
-    }
-
-    .offersdes-inner {
-        gap: 70px 0;
-    }
-
-    .offersdes-gallery_main {
-        height: 300px;
-        border-radius: 15px;
-    }
-
-    .offersdes-gallery_preview {
-        gap: 10px;
-    }
-
-    .offersdes-gallery_thumb {
-        height: 82px;
-        border-radius: 12px;
-    }
-
-    .offersdes-gallery_overlay {
-        font-size: 18px;
-    }
-
-    .offersdes-price {
-        left: 14px;
-        top: 14px;
-        font-size: 16px;
-        border-radius: 12px;
-    }
-
-    .offersdes-card_title h2 {
-        font-size: 24px;
-    }
-}
-
 @media (max-width: 480px) {
     .offersdes-gallery_main {
         height: 240px;
-    }
-
-    .offersdes-gallery_preview {
-        grid-template-columns: repeat(3, 1fr);
     }
 
     .offersdes-gallery_thumb {
         height: 68px;
     }
 
-    .offersdes-gallery_overlay {
-        font-size: 15px;
-    }
-
     .offersdes-card_title h2 {
         font-size: 21px;
-    }
-
-    .offersdes-card_text p {
-        font-size: 15px;
-        line-height: 22px;
-        margin-bottom: 24px;
     }
 
     .offersdes-card_text a {

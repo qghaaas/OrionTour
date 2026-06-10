@@ -1,16 +1,17 @@
 .about-us {
     width: 100%;
     font-family: "Arimo", sans-serif;
-    font-size: 20px;
+    font-size: clamp(16px, 1.05vw, 20px);
     color: #202020;
 }
 
 .about-us_inner {
-    width: 50%;
-    padding: 64px 0;
+    width: min(50%, 850px);
+    padding: clamp(40px, 3.4vw, 64px) 0;
 }
 
 .about-us_inner p {
+    margin: 0;
     line-height: 1.35;
     overflow-wrap: break-word;
 }
@@ -20,102 +21,79 @@
 }
 
 .details {
-    margin: 0 auto;
-    padding: 42px 9% 11%;
+    padding: clamp(34px, 2.2vw, 42px) 9% clamp(70px, 11vw, 210px);
     background-color: #f9f9f9;
 }
 
 .details h2 {
-    font-size: 35px;
+    margin: 0 0 clamp(28px, 2.1vw, 40px);
+    font-size: clamp(28px, 1.82vw, 35px);
     font-weight: 700;
-    margin-bottom: 40px;
+    line-height: 1.2;
 }
 
 .details-inner {
-    display: flex;
-    gap: 80px 138px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 520px));
+    gap: clamp(28px, 4vw, 80px) clamp(60px, 7.2vw, 138px);
 }
 
 .details-list {
     max-width: 520px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
 }
 
 .details-list li:not(:last-child) {
-    margin-bottom: 28px;
+    margin-bottom: clamp(22px, 1.45vw, 28px);
 }
 
 .details-list p {
+    margin: 0;
     line-height: 1.35;
     overflow-wrap: break-word;
 }
 
 .footer-aboutus-footer {
     margin: 0;
-    background-color: #f9f9f9;
     padding-bottom: 2%;
+    background-color: #f9f9f9;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1180px) {
     .about-us_inner {
         width: 65%;
     }
 
     .details-inner {
-        gap: 60px;
+        gap: 50px 60px;
     }
 }
 
-@media (max-width: 900px) {
-    .about-us_inner {
-        width: 80%;
-        padding: 50px 0;
-    }
-
-    .details {
-        padding: 40px 7% 90px;
-    }
-
-    .details-inner {
-        flex-direction: column;
-        gap: 28px;
-    }
-
-    .details h2 {
-        font-size: 32px;
-        margin-bottom: 32px;
-    }
-}
-
-@media (max-width: 600px) {
-    .about-us {
-        font-size: 17px;
-    }
-
+@media (max-width: 768px) {
     .about-us_inner {
         width: 100%;
         padding: 40px 0;
     }
 
     .details {
-        padding: 34px 6% 70px;
+        padding-inline: 7%;
     }
 
-    .details h2 {
-        font-size: 28px;
-        margin-bottom: 28px;
-    }
-
-    .details-list li:not(:last-child) {
-        margin-bottom: 22px;
+    .details-inner {
+        grid-template-columns: 1fr;
+        gap: 28px;
     }
 }
 
-@media (max-width: 380px) {
-    .about-us {
-        font-size: 16px;
+@media (max-width: 480px) {
+    .details {
+        padding-inline: 6%;
     }
 
-    .details h2 {
-        font-size: 26px;
+    .about-us_inner p,
+    .details-list p {
+        line-height: 1.4;
     }
 }

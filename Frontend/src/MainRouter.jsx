@@ -2,7 +2,7 @@ import { Route, Routes, HashRouter } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 const MainPageLink = lazy(() => import('./Route/MainPageLink'))
 const DomesticTourPageLink = lazy(() => import('./Route/DomesticTourPageLink'))
-const PopularDesPageLink = lazy(() => import('./Route/PopularDesPageLink'))
+const DesPageLink = lazy(() => import('./Route/DesPageLink'))
 const AccountLink = lazy(() => import('./Route/AccountLink'))
 const ContactInfoLink = lazy(() => import('./Route/ContactInfoLink'))
 const AboutUsLink = lazy(() => import('./Route/AboutUsLink'))
@@ -36,8 +36,8 @@ export default function MainRouter() {
                     <Route path="/" element={<MainPageLink />} />
                     <Route path="/Home" element={<MainPageLink />} />
                     <Route path="/DomesticTourism" element={<DomesticTourPageLink />} />
-                    <Route path="/Directions" element={<PopularDesPageLink defaultTourId={1} />} />
-                    <Route path="/tour/:id" element={<PopularDesPageLink />} />
+                    <Route path="/Directions" element={<DesPageLink defaultTourId={1} />} />
+                    <Route path="/tour/:id" element={<DesPageLink />} />
                     <Route path="/account" element={<AccountLink />} />
                     <Route path="/ContactInfo" element={<ContactInfoLink />} />
                     <Route path="/AboutUs" element={<AboutUsLink />} />

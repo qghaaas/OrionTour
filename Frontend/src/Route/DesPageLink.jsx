@@ -1,7 +1,7 @@
 import Header from '../MainPage/Header/Header'
-import Directions from '../PopularDesPage/Directions/Directions'
+import Directions from '../DesPage/Directions/Directions'
 import Footer from '../MainPage/Footer/Footer'
-import OffersDes from '../PopularDesPage/OffersDes/OffersDes'
+import OffersDes from '../DesPage/OffersDes/OffersDes'
 import { useParams } from 'react-router-dom'
 
 const DEFAULT_TOUR_ID = 1

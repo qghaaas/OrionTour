@@ -1,6 +1,5 @@
 .blog-page {
     width: 100%;
-    height: fit-content;
 }
 
 .blog-page_inner {
@@ -8,90 +7,94 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    padding: 80px 0 110px;
+    padding: clamp(55px, 4.2vw, 80px) 0 clamp(70px, 5.7vw, 110px);
 }
 
 .blog-mainBG {
     position: absolute;
-    width: 100%;
-    height: 87.7vh;
+    top: clamp(55px, 4.2vw, 80px);
+    left: 0;
     z-index: 1;
-    border-radius: 75px;
+    width: 100%;
+    height: clamp(420px, 48vw, 760px);
     overflow: hidden;
+    border-radius: clamp(28px, 3.9vw, 75px);
 }
 
 .blog-mainBG img {
     width: 100%;
     height: 100%;
+    display: block;
+    object-fit: cover;
 }
 
 .blog-mainBG::before {
     content: "";
     position: absolute;
     inset: 0;
-
-    background: linear-gradient(360deg,
-            rgba(0, 0, 0, 0.69) 21.12%,
-            rgba(0, 0, 0, 0.1311) 66.84%);
-
     z-index: 1;
     pointer-events: none;
+    background: linear-gradient(
+        360deg,
+        rgba(0, 0, 0, 0.69) 21.12%,
+        rgba(0, 0, 0, 0.13) 66.84%
+    );
 }
 
 .blog-page_content {
     position: relative;
     z-index: 2;
-    width: 68%;
-    background-color: #fff;
-    margin-top: 30%;
-    border-radius: 24px;
-    padding: 3.7%;
+    width: min(68%, 1100px);
+    margin-top: clamp(260px, 30vw, 520px);
+    padding: clamp(24px, 3.7vw, 56px);
     display: flex;
     flex-direction: column;
-    justify-content: center;
-    gap: 74px 0;
+    gap: clamp(45px, 3.85vw, 74px);
     overflow: hidden;
+    border-radius: 24px;
+    background-color: #fff;
 }
 
 .blog-page-title {
+    margin: 0;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: 35px;
-    color: #1F2A36;
-}
-
-.blog-page-title span {
-    font-family: "Raleway", sans-serif;
-    font-size: 45px;
-    color: #4E6E91;
+    font-size: clamp(28px, 1.82vw, 35px);
+    line-height: 1.2;
+    color: #1f2a36;
 }
 
 .blog-page_item {
     font-family: "Raleway", sans-serif;
-    color: #1F2A36;
+    color: #1f2a36;
 }
 
 .blog-page-title_inner {
+    margin: 0 0 clamp(20px, 1.55vw, 30px);
     font-weight: 800;
-    font-size: 30px;
-    margin-bottom: 30px;
+    font-size: clamp(24px, 1.56vw, 30px);
+    line-height: 1.25;
 }
 
 .blog-page-title_inner span {
-    color: #4E6E91;
+    color: #4e6e91;
 }
 
 .blog-page_text,
 .blog-page_subtext {
     font-weight: 500;
-    font-size: 20px;
+    font-size: clamp(16px, 1.04vw, 20px);
+    line-height: 1.55;
+}
+
+.blog-page_text {
+    margin: 0;
 }
 
 .blog-page_gallery {
     display: grid;
-    gap: 20px;
-    padding: 30px 0;
-    align-items: start;
+    gap: clamp(14px, 1vw, 20px);
+    padding: clamp(22px, 1.55vw, 30px) 0;
 }
 
 .blog-page_gallery--1 {
@@ -107,11 +110,10 @@
 }
 
 .blog-page_img {
-    display: block;
     width: 100%;
-    max-width: 100%;
-    border-radius: 25px;
+    display: block;
     object-fit: cover;
+    border-radius: clamp(18px, 1.3vw, 25px);
 }
 
 .blog-page_gallery--1 .blog-page_img {
@@ -130,6 +132,86 @@
     margin: 0;
 }
 
-.blog-page_subtext p+p {
+.blog-page_subtext p + p {
     margin-top: 24px;
+}
+
+@media (max-width: 1180px) {
+    .blog-page_content {
+        width: 82%;
+        margin-top: 330px;
+    }
+
+    .blog-mainBG {
+        height: 560px;
+    }
+}
+
+@media (max-width: 768px) {
+    .blog-page_inner {
+        padding-top: 40px;
+    }
+
+    .blog-mainBG {
+        position: relative;
+        top: auto;
+        height: 360px;
+        margin-bottom: 24px;
+        border-radius: 28px;
+    }
+
+    .blog-page_content {
+        width: 100%;
+        margin-top: 0;
+        padding: 0;
+        gap: 45px;
+        border-radius: 0;
+        background: transparent;
+    }
+
+    .blog-page_gallery--2,
+    .blog-page_gallery--3 {
+        grid-template-columns: 1fr;
+    }
+
+    .blog-page_gallery--1 .blog-page_img,
+    .blog-page_gallery--2 .blog-page_img,
+    .blog-page_gallery--3 .blog-page_img {
+        aspect-ratio: 1 / 0.65;
+    }
+}
+
+@media (max-width: 480px) {
+    .blog-mainBG {
+        height: 260px;
+        border-radius: 22px;
+    }
+
+    .blog-page_content {
+        gap: 36px;
+    }
+
+    .blog-page-title {
+        font-size: 26px;
+    }
+
+    .blog-page-title_inner {
+        font-size: 22px;
+    }
+
+    .blog-page_text,
+    .blog-page_subtext {
+        font-size: 15px;
+        line-height: 1.5;
+    }
+
+    .blog-page_gallery {
+        gap: 12px;
+    }
+
+    .blog-page_gallery--1 .blog-page_img,
+    .blog-page_gallery--2 .blog-page_img,
+    .blog-page_gallery--3 .blog-page_img {
+        aspect-ratio: 1 / 0.75;
+    }
 }

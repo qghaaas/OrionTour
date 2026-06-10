@@ -1,8 +1,7 @@
 .popdes {
     width: 100%;
-    height: fit-content;
-    padding-top: clamp(80px, 10.4vw, 199px);
-    margin-bottom: clamp(80px, 8.6vw, 165px);
+    padding-top: clamp(55px, 10.4vw, 199px);
+    margin-bottom: clamp(70px, 8.6vw, 165px);
     position: relative;
 }
 
@@ -11,18 +10,18 @@
 }
 
 .popdes-inner h2 {
+    padding-left: 7%;
+    margin-bottom: clamp(32px, 3.7vw, 71px);
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: clamp(30px, 2.1vw, 40px);
+    font-size: clamp(28px, 2.1vw, 40px);
     line-height: 1.15;
     letter-spacing: 0.01em;
     color: #001827;
-    padding-left: 7%;
-    margin-bottom: clamp(40px, 3.7vw, 71px);
 }
 
 .pop-swiper {
-    width: 89%;
+    width: min(89%, calc(100% - 130px));
     overflow: hidden;
 }
 
@@ -31,62 +30,62 @@
 }
 
 .pop-swiper .swiper-slide {
+    height: auto;
     display: flex;
     justify-content: center;
-    height: auto;
 }
 
 .pop-card {
     width: 100%;
-    min-height: 625px;
+    min-height: clamp(560px, 32.5vw, 625px);
     height: 100%;
+    padding: clamp(12px, 0.75vw, 14px) clamp(12px, 0.75vw, 14px) clamp(17px, 1vw, 19px);
     display: flex;
     flex-direction: column;
     background-color: #f4f4f4;
-    padding: 14px 14px 19px;
-    border-radius: 25px;
+    border-radius: clamp(22px, 1.3vw, 25px);
     box-sizing: border-box;
 }
 
 .pop-card_top {
-    margin-bottom: 20px;
+    width: 100%;
+    margin-bottom: clamp(18px, 1vw, 20px);
     position: relative;
     border-radius: 15px;
-    width: 100%;
     overflow: hidden;
 }
 
 .pop-card_top img {
     width: 100%;
-    display: block;
-    border-radius: 15px;
-    object-fit: cover;
     height: clamp(220px, 14.4vw, 275px);
+    display: block;
+    object-fit: cover;
+    border-radius: 15px;
 }
 
 .pop-card_top span {
     position: absolute;
+    right: clamp(14px, 1.1vw, 21px);
+    bottom: clamp(12px, 0.7vw, 13px);
+    padding: 8px 10px;
+    margin: 0;
+    border-radius: 25px;
     background-color: rgba(255, 255, 255, 0.9);
     font-family: "Arimo", sans-serif;
-    font-size: clamp(17px, 1.05vw, 20px);
+    font-size: clamp(16px, 1.05vw, 20px);
     line-height: 1;
     letter-spacing: 0.01em;
-    padding: 8px 10px;
-    border-radius: 25px;
-    bottom: 13px;
-    right: 21px;
-    margin: 0;
     white-space: nowrap;
 }
 
 .pop-card_text {
-    padding: 0 10px;
-    font-family: "Raleway", sans-serif;
     width: 100%;
-    box-sizing: border-box;
+    padding: 0 clamp(8px, 0.55vw, 10px);
     display: flex;
     flex-direction: column;
     flex: 1;
+    box-sizing: border-box;
+    font-family: "Raleway", sans-serif;
 }
 
 .pop-card_title {
@@ -94,27 +93,28 @@
 }
 
 .pop-card_title h3 {
+    margin-bottom: 5px;
     font-weight: 700;
-    font-size: clamp(24px, 1.45vw, 28px);
+    font-size: clamp(23px, 1.45vw, 28px);
     line-height: 1.15;
     letter-spacing: 0.01em;
-    margin-bottom: 5px;
 }
 
 .pop-card_title span {
+    margin-bottom: 15px;
+    display: block;
     font-weight: 500;
-    font-size: clamp(18px, 1.05vw, 20px);
+    font-size: clamp(17px, 1.05vw, 20px);
     line-height: 1.25;
     letter-spacing: 0.01em;
     color: #6d6d6d;
-    margin-bottom: 15px;
 }
 
 .pop-card_title p {
     font-weight: 500;
-    font-size: 16px;
+    font-size: clamp(15px, 0.85vw, 16px);
+    line-height: 1.5;
     letter-spacing: 0.01em;
-    line-height: 24px;
     display: -webkit-box;
     -webkit-line-clamp: 4;
     -webkit-box-orient: vertical;
@@ -127,24 +127,24 @@
 
 .pop-card_time {
     width: fit-content;
-    min-width: 33%;
+    min-width: 105px;
+    margin-top: auto;
+    margin-bottom: 15px;
+    padding: 8px 12px;
+    border-radius: 25px;
     background-color: #dddddd;
     text-align: center;
-    border-radius: 25px;
-    font-weight: 700;
     font-family: "Arimo", sans-serif;
+    font-weight: 700;
     font-size: clamp(17px, 1.05vw, 20px);
     line-height: 1;
     letter-spacing: 0.01em;
-    padding: 8px 12px;
-    margin-bottom: 15px;
-    margin-top: auto;
 }
 
 .pop-card_text .main-btn_site {
     width: 100%;
-    height: 50px;
-    min-height: 50px;
+    min-height: clamp(48px, 2.6vw, 50px);
+    height: clamp(48px, 2.6vw, 50px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -171,56 +171,20 @@
 }
 
 .popdes-prev {
-    left: 1%;
+    left: 0;
 }
 
 .popdes-next {
-    right: 1%;
+    right: 0;
 }
 
 .popdes-next img {
     transform: rotate(180deg);
 }
 
-@media (max-width: 1439px) {
-    .pop-swiper {
-        width: calc(100% - 130px);
-    }
-
-    .pop-card {
-        min-height: 600px;
-    }
-
-    .popdes-prev {
-        left: 0;
-    }
-
-    .popdes-next {
-        right: 0;
-    }
-}
-
-@media (max-width: 1199px) {
+@media (max-width: 1180px) {
     .pop-swiper {
         width: calc(100% - 110px);
-    }
-
-    .pop-card {
-        min-height: 585px;
-    }
-
-    .pop-card_top img {
-        height: 245px;
-    }
-
-    .pop-card_title h3 {
-        font-size: 25px;
-    }
-}
-
-@media (max-width: 991px) {
-    .popdes .container {
-        width: min(100% - 30px, 1530px);
     }
 
     .popdes-inner h2 {
@@ -229,37 +193,31 @@
     }
 
     .pop-card {
-        min-height: 565px;
+        min-height: 585px;
     }
 
     .pop-card_top img {
-        height: 230px;
+        height: clamp(230px, 24vw, 245px);
     }
-
-    .pop-card_title h3 {
-        font-size: 24px;
-    }
-
-    .pop-card_title span {
-        font-size: 18px;
-    }
-
-    
 }
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
     .popdes {
         padding-top: 70px;
         margin-bottom: 90px;
     }
 
+    .popdes-inner {
+        padding-bottom: 78px;
+    }
+
     .pop-swiper {
         width: 100%;
-        padding-bottom: 80px;
+        padding-bottom: 0;
     }
 
     .pop-card {
-        max-width: 405px;
+        max-width: 455px;
         min-height: 590px;
         margin: 0 auto;
     }
@@ -269,16 +227,19 @@
     }
 
     .popdes-btn {
+        top: auto;
+        bottom: 0;
+        transform: none;
         width: 58px;
         height: 58px;
     }
 
     .popdes-prev {
-        left: calc(20% - 72px);
+        left: calc(50% - 72px);
     }
 
     .popdes-next {
-        right: calc(20% - 72px);
+        right: calc(50% - 72px);
     }
 }
 
@@ -288,88 +249,46 @@
         margin-bottom: 70px;
     }
 
-    .popdes .container {
+    .popdes{
         width: min(100% - 20px, 1530px);
     }
 
-    .popdes-inner h2 {
-        font-size: 28px;
-        margin-bottom: 32px;
+    .popdes-inner {
+        padding-bottom: 70px;
     }
 
     .pop-card {
         max-width: 100%;
         min-height: 560px;
-        padding: 12px 12px 17px;
-        border-radius: 22px;
-    }
-
-    .pop-card_top {
-        margin-bottom: 18px;
     }
 
     .pop-card_top img {
-        height: 220px;
-    }
-
-    .pop-card_top span {
-        right: 14px;
-        bottom: 12px;
-        font-size: 16px;
-    }
-
-    .pop-card_text {
-        padding: 0 8px;
+        height: clamp(195px, 58vw, 220px);
     }
 
     .pop-card_title h3 {
-        font-size: 23px;
+        font-size: clamp(21px, 6vw, 23px);
     }
 
     .pop-card_title span {
-        font-size: 17px;
+        font-size: clamp(16px, 4.5vw, 17px);
     }
 
     .pop-card_title p {
-        font-size: 15px;
-        line-height: 22px;
-        -webkit-line-clamp: 4;
+        font-size: clamp(14px, 4vw, 15px);
+        line-height: 1.45;
     }
 
-    .pop-card_time {
-        font-size: 17px;
-        min-width: 105px;
-    }
-}
-
-@media (max-width: 375px) {
-    .popdes-inner h2 {
-        font-size: 25px;
+    .popdes-btn {
+        width: 52px;
+        height: 52px;
     }
 
-    .pop-card {
-        min-height: 540px;
+    .popdes-prev {
+        left: calc(50% - 64px);
     }
 
-    .pop-card_top img {
-        height: 195px;
-    }
-
-    .pop-card_title h3 {
-        font-size: 21px;
-    }
-
-    .pop-card_title span {
-        font-size: 16px;
-    }
-
-    .pop-card_title p {
-        font-size: 14px;
-        line-height: 21px;
-    }
-
-    .pop-card_text .main-btn_site {
-        height: 48px;
-        min-height: 48px;
+    .popdes-next {
+        right: calc(50% - 64px);
     }
 }

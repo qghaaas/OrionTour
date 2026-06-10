@@ -2,7 +2,7 @@
     position: fixed;
     inset: 0;
     z-index: 3000;
-    padding: 28px;
+    padding: clamp(12px, 2vw, 28px);
     background: rgba(0, 0, 0, 0.72);
     backdrop-filter: blur(7px);
     display: flex;
@@ -13,12 +13,12 @@
 .gallery-modal-content {
     width: min(1180px, 100%);
     max-height: 92vh;
-    background: #fff;
-    border-radius: 28px;
-    padding: 22px;
+    padding: clamp(14px, 1.2vw, 22px);
     display: flex;
     flex-direction: column;
-    gap: 18px;
+    gap: clamp(14px, 1vw, 18px);
+    background: #fff;
+    border-radius: clamp(20px, 1.5vw, 28px);
     box-shadow: 0 30px 90px rgba(0, 0, 0, 0.35);
 }
 
@@ -33,25 +33,26 @@
 .gallery-modal-top h3 {
     margin: 0 0 6px;
     font-weight: 700;
-    font-size: 24px;
+    font-size: clamp(18px, 1.3vw, 24px);
     line-height: 1.25;
     color: #171717;
 }
 
 .gallery-modal-top span {
     font-family: "Arimo", sans-serif;
-    font-size: 16px;
+    font-size: clamp(14px, 0.85vw, 16px);
     color: #777;
 }
 
 .gallery-modal-close {
-    width: 44px;
-    height: 44px;
+    width: clamp(38px, 2.3vw, 44px);
+    height: clamp(38px, 2.3vw, 44px);
+    flex: 0 0 auto;
     border: none;
     border-radius: 50%;
-    background: #F1F1F1;
+    background: #f1f1f1;
     color: #151515;
-    font-size: 34px;
+    font-size: clamp(30px, 1.8vw, 34px);
     line-height: 1;
     cursor: pointer;
     display: flex;
@@ -61,7 +62,7 @@
 }
 
 .gallery-modal-close:hover {
-    background: #E3E3E3;
+    background: #e3e3e3;
     transform: rotate(90deg);
 }
 
@@ -69,9 +70,9 @@
     position: relative;
     width: 100%;
     height: min(62vh, 650px);
-    border-radius: 22px;
+    border-radius: clamp(16px, 1.2vw, 22px);
     overflow: hidden;
-    background: #F4F4F4;
+    background: #f4f4f4;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -89,19 +90,19 @@
     top: 50%;
     z-index: 3;
     transform: translateY(-50%);
-    width: 52px;
-    height: 52px;
+    width: clamp(40px, 2.7vw, 52px);
+    height: clamp(40px, 2.7vw, 52px);
+    padding: 0 0 5px;
     border: none;
     border-radius: 50%;
     background: rgba(255, 255, 255, 0.92);
     color: #111;
-    font-size: 44px;
+    font-size: clamp(34px, 2.3vw, 44px);
     line-height: 1;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 5px;
     transition: background-color 0.25s ease, transform 0.25s ease;
 }
 
@@ -111,11 +112,11 @@
 }
 
 .gallery-modal-arrow-left {
-    left: 18px;
+    left: clamp(10px, 1vw, 18px);
 }
 
 .gallery-modal-arrow-right {
-    right: 18px;
+    right: clamp(10px, 1vw, 18px);
 }
 
 .gallery-modal-thumbs {
@@ -130,23 +131,23 @@
 }
 
 .gallery-modal-thumbs::-webkit-scrollbar-track {
-    background: #F1F1F1;
+    background: #f1f1f1;
     border-radius: 10px;
 }
 
 .gallery-modal-thumbs::-webkit-scrollbar-thumb {
-    background: #C9C9C9;
+    background: #c9c9c9;
     border-radius: 10px;
 }
 
 .gallery-modal-thumb {
-    flex: 0 0 96px;
-    width: 96px;
-    height: 68px;
-    border: 2px solid transparent;
-    border-radius: 14px;
+    flex: 0 0 clamp(78px, 5vw, 96px);
+    width: clamp(78px, 5vw, 96px);
+    height: clamp(56px, 3.55vw, 68px);
     padding: 0;
     margin: 0;
+    border: 2px solid transparent;
+    border-radius: clamp(10px, 0.75vw, 14px);
     background: transparent;
     overflow: hidden;
     cursor: pointer;
@@ -170,56 +171,23 @@
     display: block;
 }
 
-@media (max-width: 700px) {
-    .gallery-modal {
-        padding: 12px;
+@media (max-width: 1180px) {
+    .gallery-modal-content {
+        max-height: 94vh;
     }
 
+    .gallery-modal-view {
+        height: 60vh;
+    }
+}
+
+@media (max-width: 768px) {
     .gallery-modal-content {
         max-height: 96vh;
-        border-radius: 20px;
-        padding: 14px;
-        gap: 14px;
-    }
-
-    .gallery-modal-top h3 {
-        font-size: 18px;
-    }
-
-    .gallery-modal-top span {
-        font-size: 14px;
-    }
-
-    .gallery-modal-close {
-        width: 38px;
-        height: 38px;
-        font-size: 30px;
     }
 
     .gallery-modal-view {
         height: 58vh;
-        border-radius: 16px;
-    }
-
-    .gallery-modal-arrow {
-        width: 40px;
-        height: 40px;
-        font-size: 34px;
-    }
-
-    .gallery-modal-arrow-left {
-        left: 10px;
-    }
-
-    .gallery-modal-arrow-right {
-        right: 10px;
-    }
-
-    .gallery-modal-thumb {
-        flex-basis: 78px;
-        width: 78px;
-        height: 56px;
-        border-radius: 10px;
     }
 }
 
@@ -232,5 +200,11 @@
         width: 34px;
         height: 34px;
         font-size: 30px;
+    }
+
+    .gallery-modal-thumb {
+        flex-basis: 72px;
+        width: 72px;
+        height: 52px;
     }
 }

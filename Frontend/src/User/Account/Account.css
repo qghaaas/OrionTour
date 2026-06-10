@@ -1,6 +1,5 @@
 .account {
     width: 100%;
-    height: fit-content;;
 }
 
 .account-inner {
@@ -8,15 +7,15 @@
     align-items: flex-start;
     gap: clamp(32px, 5vw, 80px);
     padding: clamp(45px, 6vw, 100px) clamp(16px, 4vw, 70px) clamp(90px, 13vw, 280px);
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
 }
 
 .account-aside {
     width: clamp(280px, 23.5vw, 360px);
     flex: 0 0 clamp(280px, 23.5vw, 360px);
+    padding: clamp(28px, 2.35vw, 45px) 0 30px;
+    border-radius: clamp(18px, 1.3vw, 25px);
     background-color: #fff;
-    border-radius: 25px;
-    padding: 45px 0 30px;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
 }
@@ -31,11 +30,11 @@
 }
 
 .user-avatar {
-    width: 122px;
+    width: clamp(82px, 6.4vw, 122px);
     aspect-ratio: 1;
-    margin-bottom: 20px;
+    margin-bottom: clamp(14px, 1vw, 20px);
     border-radius: 50%;
-    background-color: #D9D9D9;
+    background-color: #d9d9d9;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -52,16 +51,16 @@
 .account-aside_user p {
     max-width: 100%;
     margin: 0 0 7px;
-    color: #1F2A36;
+    color: #1f2a36;
     font-weight: 700;
-    font-size: 20px;
+    font-size: clamp(18px, 1.05vw, 20px);
     overflow-wrap: anywhere;
 }
 
 .account-aside_user span {
     max-width: 100%;
-    color: #A8A1A1;
-    font-size: 16px;
+    color: #a8a1a1;
+    font-size: clamp(14px, 0.85vw, 16px);
     font-weight: 500;
     overflow-wrap: anywhere;
 }
@@ -69,12 +68,12 @@
 .aside_select-list {
     display: flex;
     flex-direction: column;
-    gap: 30px;
+    gap: clamp(16px, 1.55vw, 30px);
     padding: 30px 24px 30px clamp(30px, 3.2vw, 60px);
     margin: 0;
     list-style: none;
-    border-top: 1px solid #A4A4A4;
-    border-bottom: 1px solid #A4A4A4;
+    border-top: 1px solid #a4a4a4;
+    border-bottom: 1px solid #a4a4a4;
 }
 
 .aside_select-list li {
@@ -85,6 +84,8 @@
 
 .aside_select-list img {
     flex: 0 0 auto;
+    width: 24px;
+    height: 24px;
 }
 
 .aside_select-list button,
@@ -92,9 +93,9 @@
     border: none;
     padding: 0;
     background: transparent;
-    color: #1F2A36;
+    color: #1f2a36;
     font-family: "Raleway", sans-serif;
-    font-size: 20px;
+    font-size: clamp(16px, 1.05vw, 20px);
     font-weight: 500;
     text-align: left;
     cursor: pointer;
@@ -103,11 +104,11 @@
 
 .aside_select-list button:hover,
 .exit-account:hover {
-    color: #F99244;
+    color: #f99244;
 }
 
 .aside_select-list li.active button {
-    color: #F99244;
+    color: #f99244;
 }
 
 .aside_select-list li.active img {
@@ -128,7 +129,7 @@
 .aside_select-list-nested {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 14px;
     max-height: 0;
     margin: 0 0 0 34px;
     padding: 0;
@@ -145,12 +146,12 @@
 }
 
 .aside_select-list-nested button {
-    color: #A8A1A1 !important;
-    font-size: 18px;
+    color: #a8a1a1 !important;
+    font-size: clamp(15px, 0.95vw, 18px);
 }
 
 .aside_select-list-nested button.active-nested {
-    color: #F99244 !important;
+    color: #f99244 !important;
 }
 
 .exit-account {
@@ -165,11 +166,11 @@
 }
 
 .account-empty {
-    margin: 60px auto 140px;
     width: min(900px, calc(100% - 32px));
+    margin: 60px auto 140px;
     padding: 35px;
     border-radius: 25px;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
     font-family: "Raleway", sans-serif;
     font-size: 20px;
     color: #202020;
@@ -178,8 +179,10 @@
 .footer-account-footer {
     margin: 0;
     padding-bottom: 30px;
-    background-color: #F9F9F9;
+    background-color: #f9f9f9;
 }
+
+/* Reviews / Settings */
 
 .account-reviews,
 .account-settings {
@@ -192,12 +195,12 @@
 .account-reviews h2,
 .account-settings h2,
 .account-review-list h3 {
-    margin: 0 0 35px;
+    margin: 0 0 clamp(24px, 1.8vw, 35px);
     color: #001827;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
     font-size: clamp(30px, 3vw, 40px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-review-list h3 {
@@ -207,12 +210,13 @@
 .account-review-form,
 .account-settings-form {
     width: 100%;
-    border: 1px solid #EFEFEF;
-    border-radius: 25px;
-    background-color: #fff;
-    padding: clamp(24px, 3vw, 45px);
     display: flex;
     flex-direction: column;
+    border: 1px solid #efefef;
+    border-radius: clamp(18px, 1.3vw, 25px);
+    background-color: #fff;
+    padding: clamp(18px, 3vw, 45px);
+    box-sizing: border-box;
 }
 
 .account-review-form {
@@ -233,35 +237,35 @@
     font-family: "Raleway", sans-serif;
     font-weight: 700;
     font-size: clamp(17px, 1.4vw, 20px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-review-form input,
 .account-review-form textarea,
 .account-settings-form input {
     width: 100%;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    background-color: #EFEFEF;
     box-sizing: border-box;
+    border: 1px solid #dddddd;
+    border-radius: 25px;
+    background-color: #efefef;
     color: #202020;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
     font-size: clamp(16px, 1.4vw, 20px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
     outline: none;
     transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease;
 }
 
 .account-review-form input,
 .account-settings-form input {
-    height: 58px;
-    padding: 0 24px;
+    height: clamp(50px, 3vw, 58px);
+    padding: 0 clamp(18px, 1.25vw, 24px);
 }
 
 .account-review-form textarea {
-    min-height: 165px;
-    padding: 18px 24px;
+    min-height: clamp(135px, 8.6vw, 165px);
+    padding: 18px clamp(18px, 1.25vw, 24px);
     line-height: 1.5;
     resize: vertical;
 }
@@ -269,19 +273,19 @@
 .account-review-form input::placeholder,
 .account-review-form textarea::placeholder,
 .account-settings-form input::placeholder {
-    color: #6D6D6D;
+    color: #6d6d6d;
 }
 
 .account-review-form input:hover,
 .account-review-form textarea:hover,
 .account-settings-form input:hover {
-    background-color: #F4F4F4;
+    background-color: #f4f4f4;
 }
 
 .account-review-form input:focus,
 .account-review-form textarea:focus,
 .account-settings-form input:focus {
-    border-color: #F99244;
+    border-color: #f99244;
     background-color: #fff;
     box-shadow: 0 0 0 3px rgba(249, 146, 68, 0.16);
 }
@@ -290,12 +294,12 @@
 .account-settings-form .main-btn_site {
     height: 58px;
     border-radius: 50px;
-    background-color: #F99244;
+    background-color: #f99244;
     color: #fff;
     font-family: "Raleway", sans-serif;
     font-weight: 700;
     font-size: clamp(20px, 1.8vw, 25px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-review-form .main-btn_site {
@@ -314,18 +318,25 @@
 }
 
 .account-review-message,
-.account-settings-message {
+.account-settings-message,
+.account-review-list > p,
+.account-review-card {
     width: 100%;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    background-color: #EFEFEF;
-    padding: 20px 25px;
-    color: #202020;
+    box-sizing: border-box;
+    border: 1px solid #dddddd;
+    border-radius: clamp(18px, 1.3vw, 25px);
+    background-color: #efefef;
+    padding: clamp(18px, 2.4vw, 35px);
     font-family: "Raleway", sans-serif;
+}
+
+.account-review-message,
+.account-settings-message {
+    color: #202020;
     font-weight: 500;
     font-size: clamp(16px, 1.4vw, 20px);
     line-height: 1.5;
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-review-message {
@@ -340,25 +351,14 @@
 }
 
 .account-review-list > p {
-    width: 100%;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    background-color: #EFEFEF;
-    padding: 30px 35px;
-    color: #6D6D6D;
-    font-family: "Raleway", sans-serif;
+    color: #6d6d6d;
     font-weight: 500;
     font-size: clamp(16px, 1.4vw, 20px);
     line-height: 1.5;
 }
 
 .account-review-card {
-    width: 100%;
-    border: 1px solid #DDDDDD;
-    border-radius: 25px;
-    background-color: #EFEFEF;
-    padding: clamp(24px, 2.4vw, 35px);
-    font-family: "Raleway", sans-serif;
+    color: #202020;
 }
 
 .account-review-card-top {
@@ -380,12 +380,12 @@
     font-weight: 500;
     font-size: clamp(16px, 1.4vw, 20px);
     line-height: 1.5;
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-review-card small {
     display: block;
-    color: #6D6D6D;
+    color: #6d6d6d;
     font-family: "Raleway", sans-serif;
     font-weight: 500;
     font-size: clamp(14px, 1.2vw, 18px);
@@ -396,17 +396,17 @@
     align-items: center;
     justify-content: center;
     min-width: 160px;
-    border-radius: 25px;
     padding: 8px 14px;
+    border-radius: 25px;
     font-family: "Arimo", sans-serif;
     font-weight: 700;
     font-size: clamp(16px, 1.4vw, 20px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
     white-space: nowrap;
 }
 
 .review-status.active {
-    background-color: #F99244;
+    background-color: #f99244;
     color: #fff;
 }
 
@@ -423,8 +423,8 @@
 }
 
 .account-rating-star {
-    width: 34px;
-    height: 34px;
+    width: clamp(28px, 1.8vw, 34px);
+    height: clamp(28px, 1.8vw, 34px);
     border: none;
     padding: 0;
     margin: 0;
@@ -461,7 +461,7 @@
 
 .account-rating-stars-interactive .account-rating-star:focus-visible {
     border-radius: 50%;
-    outline: 2px solid #F99244;
+    outline: 2px solid #f99244;
     outline-offset: 4px;
 }
 
@@ -491,23 +491,23 @@
     font-family: "Raleway", sans-serif;
     font-weight: 700;
     font-size: clamp(17px, 1.4vw, 20px);
-    letter-spacing: 1%;
+    letter-spacing: 0.01em;
 }
 
 .account-avatar-list {
     display: flex;
     align-items: center;
     flex-wrap: wrap;
-    gap: 18px;
+    gap: clamp(14px, 0.95vw, 18px);
 }
 
 .account-avatar-option {
-    width: clamp(86px, 8vw, 112px);
-    height: clamp(86px, 8vw, 112px);
-    border: 2px solid #DDDDDD;
+    width: clamp(74px, 8vw, 112px);
+    height: clamp(74px, 8vw, 112px);
+    border: 2px solid #dddddd;
     border-radius: 50%;
     padding: 0;
-    background-color: #EFEFEF;
+    background-color: #efefef;
     overflow: hidden;
     cursor: pointer;
     transition: border-color 0.25s ease, transform 0.25s ease;
@@ -521,58 +521,24 @@
 }
 
 .account-avatar-option:hover {
-    border-color: #F99244;
+    border-color: #f99244;
     transform: scale(1.04);
 }
 
 .account-avatar-option.active {
-    border-color: #F99244;
+    border-color: #f99244;
 }
 
 @media (max-width: 1180px) {
     .account-inner {
-        gap: 32px;
-        padding-inline: 24px;
-    }
-
-    .account-aside {
-        width: 280px;
-        flex-basis: 280px;
-    }
-
-    .aside_select-list {
-        padding-left: 30px;
-    }
-
-    .aside_select-list button,
-    .exit-account {
-        font-size: 18px;
-    }
-
-    .account-reviews,
-    .account-settings {
-        max-width: 100%;
-    }
-}
-
-@media (max-width: 980px) {
-    .account-inner {
         flex-direction: column;
-        padding: 40px 20px 110px;
+        gap: 34px;
+        padding: 40px 24px 110px;
     }
 
     .account-aside {
         width: 100%;
         flex: none;
-        padding: 28px 0;
-    }
-
-    .account-aside_user {
-        margin-bottom: 18px;
-    }
-
-    .user-avatar {
-        width: 96px;
     }
 
     .aside_select-list {
@@ -586,15 +552,11 @@
         min-height: 54px;
         padding: 12px 14px;
         border-radius: 18px;
-        background-color: #F6F6F6;
+        background-color: #f6f6f6;
     }
 
     .orders-item {
         grid-column: 1 / -1;
-    }
-
-    .aside-item-main {
-        min-height: 30px;
     }
 
     .aside_select-list-nested {
@@ -606,22 +568,19 @@
         margin-top: 12px;
     }
 
-    .exit-account {
-        margin-top: 18px;
-    }
-
     .active-content {
         width: 100%;
+    }
+
+    .account-reviews,
+    .account-settings {
+        max-width: 100%;
     }
 }
 
 @media (max-width: 768px) {
     .account-inner {
         padding: 32px 16px 90px;
-    }
-
-    .account-aside {
-        border-radius: 22px;
     }
 
     .aside_select-list {
@@ -632,19 +591,6 @@
 
     .aside_select-list li {
         width: 100%;
-    }
-
-    .aside_select-list button,
-    .exit-account {
-        font-size: 17px;
-    }
-
-    .account-review-form,
-    .account-settings-form,
-    .account-review-card,
-    .account-review-list > p {
-        border-radius: 22px;
-        padding: 24px;
     }
 
     .account-review-card-top {
@@ -662,32 +608,15 @@
         width: 100%;
         max-width: none;
     }
-
-    .account-avatar-list {
-        gap: 14px;
-    }
 }
 
-@media (max-width: 520px) {
+@media (max-width: 480px) {
     .account-inner {
         padding: 26px 12px 75px;
     }
 
     .account-aside {
         border-radius: 18px;
-    }
-
-    .account-aside_user p {
-        font-size: 18px;
-    }
-
-    .account-aside_user span {
-        font-size: 14px;
-    }
-
-    .user-avatar {
-        width: 82px;
-        margin-bottom: 14px;
     }
 
     .aside_select-list {
@@ -705,84 +634,13 @@
         height: 22px;
     }
 
-    .aside_select-list button,
-    .exit-account {
-        font-size: 16px;
-    }
-
     .aside_select-list-nested {
         margin-left: 27px;
         gap: 12px;
     }
 
-    .aside_select-list-nested button {
-        font-size: 15px;
-    }
-
-    .account-review-form,
-    .account-settings-form,
-    .account-review-card,
-    .account-review-list > p,
-    .account-review-message,
-    .account-settings-message {
-        border-radius: 18px;
-        padding: 18px;
-    }
-
-    .account-review-form input,
-    .account-settings-form input {
-        height: 50px;
-        padding: 0 18px;
-        border-radius: 20px;
-    }
-
-    .account-review-form textarea {
-        min-height: 135px;
-        padding: 16px 18px;
-        border-radius: 20px;
-    }
-
-    .account-rating-star {
-        width: 30px;
-        height: 30px;
-    }
-
     .account-review-card-rating .account-rating-star {
         width: 22px;
         height: 22px;
-    }
-
-    .account-avatar-option {
-        width: 74px;
-        height: 74px;
-    }
-}
-
-@media (max-width: 380px) {
-    .account-inner {
-        padding-inline: 10px;
-    }
-
-    .account-review-form,
-    .account-settings-form,
-    .account-review-card,
-    .account-review-list > p,
-    .account-review-message,
-    .account-settings-message {
-        padding: 16px;
-    }
-
-    .account-rating-stars {
-        gap: 4px;
-    }
-
-    .account-rating-star {
-        width: 28px;
-        height: 28px;
-    }
-
-    .account-review-card-rating .account-rating-star {
-        width: 20px;
-        height: 20px;
     }
 }

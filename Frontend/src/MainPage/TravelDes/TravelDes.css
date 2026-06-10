@@ -8,39 +8,39 @@
 }
 
 .travdes-inner h2 {
+    margin-bottom: clamp(32px, 7vw, 138px);
     font-family: "Arimo", sans-serif;
     font-weight: 700;
-    font-size: clamp(32px, 2.1vw, 40px);
+    font-size: clamp(28px, 2.1vw, 40px);
     line-height: 1.15;
     letter-spacing: 0.01em;
     color: #202020;
-    margin-bottom: clamp(45px, 7vw, 138px);
 }
 
 .travdes-form {
-    width: 72.3%;
-    min-height: clamp(430px, 50.6vh, 560px);
+    width: min(82%, 1380px);
+    min-height: clamp(410px, 50.6vh, 560px);
     position: relative;
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    justify-content: flex-end;
     overflow: visible;
 
-    background-color: rgba(78, 110, 145, 1);
+    background-color: #4e6e91;
     background-image: url("./img/travelGlow.png");
     background-repeat: no-repeat;
     background-size: cover;
     background-position: center;
 
-    border-radius: 50px;
+    border-radius: clamp(35px, 2.6vw, 50px);
 }
 
 .travdes-form > img {
     position: absolute;
-    left: -100px;
+    left: clamp(-100px, -5vw, -70px);
     bottom: 0;
     z-index: 1;
-    width: clamp(360px, 31vw, 590px);
+    width: clamp(400px, 31vw, 590px);
     max-height: 110%;
     object-fit: contain;
     pointer-events: none;
@@ -49,8 +49,8 @@
 .travdes-content {
     position: relative;
     z-index: 2;
-    width: 59%;
-    padding-right: 38px;
+    width: 58%;
+    padding-right: clamp(28px, 2vw, 38px);
 
     display: flex;
     flex-direction: column;
@@ -64,28 +64,29 @@
 
 .travdes-content h3 {
     font-weight: 700;
-    font-size: clamp(28px, 1.85vw, 35px);
+    font-size: clamp(25px, 1.85vw, 35px);
     line-height: 1.15;
 }
 
 .travdes-content p {
+    max-width: 620px;
     font-weight: 500;
-    font-size: clamp(17px, 1.05vw, 20px);
+    font-size: clamp(16px, 1.05vw, 20px);
     line-height: 1.3;
 }
 
 .travdes-content input {
-    width: 90%;
-    height: clamp(64px, 4.65vw, 89px);
-    padding: 0 25px;
+    width: min(90%, 590px);
+    height: clamp(58px, 4.65vw, 89px);
+    padding: 0 clamp(18px, 1.3vw, 25px);
     box-sizing: border-box;
 
     border: none;
     outline: none;
-    border-radius: 35px;
+    border-radius: clamp(24px, 1.8vw, 35px);
 
     font-family: "Raleway", sans-serif;
-    font-size: clamp(16px, 1.05vw, 20px);
+    font-size: clamp(15px, 1.05vw, 20px);
     color: #202020;
 }
 
@@ -93,57 +94,31 @@
     color: #7d7d7d;
 }
 
-@media (max-width: 1400px) {
-    .travdes-form {
-        width: 82%;
-    }
-
-    .travdes-form > img {
-        left: -80px;
-        width: 430px;
-    }
-
-    .travdes-content {
-        width: 58%;
-    }
+.travdes-message {
+    margin: 0;
+    font-size: 15px;
+    line-height: 1.3;
+    color: #fff;
 }
 
-@media (max-width: 1200px) {
+@media (max-width: 1180px) {
     .travdes-inner {
         padding-left: 0;
     }
 
     .travdes-form {
         width: 100%;
-        min-height: 440px;
+        min-height: 430px;
     }
 
     .travdes-form > img {
-        left: -70px;
-        width: 400px;
+        left: -80px;
+        width: clamp(360px, 38vw, 430px);
+        opacity: 0.9;
     }
 
     .travdes-content {
-        width: 60%;
-        padding-right: 32px;
-    }
-}
-
-@media (max-width: 992px) {
-    .travdes-form {
-        min-height: 410px;
-        border-radius: 40px;
-    }
-
-    .travdes-form > img {
-        left: -90px;
-        width: 380px;
-        opacity: 0.85;
-    }
-
-    .travdes-content {
-        width: 65%;
-        padding-right: 28px;
+        width: 62%;
     }
 
     .travdes-content input {
@@ -159,8 +134,8 @@
     .travdes-form {
         min-height: auto;
         padding: 44px 28px 260px;
-        justify-content: flex-start;
         align-items: flex-start;
+        justify-content: flex-start;
         overflow: hidden;
         border-radius: 35px;
     }
@@ -189,46 +164,16 @@
         margin-bottom: 70px;
     }
 
-    .travdes-inner h2 {
-        font-size: 28px;
-        margin-bottom: 32px;
-    }
-
     .travdes-form {
         padding: 34px 20px 230px;
         border-radius: 28px;
     }
 
     .travdes-form > img {
-        width: 315px;
-    }
-
-    .travdes-content h3 {
-        font-size: 25px;
-    }
-
-    .travdes-content p {
-        font-size: 16px;
+        width: clamp(285px, 82vw, 315px);
     }
 
     .travdes-content input {
-        height: 58px;
-        padding: 0 18px;
-        border-radius: 24px;
-        font-size: 15px;
-    }
-}
-
-@media (max-width: 375px) {
-    .travdes-form {
-        padding-bottom: 210px;
-    }
-
-    .travdes-form > img {
-        width: 285px;
-    }
-
-    .travdes-content h3 {
-        font-size: 23px;
+        width: 100%;
     }
 }

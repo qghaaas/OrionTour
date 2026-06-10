@@ -56,7 +56,7 @@ export default function PopularDes() {
                                 slidesPerView: 2,
                                 spaceBetween: 30,
                             },
-                            1200: {
+                            1181: {
                                 slidesPerView: 3,
                                 spaceBetween: 45,
                             },

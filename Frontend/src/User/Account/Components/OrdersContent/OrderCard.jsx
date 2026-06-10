@@ -1,4 +1,6 @@
 import { Link } from 'react-router-dom';
+import './Orders.css'
+
 
 const ACTIVE_STATUSES = ['active', 'new', 'pending', 'confirmed', 'paid'];
 

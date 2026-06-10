@@ -13,63 +13,73 @@ import atsign from './img/Atsign.svg'
 export default function Footer({ variant = 'default', className = '' }) {
     return (
         <footer className={`footer footer-${variant} ${className}`}>
-            <div className="container">
-                <div className="footer-inner">
-                    <Link className="footer-logo" to="/">
-                        <img src={logo} alt="Логотип" />
-                    </Link>
+    <div className="container">
+        <div className="footer-inner">
+            <Link className="footer-logo" to="/">
+                <img src={logo} alt="Логотип Орион Тур" />
+            </Link>
 
-                    <nav className="footer-menu">
-                        <ul className="footer-item">
+            <div className="footer-content">
+                <nav className="footer-nav" aria-label="Навигация в подвале сайта">
+                    <div className="footer-column">
+                        <h3>Компания</h3>
+
+                        <ul className="footer-list">
                             <li><Link to="/">Главная страница</Link></li>
+                            <li><Link to="/AboutUs">О нас</Link></li>
+                            <li><Link to="/ContactInfo">Контакты</Link></li>
+                        </ul>
+                    </div>
+
+                    <div className="footer-column">
+                        <h3>Туры</h3>
+
+                        <ul className="footer-list">
                             <li><Link to="/Directions">Направления</Link></li>
                             <li><Link to="#">Поиск тура</Link></li>
-                        </ul>
-
-                        <ul className="footer-item">
                             <li><Link to="/DomesticTourism">Внутренний туризм</Link></li>
-                            <li><Link to="/Directions">Направления</Link></li>
                             <li><Link to="/Blog">Блог</Link></li>
                         </ul>
+                    </div>
+                </nav>
 
-                        <ul className="footer-item">
-                            <li><Link to="/ContactInfo">Контакты</Link></li>
-                            <li><Link to="/AboutUs">О нас</Link></li>
-                        </ul>
+                <div className="footer-contacts">
+                    <h3>Контакты</h3>
 
-                        <ul className="footer-item footer-item_sep">
-                            <li>
-                                <img src={location} alt="" />
-                                <Link to="#">orion_tour_39</Link>
-                            </li>
+                    <ul className="footer-list footer-contact-list">
+                        <li>
+                            <img src={location} alt="" />
+                            <Link to="#">orion_tour_39</Link>
+                        </li>
 
-                            <li>
-                                <img src={phone} alt="" />
-                                <Link to="tel:+74012759599">+7 (4012) 75-95-99</Link>
-                            </li>
+                        <li>
+                            <img src={phone} alt="" />
+                            <Link to="tel:+74012759599">+7 (4012) 75-95-99</Link>
+                        </li>
 
-                            <li>
-                                <img src={atsign} alt="" />
-                                <Link to="#">Калининград, площадь Победы, 4</Link>
-                            </li>
-                        </ul>
+                        <li>
+                            <img src={atsign} alt="" />
+                            <Link to="#">Калининград, площадь Победы, 4</Link>
+                        </li>
+                    </ul>
+                </div>
 
-                        <div className="social-link">
-                            <p>Соц.сети</p>
+                <div className="footer-social">
+                    <h3>Соц.сети</h3>
 
-                            <div className="social-link-icons">
-                                <Link to="#">
-                                    <img src={telegram} alt="Telegram" />
-                                </Link>
+                    <div className="footer-social-icons">
+                        <Link to="#" aria-label="Telegram">
+                            <img src={telegram} alt="" />
+                        </Link>
 
-                                <Link to="#">
-                                    <img src={vk} alt="VK" />
-                                </Link>
-                            </div>
-                        </div>
-                    </nav>
+                        <Link to="#" aria-label="VK">
+                            <img src={vk} alt="" />
+                        </Link>
+                    </div>
                 </div>
             </div>
-        </footer>
+        </div>
+    </div>
+</footer>
     )
 }
