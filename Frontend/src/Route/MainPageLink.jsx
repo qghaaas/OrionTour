@@ -5,6 +5,7 @@ import Hero from "../MainPage/Hero/Hero"
 import PopularDes from "../MainPage/PopularDes/PopularDes"
 import Reviews from "../MainPage/Reviews/Reviews"
 import TravelDes from "../MainPage/TravelDes/TravelDes"
+import Partners from "../Partners/Partners"
 
 
 export default function MainPageLink() {
@@ -15,6 +16,7 @@ export default function MainPageLink() {
             <DomTour />
             <TravelDes />
             <Reviews />
+            <Partners/>
             <Footer />
         </>
 

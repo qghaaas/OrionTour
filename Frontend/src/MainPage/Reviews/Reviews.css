@@ -1,6 +1,6 @@
 .reviews {
     width: 100%;
-    margin-bottom: clamp(56px, 8vw, 160px);
+    margin-bottom: clamp(56px, 5vw, 100px);
     overflow: hidden;
 }
 
@@ -151,6 +151,133 @@
     transform: rotate(180deg);
 }
 
+body.modal-open {
+    overflow: hidden;
+}
+
+.reviews-card_bottom {
+    margin-top: clamp(14px, 2.4vw, 30px);
+    display: flex;
+    flex-direction: column;
+    gap: clamp(12px, 1.5vw, 18px);
+}
+
+.reviews-read-more {
+    width: fit-content;
+    padding: 0;
+    border: none;
+    background: transparent;
+    font-family: "Raleway", sans-serif;
+    font-weight: 700;
+    font-size: clamp(14px, 1.1vw, 17px);
+    line-height: 1.2;
+    color: #78a1ce;
+    cursor: pointer;
+    transition:
+        color 0.25s ease,
+        transform 0.25s ease;
+}
+
+.reviews-read-more:hover {
+    color: #4f7fb2;
+    transform: translateX(4px);
+}
+
+.reviews-card_star {
+    margin-top: 0;
+}
+
+.reviews-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(18, 28, 40, 0.42);
+    backdrop-filter: blur(8px);
+    animation: reviewsOverlayFade 0.35s ease forwards;
+}
+
+.reviews-modal_card {
+    position: relative;
+    width: min(100%, 760px);
+    max-height: min(82vh, 720px);
+    overflow-y: auto;
+    padding: clamp(22px, 3vw, 42px);
+    border-radius: clamp(22px, 2vw, 30px);
+    background: #efefef;
+    box-shadow: 0 26px 80px rgba(20, 31, 45, 0.22);
+    box-sizing: border-box;
+    transform-origin: center;
+    animation: reviewsCardOpen 0.42s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.reviews-modal_close {
+    position: absolute;
+    top: clamp(12px, 1.8vw, 22px);
+    right: clamp(14px, 2vw, 26px);
+    width: 38px;
+    height: 38px;
+    padding: 0;
+    border: none;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.65);
+    font-size: 30px;
+    line-height: 1;
+    color: #202020;
+    cursor: pointer;
+    transition:
+        background 0.25s ease,
+        transform 0.25s ease;
+}
+
+.reviews-modal_close:hover {
+    background: #fff;
+    transform: rotate(90deg);
+}
+
+.reviews-modal_top {
+    padding-right: 44px;
+}
+
+.reviews-modal_desc {
+    margin: 0;
+    font-family: "Raleway", sans-serif;
+    font-size: clamp(15px, 1.25vw, 20px);
+    line-height: 1.55;
+    letter-spacing: 0.01em;
+    color: #202020;
+    white-space: pre-line;
+}
+
+.reviews-modal_star {
+    margin-top: clamp(18px, 2vw, 28px);
+}
+
+@keyframes reviewsOverlayFade {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+@keyframes reviewsCardOpen {
+    from {
+        opacity: 0;
+        transform: scale(0.86) translateY(24px);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
 @media (max-width: 1180px) {
     .reviews-slide {
         width: clamp(300px, 62vw, 620px) !important;
@@ -197,6 +324,23 @@
         transform: none;
         box-shadow: none;
     }
+
+     .reviews-modal {
+        padding: 14px;
+    }
+
+    .reviews-modal_card {
+        width: min(100%, 480px);
+        max-height: 82vh;
+    }
+
+    .reviews-read-more {
+        font-size: 14px;
+    }
+
+      .reviews-card_desc {
+        -webkit-line-clamp: 4;
+    }
 }
 
 @media (max-width: 480px) {
@@ -209,6 +353,23 @@
     }
 
     .reviews-card_desc {
-        -webkit-line-clamp: 5;
+        -webkit-line-clamp: 4;
+    }
+
+     .reviews-modal_card {
+        padding: 22px 18px;
+        border-radius: 22px;
+    }
+
+    .reviews-modal_close {
+        top: 10px;
+        right: 10px;
+        width: 34px;
+        height: 34px;
+        font-size: 26px;
+    }
+
+    .reviews-modal_top {
+        padding-right: 36px;
     }
 }

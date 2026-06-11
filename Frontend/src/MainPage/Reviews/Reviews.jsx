@@ -10,6 +10,7 @@ import 'swiper/css/navigation'
 
 export default function Reviews() {
     const [reviews, setReviews] = useState([])
+    const [activeReview, setActiveReview] = useState(null)
 
     const sectionRef = useRef(null)
     const swiperRef = useRef(null)
@@ -18,8 +19,11 @@ export default function Reviews() {
 
     const getStartIndex = () => {
         if (typeof window === 'undefined') return 0
-
         return window.innerWidth > 768 && reviews.length > 2 ? 1 : 0
+    }
+
+    const closeModal = () => {
+        setActiveReview(null)
     }
 
     useEffect(() => {
@@ -37,10 +41,8 @@ export default function Reviews() {
 
             if (!swiper || swiper.destroyed) return
 
-            const startIndex = getStartIndex()
-
             swiper.update()
-            swiper.slideTo(startIndex, 0, false)
+            swiper.slideTo(getStartIndex(), 0, false)
         }
 
         const frameId = requestAnimationFrame(updateSwiper)
@@ -68,6 +70,24 @@ export default function Reviews() {
             window.removeEventListener('resize', updateSwiper)
         }
     }, [reviews.length])
+
+    useEffect(() => {
+        if (!activeReview) return
+
+        const handleEsc = (event) => {
+            if (event.key === 'Escape') {
+                closeModal()
+            }
+        }
+
+        document.body.classList.add('modal-open')
+        window.addEventListener('keydown', handleEsc)
+
+        return () => {
+            document.body.classList.remove('modal-open')
+            window.removeEventListener('keydown', handleEsc)
+        }
+    }, [activeReview])
 
     if (!reviews.length) return null
 
@@ -127,33 +147,11 @@ export default function Reviews() {
                             },
                         }}
                     >
-                        {reviews.map((review) => {
-                            const rating = Math.max(0, Math.min(5, Number(review.rating) || 0))
-                            const description = review.description?.trim() || 'Пользователь пока не добавил текст отзыва.'
-                            const name = review.name?.trim() || 'Пользователь'
-                            const initials = review.initials?.trim() || name.slice(0, 1).toUpperCase()
-
-                            return (
-                                <SwiperSlide key={review.id} className="reviews-slide">
-                                    <article className="reviews-card">
-                                        <div className="reviews-card_top">
-                                            <span className="reviews-avatar">{initials}</span>
-                                            <p>{name}</p>
-                                        </div>
-
-                                        <p className="reviews-card_desc">{description}</p>
-
-                                        <ul className="reviews-card_star" aria-label={`Оценка ${rating} из 5`}>
-                                            {Array.from({ length: rating }).map((_, index) => (
-                                                <li key={index}>
-                                                    <img src={star} alt="" />
-                                                </li>
-                                            ))}
-                                        </ul>
-                                    </article>
-                                </SwiperSlide>
-                            )
-                        })}
+                        {reviews.map((review) => (
+                            <SwiperSlide key={review.id} className="reviews-slide">
+                                <ReviewCard review={review} onOpen={setActiveReview} />
+                            </SwiperSlide>
+                        ))}
                     </Swiper>
 
                     {reviews.length > 1 && (
@@ -169,6 +167,105 @@ export default function Reviews() {
                     )}
                 </div>
             </div>
+
+            {activeReview && (
+                <ReviewsModal review={activeReview} onClose={closeModal} />
+            )}
         </section>
+    )
+}
+
+function ReviewCard({ review, onOpen }) {
+    const descRef = useRef(null)
+    const [isClamped, setIsClamped] = useState(false)
+
+    const rating = Math.max(0, Math.min(5, Number(review.rating)))
+
+    useEffect(() => {
+        const desc = descRef.current
+
+        if (!desc) return
+
+        const checkClamp = () => {
+            setIsClamped(desc.scrollHeight > desc.clientHeight + 1)
+        }
+
+        const frameId = requestAnimationFrame(checkClamp)
+
+        const resizeObserver = new ResizeObserver(checkClamp)
+        resizeObserver.observe(desc)
+
+        window.addEventListener('resize', checkClamp)
+
+        return () => {
+            cancelAnimationFrame(frameId)
+            resizeObserver.disconnect()
+            window.removeEventListener('resize', checkClamp)
+        }
+    }, [review.description])
+
+    return (
+        <article className="reviews-card">
+            <div className="reviews-card_top">
+                <span className="reviews-avatar">{review.initials}</span>
+                <p>{review.name}</p>
+            </div>
+
+            <p ref={descRef} className="reviews-card_desc">
+                {review.description}
+            </p>
+
+            <div className="reviews-card_bottom">
+                {isClamped && (
+                    <button
+                        className="reviews-read-more"
+                        type="button"
+                        onClick={() =>
+                            onOpen({
+                                ...review,
+                                rating,
+                            })
+                        }
+                    >
+                        Читать полностью
+                    </button>
+                )}
+
+                <ul className="reviews-card_star" aria-label={`Оценка ${rating} из 5`}>
+                    {Array.from({ length: rating }).map((_, index) => (
+                        <li key={index}>
+                            <img src={star} alt="" />
+                        </li>
+                    ))}
+                </ul>
+            </div>
+        </article>
+    )
+}
+
+function ReviewsModal({ review, onClose }) {
+    return (
+        <div className="reviews-modal" onMouseDown={onClose}>
+            <article className="reviews-modal_card" onMouseDown={(event) => event.stopPropagation()}>
+                <button className="reviews-modal_close" type="button" onClick={onClose}>
+                    ×
+                </button>
+
+                <div className="reviews-card_top reviews-modal_top">
+                    <span className="reviews-avatar">{review.initials}</span>
+                    <p>{review.name}</p>
+                </div>
+
+                <p className="reviews-modal_desc">{review.description}</p>
+
+                <ul className="reviews-card_star reviews-modal_star" aria-label={`Оценка ${review.rating} из 5`}>
+                    {Array.from({ length: review.rating }).map((_, index) => (
+                        <li key={index}>
+                            <img src={star} alt="" />
+                        </li>
+                    ))}
+                </ul>
+            </article>
+        </div>
     )
 }

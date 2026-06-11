@@ -6,7 +6,7 @@ import './AboutUs.css'
 export default function AboutUs() {
     return (
         <>
-           <section className="about-us">
+            <section className="about-us">
                 <h1 className="name-title_page">О нас</h1>
                 <div className="container">
                     <div className='about-us_inner'>
